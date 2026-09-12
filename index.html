@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Morón Madrid</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: #fff;
+      color: #000;
+      font-family: "Courier New", monospace;
+      font-size: 12px;
+      line-height: 1.2;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 14px 20px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      z-index: 100;
+      mix-blend-mode: multiply;
+    }
+
+    header a {
+      color: #000;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    header a:first-child {
+      text-align: left;
+    }
+
+    header a:last-child {
+      text-align: right;
+    }
+
+    header a:hover {
+      text-decoration: underline;
+    }
+
+    main {
+      padding-top: 45px;
+    }
+
+    section {
+      width: 100%;
+      position: relative;
+    }
+
+    .hero {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .hero-title {
+      font-size: clamp(40px, 9vw, 130px);
+      letter-spacing: -5px;
+      font-weight: normal;
+    }
+
+    .intro {
+      padding: 120px 20px;
+      min-height: 70vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .intro p {
+      max-width: 600px;
+      font-size: 18px;
+      line-height: 1.3;
+    }
+
+    .portfolio {
+      padding: 20px;
+    }
+
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .item {
+      overflow: hidden;
+    }
+
+    .item img,
+    .item video {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+    }
+
+    .item-1 {
+      grid-column: 1 / 8;
+    }
+
+    .item-2 {
+      grid-column: 9 / 13;
+      margin-top: 180px;
+    }
+
+    .item-3 {
+      grid-column: 3 / 7;
+      margin-top: 100px;
+    }
+
+    .item-4 {
+      grid-column: 8 / 13;
+      margin-top: 50px;
+    }
+
+    .item-5 {
+      grid-column: 1 / 6;
+      margin-top: 150px;
+    }
+
+    .placeholder {
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      background: #eee;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #777;
+    }
+
+    .caption {
+      padding-top: 8px;
+      font-size: 10px;
+    }
+
+    .about {
+      min-height: 80vh;
+      padding: 160px 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    .about p {
+      max-width: 500px;
+      font-size: 20px;
+    }
+
+    .contact {
+      min-height: 60vh;
+      padding: 100px 20px 30px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+
+    .contact a {
+      color: #000;
+      text-decoration: none;
+    }
+
+    .contact a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 700px) {
+
+      header {
+        padding: 12px;
+        grid-template-columns: 1fr 1fr;
+        row-gap: 8px;
+      }
+
+      header a {
+        text-align: left !important;
+      }
+
+      header a:nth-child(n+3) {
+        display: none;
+      }
+
+      main {
+        padding-top: 50px;
+      }
+
+      .hero-title {
+        font-size: 18vw;
+        letter-spacing: -2px;
+      }
+
+      .intro {
+        padding: 80px 20px;
+      }
+
+      .intro p {
+        font-size: 15px;
+      }
+
+      .portfolio-grid {
+        display: block;
+      }
+
+      .item {
+        margin: 0 0 60px 0 !important;
+      }
+
+      .about {
+        min-height: 60vh;
+        padding: 100px 20px;
+      }
+
+      .about p {
+        font-size: 17px;
+      }
+
+      .contact {
+        min-height: 50vh;
+        display: block;
+        padding-bottom: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <a href="#">MORÓN MADRID</a>
+    <a href="#tienda">TIENDA</a>
+    <a href="#estudio">ESTUDIO</a>
+    <a href="#nosotros">NOSOTROS</a>
+    <a href="#contacto">CONTACTO</a>
+  </header>
+
+  <main>
+
+    <section class="hero">
+      <h1 class="hero-title">MORÓN MADRID</h1>
+    </section>
+
+    <section class="intro">
+      <p>
+        Objetos, prendas y accesorios.<br>
+        Diseñados y producidos en Buenos Aires.
+      </p>
+    </section>
+
+    <section class="portfolio" id="estudio">
+
+      <div class="portfolio-grid">
+
+        <div class="item item-1">
+          <div class="placeholder">FOTO 01</div>
+          <div class="caption">MORÓN MADRID / 01</div>
+        </div>
+
+        <div class="item item-2">
+          <div class="placeholder">FOTO 02</div>
+          <div class="caption">MORÓN MADRID / 02</div>
+        </div>
+
+        <div class="item item-3">
+          <div class="placeholder">FOTO 03</div>
+          <div class="caption">MORÓN MADRID / 03</div>
+        </div>
+
+        <div class="item item-4">
+          <div class="placeholder">VIDEO</div>
+          <div class="caption">MORÓN MADRID / 04</div>
+        </div>
+
+        <div class="item item-5">
+          <div class="placeholder">FOTO 05</div>
+          <div class="caption">MORÓN MADRID / 05</div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <section class="about" id="nosotros">
+      <p>
+        Morón Madrid es una marca independiente de prendas,
+        accesorios y objetos que explora la relación entre
+        textiles, color, construcción y uso cotidiano.
+      </p>
+    </section>
+
+    <section class="contact" id="contacto">
+      <span>© MORÓN MADRID 2026</span>
+      <a href="mailto:info@moronmadrid.com.ar">
+        info@moronmadrid.com.ar
+      </a>
+    </section>
+
+  </main>
+
+</body>
+</html>
