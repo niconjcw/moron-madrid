@@ -49,6 +49,17 @@ nav {
     gap: 50px;
     margin-top: 40px;
 }
+    .tienda-link {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.tienda-link img {
+  width: auto;
+  height: 20px;
+  margin-top: -3px;
+}
 
 header a {
   color: #000;
@@ -179,6 +190,9 @@ header a:hover {
     margin-top: 18px;
     align-items: flex-end;
   }
+      .tienda-link {
+  justify-content: flex-end;
+}
 
   header a {
     text-align: right !important;
@@ -240,7 +254,7 @@ header a:hover {
 }
 
   .about p {
-    font-size: 12px;
+    font-size: 10px;
   }
 
   .contact {
@@ -262,7 +276,10 @@ header a:hover {
   </a>
 
   <nav>
-    <img src="https://editablegifs.com/gifs/gifs/arrow-1/output.gif" style="max-width: auto; height: 20px; margin-top: -3px;"><a href="http://moronmadrid.com.ar">tienda</a> 
+<span class="tienda-link">
+  <img src="https://editablegifs.com/gifs/gifs/arrow-1/output.gif">
+  <a href="http://moronmadrid.com.ar">tienda</a>
+</span>
     <a href="#estudio">cosas</a>
     <a href="#nosotros">nosotros</a>
     <a href="#contacto">contacto</a>
