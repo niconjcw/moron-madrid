@@ -366,6 +366,31 @@ header a:hover {
   </style>
 </head>
 
+<!-- spotify -->
+<div class="spotify-player">
+  <div class="spotify-toggle" onclick="toggleSpotify()">
+    ♫ Morón Madrid Radio
+  </div>
+
+  <div class="spotify-embed" id="spotifyEmbed">
+    <iframe
+      src="https://open.spotify.com/embed/playlist/3JtEmyIcqEi4wTY7tuIID3"
+      width="100%"
+      height="152"
+      frameborder="0"
+      allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture">
+    </iframe>
+  </div>
+</div>
+
+<script>
+function toggleSpotify() {
+  const player = document.getElementById("spotifyEmbed");
+  player.classList.toggle("show");
+}
+</script>
+
+
 <body>
   <div id="intro">Morón Madrid — ARG — 2026</div>
   
