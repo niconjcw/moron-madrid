@@ -178,29 +178,24 @@ header a:hover {
     }
 
 .contact {
-  min-height: 50vh;
+  min-height: 100vh;
   padding: 100px 20px 20px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr auto;
-  align-items: end;
-}
-
-.contact a {
-  color: #000;
-  text-decoration: none;
-}
-
-.contact a:hover {
-  text-decoration: underline;
+  align-items: center;
 }
 
 .contact a:nth-of-type(1) {
-  justify-self: start;
+  justify-self: end;
+  margin-right: 20px;
+  transform: translateY(-80px);
 }
 
 .contact a:nth-of-type(2) {
-  justify-self: end;
+  justify-self: start;
+  margin-left: 20px;
+  transform: translateY(-80px);
 }
 
 .contact span {
@@ -308,21 +303,25 @@ header a:hover {
     line-height: 1.2;
   }
 
-  .contact {
-  min-height: 50vh;
+.contact {
+  min-height: 100vh;
   padding: 100px 20px 20px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr auto;
-  align-items: end;
+  align-items: center;
 }
 
 .contact a:nth-of-type(1) {
-  justify-self: start;
+  justify-self: end;
+  margin-right: 10px;
+  transform: translateY(-60px);
 }
 
 .contact a:nth-of-type(2) {
-  justify-self: end;
+  justify-self: start;
+  margin-left: 10px;
+  transform: translateY(-60px);
 }
 
 .contact span {
