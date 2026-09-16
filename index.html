@@ -363,16 +363,43 @@ header a:hover {
     visibility: hidden;
   }
 }
-    .spotify-box {
-    width: 100%;
-    overflow: hidden;
+    #spotify-popup {
+    position: fixed;
+    right: 25px;
+    bottom: 25px;
+    width: 320px;
+    background: white;
+    z-index: 9999;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
 }
 
-.spotify-box iframe {
+#spotify-popup iframe {
     display: block;
     width: 100%;
     height: 152px;
     border: 0;
+}
+
+#spotify-close {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 22px;
+    height: 22px;
+    border: none;
+    border-radius: 50%;
+    background: white;
+    color: black;
+    font-family: Roboto, sans-serif;
+    font-size: 10px;
+    line-height: 20px;
+    padding: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+
+#spotify-close:hover {
+    transform: rotate(90deg);
 }
   </style>
 </head>
@@ -411,19 +438,6 @@ header a:hover {
           <img src="WhatsApp Image 2024-07-23 at 21.45.25 (4).jpeg">
           <div class="caption">dillom - minimi</div>
         </div>
-
-        <div class="item item-2">
-        <div class="spotify-box">
-        <iframe
-            src="https://open.spotify.com/embed/playlist/3JtEmyIcqEi4wTY7tuIID3?utm_source=generator"
-            width="100%"
-            height="152"
-            frameborder="0"
-            allowfullscreen=""
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-            loading="lazy">
-        </iframe>
-        </div></div>
 
         <div class="item item-3">
           <img src="428657886_17915774420882770_5483151901907390651_n.jpg">
@@ -587,6 +601,17 @@ Valoramos la colaboración entre emprendedores, promoviendo un consumo que prior
     </section>
 
   </main>
+<div id="spotify-popup">
+    <button id="spotify-close">×</button>
 
+    <iframe
+        src="https://open.spotify.com/embed/playlist/3JtEmyIcqEi4wTY7tuIID3?utm_source=generator"
+        width="100%"
+        height="152"
+        frameborder="0"
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        loading="lazy">
+    </iframe>
+</div>
 </body>
 </html>
