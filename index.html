@@ -365,10 +365,10 @@ header a:hover {
 }
     #spotify-popup {
     position: fixed;
-    right: 25px;
+    right: 50%;
     bottom: 25px;
     width: 320px;
-    background: white;
+    background: transparent;
     z-index: 9999;
     box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
 }
@@ -391,7 +391,7 @@ header a:hover {
     background: white;
     color: black;
     font-family: Roboto, sans-serif;
-    font-size: 10px;
+    font-size: 12px;
     line-height: 20px;
     padding: 0;
     cursor: pointer;
@@ -400,6 +400,13 @@ header a:hover {
 
 #spotify-close:hover {
     transform: rotate(90deg);
+}
+    @media (max-width: 600px) {
+    #spotify-popup {
+        width: 280px;
+        right: 15px;
+        bottom: 15px;
+    }
 }
   </style>
 </head>
@@ -613,5 +620,10 @@ Valoramos la colaboración entre emprendedores, promoviendo un consumo que prior
         loading="lazy">
     </iframe>
 </div>
+  <script>
+document.getElementById("spotify-close").addEventListener("click", function() {
+    document.getElementById("spotify-popup").style.display = "none";
+});
+</script>
 </body>
 </html>
