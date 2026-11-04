@@ -369,16 +369,21 @@ header a:hover {
 
 .cube-item {
   overflow: visible;
+  position: relative;
+  z-index: 50;
 }
 
 .cube-stage {
-  width: 100%;
+  position: relative;
+  width: 100vw;
   height: 550px;
+  margin-left: calc(50% - 50vw);
   display: flex;
   align-items: center;
   justify-content: center;
   perspective: 1800px;
   background: transparent;
+  pointer-events: none;
 }
 
 .cube {
@@ -387,6 +392,7 @@ header a:hover {
   width: var(--size);
   height: var(--size);
   position: relative;
+  flex-shrink: 0;
   transform-style: preserve-3d;
   animation: cube-rotate 12s ease-in-out infinite;
 }
