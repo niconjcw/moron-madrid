@@ -363,6 +363,141 @@ header a:hover {
     visibility: hidden;
   }
 }
+    
+/* CUBO 3D MORÓN MADRID */
+
+.cube-item {
+  overflow: visible;
+}
+
+.cube-stage {
+  width: 100%;
+  height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 900px;
+  background: transparent;
+}
+
+.cube {
+  --size: 170px;
+
+  width: var(--size);
+  height: var(--size);
+  position: relative;
+  transform-style: preserve-3d;
+  animation: cube-rotate 12s ease-in-out infinite;
+}
+
+.cube-face {
+  position: absolute;
+  width: var(--size);
+  height: var(--size);
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.cube-face img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Posición de las seis caras */
+
+.cube-front {
+  transform: translateZ(85px);
+}
+
+.cube-back {
+  transform: rotateY(180deg) translateZ(85px);
+}
+
+.cube-right {
+  transform: rotateY(90deg) translateZ(85px);
+}
+
+.cube-left {
+  transform: rotateY(-90deg) translateZ(85px);
+}
+
+.cube-top {
+  transform: rotateX(90deg) translateZ(85px);
+}
+
+.cube-bottom {
+  transform: rotateX(-90deg) translateZ(85px);
+}
+
+/* Movimiento */
+
+@keyframes cube-rotate {
+  0%, 16.66% {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+
+  33.33% {
+    transform: rotateX(0deg) rotateY(-90deg);
+  }
+
+  50% {
+    transform: rotateX(0deg) rotateY(-180deg);
+  }
+
+  66.66% {
+    transform: rotateX(0deg) rotateY(-270deg);
+  }
+
+  83.33% {
+    transform: rotateX(-90deg) rotateY(-360deg);
+  }
+
+  91.66% {
+    transform: rotateX(-180deg) rotateY(-360deg);
+  }
+
+  100% {
+    transform: rotateX(-360deg) rotateY(-360deg);
+  }
+}
+
+@media (max-width: 700px) {
+  .cube-stage {
+    height: 240px;
+  }
+
+  .cube {
+    --size: 135px;
+  }
+
+  .cube-front {
+    transform: translateZ(67.5px);
+  }
+
+  .cube-back {
+    transform: rotateY(180deg) translateZ(67.5px);
+  }
+
+  .cube-right {
+    transform: rotateY(90deg) translateZ(67.5px);
+  }
+
+  .cube-left {
+    transform: rotateY(-90deg) translateZ(67.5px);
+  }
+
+  .cube-top {
+    transform: rotateX(90deg) translateZ(67.5px);
+  }
+
+  .cube-bottom {
+    transform: rotateX(-90deg) translateZ(67.5px);
+  }
+}
+
   </style>
 </head>
 
@@ -390,6 +525,40 @@ header a:hover {
     <section class="portfolio" id="estudio">
 
       <div class="portfolio-grid">
+
+<div class="item item-3 cube-item">
+
+  <div class="cube-stage">
+    <div class="cube">
+
+      <div class="cube-face cube-front">
+        <img src="LINK-FOTO-1">
+      </div>
+
+      <div class="cube-face cube-back">
+        <img src="LINK-FOTO-2">
+      </div>
+
+      <div class="cube-face cube-right">
+        <img src="LINK-FOTO-3">
+      </div>
+
+      <div class="cube-face cube-left">
+        <img src="LINK-FOTO-4">
+      </div>
+
+      <div class="cube-face cube-top">
+        <img src="LINK-FOTO-5">
+      </div>
+
+      <div class="cube-face cube-bottom">
+        <img src="LINK-FOTO-6">
+      </div>
+
+    </div>
+  </div>
+
+</div>
 
         <div class="item item-1">
           <img src="tumblr_d20a1c52e3a7cb2239dec906c8ab1868_72753981_2048.jpg">
