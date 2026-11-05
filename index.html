@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -26,62 +27,64 @@
       line-height: 1.2;
     }
 
-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  padding: 12px 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  z-index: 100;
-}
+    /* HEADER */
 
-.logo img {
-  width: 100px;
-  margin: 20px 20px;
-  height: auto;
-  display: block;
-  transition: transform 0.7s cubic-bezier(.2, .8, .2, 1);
-}
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      z-index: 100;
+    }
 
-.logo:hover img {
-  transform: rotate(360deg) scale(1.05);
-}
+    .logo img {
+      width: 100px;
+      margin: 20px;
+      height: auto;
+      display: block;
+      transition: transform 0.7s cubic-bezier(.2, .8, .2, 1);
+    }
 
-nav {
-    display: flex;
-    gap: 50px;
-    margin-top: 40px;
-    font-size: 0.9rem;
-    font-weight: 300;
-    line-height: 1.2;
-}
+    .logo:hover img {
+      transform: rotate(360deg) scale(1.05);
+    }
 
-.tienda-link {
-  display: flex;
-  align-items: flex-start;
-  gap: 4px;
-  font-size: 0.9rem;
-  font-weight: 300;
-  line-height: 1.2;
-}
+    nav {
+      display: flex;
+      gap: 50px;
+      margin-top: 40px;
+      font-size: 0.9rem;
+      font-weight: 300;
+      line-height: 1.2;
+    }
 
-.tienda-link img {
-  width: auto;
-  height: 20px;
-  margin-top: -1px;
-}
+    .tienda-link {
+      display: flex;
+      align-items: flex-start;
+      gap: 4px;
+      font-size: 0.9rem;
+      font-weight: 300;
+      line-height: 1.2;
+    }
 
-header a {
-  color: #000;
-  text-decoration: none;
-}
+    .tienda-link img {
+      width: auto;
+      height: 20px;
+      margin-top: -1px;
+    }
 
-header a:hover {
-  text-decoration: underline;
-}
+    header a {
+      color: #000;
+      text-decoration: none;
+    }
+
+    header a:hover {
+      text-decoration: underline;
+    }
 
     main {
       padding-top: 45px;
@@ -92,158 +95,65 @@ header a:hover {
       position: relative;
     }
 
-    .portfolio {
-      padding: 20px;
-    }
-
     /* PORTFOLIO */
 
-.portfolio {
-  padding: 30px 20px;
-}
+    .portfolio {
+      padding: 30px 20px;
+    }
 
-.portfolio-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 24px 20px;
-  align-items: start;
-}
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 24px 20px;
+      align-items: start;
+    }
 
-.item {
-  overflow: hidden;
-  margin-bottom: 90px;
-}
+    .item {
+      overflow: hidden;
+      margin-bottom: 90px;
+    }
 
-.item img,
-.item video {
-  display: block;
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-}
-
-.item img {
-  transition: transform 0.4s ease;
-}
-
-.item:hover img {
-  transform: scale(1.015);
-}
-
-/* DISTRIBUCIÓN DE IMÁGENES */
-
-.item-1 {
-  grid-column: 1 / 6;
-  margin-top: 20px;
-}
-
-.item-2 {
-  grid-column: 9 / 13;
-  margin-top: 180px;
-}
-
-.item-3 {
-  grid-column: 2 / 7;
-  margin-top: 80px;
-}
-
-.item-4 {
-  grid-column: 8 / 13;
-  margin-top: 40px;
-}
-
-.item-5 {
-  grid-column: 1 / 7;
-  margin-top: 110px;
-}
-
-/* CUBO 3D */
-
-.portfolio-grid > a:first-child {
-  grid-column: 1 / 13;
-  display: block;
-  margin: 30px 0 100px;
-}
-
-.cube-item {
-  overflow: visible;
-  position: relative;
-  z-index: 50;
-}
-
-.cube-stage {
-  position: relative;
-  width: 100vw;
-  height: 620px;
-  margin-left: calc(50% - 50vw);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  perspective: 1800px;
-  background: transparent;
-  pointer-events: auto;
-}
-
-.cube {
-  --size: 500px;
-  width: var(--size);
-  height: var(--size);
-  position: relative;
-  flex-shrink: 0;
-  transform-style: preserve-3d;
-  animation: cube-rotate 10s ease-in-out infinite;
-}
-
-.cube-face {
-  position: absolute;
-  width: var(--size);
-  height: var(--size);
-  overflow: hidden;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-.cube-face img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* CARAS */
-
-.cube-front {
-  transform: translateZ(250px);
-}
-
-.cube-back {
-  transform: rotateY(180deg) translateZ(250px);
-}
-
-.cube-right {
-  transform: rotateY(90deg) translateZ(250px);
-}
-
-.cube-left {
-  transform: rotateY(-90deg) translateZ(250px);
-}
-
-.cube-top {
-  transform: rotateX(90deg) translateZ(250px);
-}
-
-.cube-bottom {
-  transform: rotateX(-90deg) translateZ(250px);
-}
-
-    .placeholder {
+    .item img,
+    .item video {
+      display: block;
       width: 100%;
-      aspect-ratio: 4 / 5;
-      background: #eee;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #777;
+      height: auto;
+      object-fit: contain;
+    }
+
+    .item img {
+      transition: transform 0.4s ease;
+    }
+
+    .item:hover img {
+      transform: scale(1.015);
+    }
+
+    /* DISTRIBUCIÓN DESKTOP */
+
+    .item-1 {
+      grid-column: 1 / 6;
+      margin-top: 20px;
+    }
+
+    .item-2 {
+      grid-column: 9 / 13;
+      margin-top: 180px;
+    }
+
+    .item-3 {
+      grid-column: 2 / 7;
+      margin-top: 80px;
+    }
+
+    .item-4 {
+      grid-column: 8 / 13;
+      margin-top: 40px;
+    }
+
+    .item-5 {
+      grid-column: 1 / 7;
+      margin-top: 110px;
     }
 
     .caption {
@@ -251,469 +161,462 @@ header a:hover {
       font-size: 10px;
     }
 
+    /* CUBO 3D */
+
+    .cube-link {
+      grid-column: 1 / 13;
+      display: block;
+      margin: 30px 0 100px;
+      cursor: pointer;
+    }
+
+    .cube-item {
+      overflow: visible;
+      position: relative;
+      z-index: 50;
+      margin: 0;
+    }
+
+    .cube-stage {
+      position: relative;
+      width: 100vw;
+      height: 620px;
+      margin-left: calc(50% - 50vw);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1800px;
+      background: transparent;
+    }
+
+    .cube {
+      --size: 500px;
+
+      width: var(--size);
+      height: var(--size);
+      position: relative;
+      flex-shrink: 0;
+      transform-style: preserve-3d;
+      animation: cube-rotate 18s cubic-bezier(.45, 0, .55, 1) infinite;
+    }
+
+    .cube-face {
+      position: absolute;
+      width: var(--size);
+      height: var(--size);
+      overflow: hidden;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    .cube-face img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* SEIS CARAS */
+
+    .cube-front {
+      transform: translateZ(250px);
+    }
+
+    .cube-back {
+      transform: rotateY(180deg) translateZ(250px);
+    }
+
+    .cube-right {
+      transform: rotateY(90deg) translateZ(250px);
+    }
+
+    .cube-left {
+      transform: rotateY(-90deg) translateZ(250px);
+    }
+
+    .cube-top {
+      transform: rotateX(90deg) translateZ(250px);
+    }
+
+    .cube-bottom {
+      transform: rotateX(-90deg) translateZ(250px);
+    }
+
+    /* MOVIMIENTO DEL CUBO */
+
+    @keyframes cube-rotate {
+
+      0% {
+        transform: rotateX(-8deg) rotateY(12deg);
+      }
+
+      12% {
+        transform: rotateX(-8deg) rotateY(102deg);
+      }
+
+      25% {
+        transform: rotateX(-98deg) rotateY(102deg);
+      }
+
+      38% {
+        transform: rotateX(-98deg) rotateY(12deg);
+      }
+
+      50% {
+        transform: rotateX(-188deg) rotateY(12deg);
+      }
+
+      63% {
+        transform: rotateX(-188deg) rotateY(-78deg);
+      }
+
+      76% {
+        transform: rotateX(-98deg) rotateY(-78deg);
+      }
+
+      88% {
+        transform: rotateX(-8deg) rotateY(-78deg);
+      }
+
+      100% {
+        transform: rotateX(-8deg) rotateY(12deg);
+      }
+    }
+
+    /* ABOUT */
+
     .about {
-  min-height: 100vh;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  text-transform: lowercase;
-}
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      text-transform: lowercase;
+    }
 
-.about p {
-  max-width: 1200px;
-  font-size: 0.9rem;
-  font-weight: 300;
-  line-height: 1.2;
-}
+    .about p {
+      max-width: 1200px;
+      font-size: 0.9rem;
+      font-weight: 300;
+      line-height: 1.2;
+    }
 
-.contact {
-  min-height: 100vh;
-  padding: 210px 20px 20px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr auto;
-  align-items: center;
-}
+    /* CONTACT */
 
-.contact a:nth-of-type(1) {
-  justify-self: end;
-  margin-right: 20px;
-  transform: translateY(-80px);
-}
+    .contact {
+      min-height: 100vh;
+      padding: 210px 20px 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr auto;
+      align-items: center;
+    }
 
-.contact a:nth-of-type(2) {
-  justify-self: start;
-  margin-left: 20px;
-  transform: translateY(-80px);
-}
+    .contact a:nth-of-type(1) {
+      justify-self: end;
+      margin-right: 20px;
+      transform: translateY(-80px);
+    }
 
-.contact span {
-  grid-column: 1 / 3;
-  text-align: center;
-  padding-top: 20px;
-  font-size: 10px;
-}
+    .contact a:nth-of-type(2) {
+      justify-self: start;
+      margin-left: 20px;
+      transform: translateY(-80px);
+    }
+
+    .contact span {
+      grid-column: 1 / 3;
+      text-align: center;
+      padding-top: 20px;
+      font-size: 10px;
+    }
+
+    /* INTRO */
+
+    #intro {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f5f5f5;
+      font-size: 12px;
+      pointer-events: none;
+      animation: intro 1.4s ease forwards;
+    }
+
+    @keyframes intro {
+      0%, 65% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+
+    /* MOBILE */
 
     @media (max-width: 700px) {
 
-  header {
-    padding: 12px;
-    align-items: flex-start;
-  }
-
-  .logo img {
-    width: 70px;
-    margin: 10px;
-  }
-
-  nav {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 18px;
-    align-items: flex-end;
-    font-size: 0.9rem;
-    font-weight: 300;
-    line-height: 1.2;
-  }
-      
-  .tienda-link {
-  justify-content: flex-end;
-  font-size: 0.9rem;
-  font-weight: 300;
-  line-height: 1.2;
-  }
-
-  header a {
-    text-align: right !important;
-    font-size: 0.9rem;
-    font-weight: 300;
-    line-height: 1.2;
-  }
-
-  main {
-    padding-top: 150px;
-  }
-
-  .portfolio {
-    padding: 12px;
-  }
-
-  .portfolio {
-  padding: 12px;
-}
-
-.portfolio-grid {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 14px;
-  align-items: start;
-}
-
-.item {
-  margin: 0 0 65px 0 !important;
-  overflow: hidden;
-}
-
-.item:nth-child(6n+1) {
-  grid-column: 1 / 6;
-}
-
-.item:nth-child(6n+2) {
-  grid-column: 2 / 7;
-}
-
-.item:nth-child(6n+3) {
-  grid-column: 1 / 5;
-}
-
-.item:nth-child(6n+4) {
-  grid-column: 3 / 7;
-}
-
-.item:nth-child(6n+5) {
-  grid-column: 1 / 6;
-}
-
-.item:nth-child(6n+6) {
-  grid-column: 2 / 7;
-}
-
-/* CUBO MOBILE */
-
-.portfolio-grid > a:first-child {
-  grid-column: 1 / 7;
-  margin: 0 0 50px;
-}
-
-.cube-stage {
-  width: 100vw;
-  height: 340px;
-  margin-left: calc(50% - 50vw);
-}
-
-.cube {
-  --size: 300px;
-}
-
-.cube-front {
-  transform: translateZ(150px);
-}
-
-.cube-back {
-  transform: rotateY(180deg) translateZ(150px);
-}
-
-.cube-right {
-  transform: rotateY(90deg) translateZ(150px);
-}
-
-.cube-left {
-  transform: rotateY(-90deg) translateZ(150px);
-}
-
-.cube-top {
-  transform: rotateX(90deg) translateZ(150px);
-}
-
-.cube-bottom {
-  transform: rotateX(-90deg) translateZ(150px);
-}
-      
-  .caption {
-    font-size: 10px;
-    padding-top: 6px;
-  }
-
-.about {
-  min-height: 100vh;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-.about p {
-  max-width: 1200px;
-  font-size: 0.9rem;
-  font-weight: 300;
-  line-height: 1.2;
-}
-
-.contact {
-  min-height: 100vh;
-  padding: 210px 20px 20px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr auto;
-  align-items: center;
-}
-
-.contact a:nth-of-type(1) {
-  justify-self: end;
-  margin-right: 10px;
-  transform: translateY(-60px);
-}
-
-.contact a:nth-of-type(2) {
-  justify-self: start;
-  margin-left: 10px;
-  transform: translateY(-60px);
-}
-
-.contact span {
-  grid-column: 1 / 3;
-  text-align: center;
-  padding-top: 20px;
-  font-size: 10px;
-}
-}
-    #intro {
-  position: fixed;
-  inset: 0;
-  z-index: 999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f5f5f5;
-  font-size: 12px;
-  pointer-events: none;
-  animation: intro 1.4s ease forwards;
-}
-
-@keyframes intro {
-  0% {
-    opacity: 1;
-  }
-
-  65% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-    visibility: hidden;
-  }
-}
-    
-
-/* CUBO 3D MORÓN MADRID */
-
-.cube-item {
-  overflow: visible;
-  position: relative;
-  z-index: 50;
-}
-
-.cube-stage {
-  position: relative;
-  width: 100vw;
-  height: 550px;
-  margin-left: calc(50% - 50vw);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  perspective: 1800px;
-  background: transparent;
-  pointer-events: none;
-}
-
-.cube {
-  --size: 500px;
-
-  width: var(--size);
-  height: var(--size);
-  position: relative;
-  flex-shrink: 0;
-  transform-style: preserve-3d;
-  animation: cube-rotate 18s cubic-bezier(.45, 0, .55, 1) infinite;
-}
-
-.cube-face {
-  position: absolute;
-  width: var(--size);
-  height: var(--size);
-  overflow: hidden;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-.cube-face img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* POSICIÓN DE LAS SEIS CARAS */
-
-.cube-front {
-  transform: translateZ(250px);
-}
-
-.cube-back {
-  transform: rotateY(180deg) translateZ(250px);
-}
-
-.cube-right {
-  transform: rotateY(90deg) translateZ(250px);
-}
-
-.cube-left {
-  transform: rotateY(-90deg) translateZ(250px);
-}
-
-.cube-top {
-  transform: rotateX(90deg) translateZ(250px);
-}
-
-.cube-bottom {
-  transform: rotateX(-90deg) translateZ(250px);
-}
-
-/* MOVIMIENTO */
-
-@keyframes cube-rotate {
-
-  0% {
-    transform: rotateX(-8deg) rotateY(12deg);
-  }
-
-  12% {
-    transform: rotateX(-8deg) rotateY(102deg);
-  }
-
-  25% {
-    transform: rotateX(-98deg) rotateY(102deg);
-  }
-
-  38% {
-    transform: rotateX(-98deg) rotateY(12deg);
-  }
-
-  50% {
-    transform: rotateX(-188deg) rotateY(12deg);
-  }
-
-  63% {
-    transform: rotateX(-188deg) rotateY(-78deg);
-  }
-
-  76% {
-    transform: rotateX(-98deg) rotateY(-78deg);
-  }
-
-  88% {
-    transform: rotateX(-8deg) rotateY(-78deg);
-  }
-
-  100% {
-    transform: rotateX(-8deg) rotateY(-348deg);
-  }
-
-}
-
-
-/* MOBILE */
-
-@media (max-width: 700px) {
-  .cube-stage {
-    height: 340px;
-  }
-
-  .cube {
-    --size: 300px;
-  }
-
-  .cube-front {
-    transform: translateZ(150px);
-  }
-
-  .cube-back {
-    transform: rotateY(180deg) translateZ(150px);
-  }
-
-  .cube-right {
-    transform: rotateY(90deg) translateZ(150px);
-  }
-
-  .cube-left {
-    transform: rotateY(-90deg) translateZ(150px);
-  }
-
-  .cube-top {
-    transform: rotateX(90deg) translateZ(150px);
-  }
-
-  .cube-bottom {
-    transform: rotateX(-90deg) translateZ(150px);
-  }
-}
+      header {
+        padding: 12px;
+        align-items: flex-start;
+      }
+
+      .logo img {
+        width: 70px;
+        margin: 10px;
+      }
+
+      nav {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 18px;
+        align-items: flex-end;
+        font-size: 0.9rem;
+        font-weight: 300;
+        line-height: 1.2;
+      }
+
+      .tienda-link {
+        justify-content: flex-end;
+        font-size: 0.9rem;
+        font-weight: 300;
+        line-height: 1.2;
+      }
+
+      header a {
+        text-align: right !important;
+        font-size: 0.9rem;
+        font-weight: 300;
+        line-height: 1.2;
+      }
+
+      main {
+        padding-top: 150px;
+      }
+
+      .portfolio {
+        padding: 12px;
+      }
+
+      .portfolio-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 14px;
+        align-items: start;
+      }
+
+      .item {
+        margin: 0 0 65px 0 !important;
+        overflow: hidden;
+      }
+
+      /* DISTRIBUCIÓN MOBILE */
+
+      .portfolio-grid > .item:nth-of-type(6n+1) {
+        grid-column: 1 / 6;
+      }
+
+      .portfolio-grid > .item:nth-of-type(6n+2) {
+        grid-column: 2 / 7;
+      }
+
+      .portfolio-grid > .item:nth-of-type(6n+3) {
+        grid-column: 1 / 5;
+      }
+
+      .portfolio-grid > .item:nth-of-type(6n+4) {
+        grid-column: 3 / 7;
+      }
+
+      .portfolio-grid > .item:nth-of-type(6n+5) {
+        grid-column: 1 / 6;
+      }
+
+      .portfolio-grid > .item:nth-of-type(6n+6) {
+        grid-column: 2 / 7;
+      }
+
+      .caption {
+        font-size: 10px;
+        padding-top: 6px;
+      }
+
+      /* CUBO MOBILE */
+
+      .cube-link {
+        grid-column: 1 / 7;
+        margin: 0 0 50px;
+      }
+
+      .cube-stage {
+        height: 340px;
+      }
+
+      .cube {
+        --size: 300px;
+      }
+
+      .cube-front {
+        transform: translateZ(150px);
+      }
+
+      .cube-back {
+        transform: rotateY(180deg) translateZ(150px);
+      }
+
+      .cube-right {
+        transform: rotateY(90deg) translateZ(150px);
+      }
+
+      .cube-left {
+        transform: rotateY(-90deg) translateZ(150px);
+      }
+
+      .cube-top {
+        transform: rotateX(90deg) translateZ(150px);
+      }
+
+      .cube-bottom {
+        transform: rotateX(-90deg) translateZ(150px);
+      }
+
+      /* ABOUT MOBILE */
+
+      .about {
+        min-height: 100vh;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .about p {
+        max-width: 1200px;
+        font-size: 0.9rem;
+        font-weight: 300;
+        line-height: 1.2;
+      }
+
+      /* CONTACT MOBILE */
+
+      .contact {
+        min-height: 100vh;
+        padding: 210px 20px 20px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr auto;
+        align-items: center;
+      }
+
+      .contact a:nth-of-type(1) {
+        justify-self: end;
+        margin-right: 10px;
+        transform: translateY(-60px);
+      }
+
+      .contact a:nth-of-type(2) {
+        justify-self: start;
+        margin-left: 10px;
+        transform: translateY(-60px);
+      }
+
+      .contact span {
+        grid-column: 1 / 3;
+        text-align: center;
+        padding-top: 20px;
+        font-size: 10px;
+      }
+    }
 
   </style>
 </head>
 
-
 <body>
-  <div id="intro">Morón Madrid — ARG — 2026</div>
-  
-  <header>
-  <a href="/" class="logo">
-    <img src="sticker.png" alt="morón madrid">
-  </a>
 
-  <nav>
-<span class="tienda-link">
-  <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEguX14GzmThK94GeMibceKA7zICqad06YxNNfXdMDJWfekWmO24pdYg9z9BdkouOws5N-Haa-0IfN-U79hTyy7-EB1WS40G4UsRYDb8xFVnx9iB5SYvx0J5BH5a5E35dx3srcSqWHckxVBJ/s1600/nuevo-2.gif">
-  <a href="http://moronmadrid.com.ar">tienda</a>
-</span>
-    <a href="#estudio">archivo</a>
-    <a href="#nosotros">nosotros</a>
-    <a href="#contacto">contacto</a>
-  </nav>
-</header>
+  <div id="intro">Morón Madrid — ARG — 2026</div>
+
+  <header>
+
+    <a href="/" class="logo">
+      <img src="sticker.png" alt="morón madrid">
+    </a>
+
+    <nav>
+
+      <span class="tienda-link">
+        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEguX14GzmThK94GeMibceKA7zICqad06YxNNfXdMDJWfekWmO24pdYg9z9BdkouOws5N-Haa-0IfN-U79hTyy7-EB1WS40G4UsRYDb8xFVnx9iB5SYvx0J5BH5a5E35dx3srcSqWHckxVBJ/s1600/nuevo-2.gif">
+        <a href="http://moronmadrid.com.ar">tienda</a>
+      </span>
+
+      <a href="#estudio">archivo</a>
+      <a href="#nosotros">nosotros</a>
+      <a href="#contacto">contacto</a>
+
+    </nav>
+
+  </header>
+
   <main>
 
     <section class="portfolio" id="estudio">
 
       <div class="portfolio-grid">
-<a href="https://www.limaydenim.com/capsula-morom-madrid-2i7nd/" target="_blank" style="display:block; cursor:pointer;">
-<div class="item item-3 cube-item">
 
-  <div class="cube-stage">
-    <div class="cube">
+        <!-- CUBO LIMAY + MORÓN MADRID -->
 
-      <div class="cube-face cube-front">
-        <img src="01portada-cartterra-42e407a00e14bb466c17932208051734-1024-1024.jpg">
-      </div>
+        <a href="https://www.limaydenim.com/capsula-morom-madrid-2i7nd/"
+           target="_blank"
+           rel="noopener"
+           class="cube-link">
 
-      <div class="cube-face cube-back">
-        <img src="01-portada-bolso-mm-4b68edd98fed5ddfb817932209012075-1024-1024.jpg">
-      </div>
+          <div class="item cube-item">
 
-      <div class="cube-face cube-right">
-        <img src="Diseño sin título (1).jpg">
-      </div>
+            <div class="cube-stage">
 
-      <div class="cube-face cube-left">
-        <img src="Diseño sin título.jpg">
-      </div>
+              <div class="cube">
 
-      <div class="cube-face cube-top">
-        <img src="copia-de-pollera-mm_1642-e84d753e395b8414ab17932205106138-1024-1024.jpg">
-      </div>
+                <div class="cube-face cube-front">
+                  <img src="01portada-cartterra-42e407a00e14bb466c17932208051734-1024-1024.jpg">
+                </div>
 
-      <div class="cube-face cube-bottom">
-        <img src="emptyname-718-fa597d201608b56caf17932211804076-1024-1024.jpg">
-      </div>
+                <div class="cube-face cube-back">
+                  <img src="01-portada-bolso-mm-4b68edd98fed5ddfb817932209012075-1024-1024.jpg">
+                </div>
 
-  </div>
+                <div class="cube-face cube-right">
+                  <img src="Diseño sin título (1).jpg">
+                </div>
 
-</div>
-</a>
+                <div class="cube-face cube-left">
+                  <img src="Diseño sin título.jpg">
+                </div>
+
+                <div class="cube-face cube-top">
+                  <img src="copia-de-pollera-mm_1642-e84d753e395b8414ab17932205106138-1024-1024.jpg">
+                </div>
+
+                <div class="cube-face cube-bottom">
+                  <img src="emptyname-718-fa597d201608b56caf17932211804076-1024-1024.jpg">
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </a>
+
+        <!-- PORTFOLIO ITEMS -->
+
         <div class="item item-1">
           <img src="tumblr_d20a1c52e3a7cb2239dec906c8ab1868_72753981_2048.jpg">
           <div class="caption">salmón gurú - milán</div>
@@ -758,7 +661,7 @@ header a:hover {
           <img src="https://64.media.tumblr.com/20bf1f72cd9540d293a3a5f2589300f8/b910be1e9e13a462-63/s1280x1920/4e32f0c8ff8a87a2488b8f826d9772c37877f000.jpg">
           <div class="caption">chomba cuello chanfleado x2</div>
         </div>
-        
+
         <div class="item item-1">
           <img src="https://64.media.tumblr.com/98f4112f1c5e64bab0629b84154b68c1/b910be1e9e13a462-1b/s1280x1920/e639a18b74b8c214df51defae747bbd9512ead43.jpg">
           <div class="caption">cartera de pana labrada</div>
@@ -782,8 +685,8 @@ header a:hover {
         <div class="item item-5">
           <img src="https://64.media.tumblr.com/24f2ced7268711a7cafa6501bd9f06bd/3b9a741088b582d8-8c/s2048x3072/c2a70b3c6cf2417335cd70ebe85e913c99cb5a9d.jpg">
           <div class="caption">bolso plateado</div>
-          </div>
-        
+        </div>
+
         <div class="item item-1">
           <img src="https://64.media.tumblr.com/b1c495dbcd01612c32d3928c4f310e96/70c7b4dce52b90a4-3e/s2048x3072/5ad5629cde044255749e7ba23f39b6d965676fb7.jpg">
           <div class="caption">ritual @ manresa - los gatos, CA</div>
@@ -808,7 +711,7 @@ header a:hover {
           <img src="https://64.media.tumblr.com/14642214975edd1be2bbcdb39c76a3e9/b267b45d5af9514f-74/s2048x3072/ea9cdae3917b6a1b3018ef64864734be60f1ff9f.jpg">
           <div class="caption">yatai yatoi - ba</div>
         </div>
-        
+
         <div class="item item-1">
           <img src="https://64.media.tumblr.com/e5d39d0c672f753f15d581786c082a00/f05cf7d8c6a909da-e1/s2048x3072/71ad7fbe2a7ca1466ba215dbb458fb7cd2475e6a.jpg">
           <div class="caption">cartera de patchwork</div>
@@ -833,17 +736,17 @@ header a:hover {
           <img src="https://64.media.tumblr.com/4891e372bf96355f8f86e8e5e2481d4f/ca820511bff79d66-ed/s2048x3072/3099f9409cd45b8431f7c6f9731a471a80a43152.jpg">
           <div class="caption">don julio - ba</div>
         </div>
-        
+
         <div class="item item-1">
           <img src="https://64.media.tumblr.com/f49ce3f8259be9214b6a79ac793ad4e9/223ed753e8ae84cb-b3/s1280x1920/c3e051a2342127949adc8372edcdae9c30819d3d.jpg">
           <div class="caption">cacho rotisería - ba</div>
         </div>
-        
+
         <div class="item item-5">
           <img src="https://64.media.tumblr.com/ddab66bd46f7af043866804a403545c0/f6659faa4c1e7638-e2/s2048x3072/41a1ef0c1a0b225f489a6d3d2ba3dbc74711d1c9.jpg" style="max-width: 100%;">
           <div class="caption">mm + hernán paganini</div>
         </div>
-        
+
         <div class="item item-2">
           <img src="https://64.media.tumblr.com/dea69b534a4f6bd297bfd3878a790577/db18a628871e0023-54/s2048x3072/f65d7a83d96edefdb1903f01990a6f178e7f0383.jpg">
           <div class="caption">studio eme carranza - ba</div>
@@ -859,30 +762,39 @@ header a:hover {
           <div class="caption">cartera de patchwork</div>
         </div>
 
-
-
       </div>
 
     </section>
 
+    <!-- ABOUT -->
+
     <section class="about" id="nosotros">
+
       <p>
-       Somos <a href="http://instagram.com/matias.otero">Mati</a> y <a href="http://instagram.com/nico.njcw">Nico</a>. Desde 2015, nos dedicamos a Morón Madrid, donde diseñamos y fabricamos nuestros propios productos.<br>
-Como estudio, también desarrollamos y producimos soluciones textiles para diversas necesidades, ya sean artísticas o funcionales, o una combinación de ambas.<br>
-Nos enfocamos en una producción responsable, trabajando de manera artesanal en pequeñas cantidades o por encargo.<br>
-Valoramos la colaboración entre emprendedores, promoviendo un consumo que priorice lo humano y responsable.<br>
+        Somos <a href="http://instagram.com/matias.otero">Mati</a> y
+        <a href="http://instagram.com/nico.njcw">Nico</a>. Desde 2015,
+        nos dedicamos a Morón Madrid, donde diseñamos y fabricamos nuestros propios productos.<br>
+        Como estudio, también desarrollamos y producimos soluciones textiles para diversas necesidades, ya sean artísticas o funcionales, o una combinación de ambas.<br>
+        Nos enfocamos en una producción responsable, trabajando de manera artesanal en pequeñas cantidades o por encargo.<br>
+        Valoramos la colaboración entre emprendedores, promoviendo un consumo que priorice lo humano y responsable.
       </p>
+
     </section>
 
+    <!-- CONTACT -->
+
     <section class="contact" id="contacto">
-      
+
       <a href="http://instagram.com/moronmadrid">
-      <img src="https://cdn.pixabay.com/animation/2024/05/03/12/05/12-05-51-13_512.gif" style="max-width: auto; height: 70px;">
+        <img src="https://cdn.pixabay.com/animation/2024/05/03/12/05/12-05-51-13_512.gif" style="max-width: auto; height: 70px;">
       </a>
+
       <a href="mailto:info@moronmadrid.com.ar">
-      <img src="https://mugmanfr.neocities.org/Images/Nouvelles/Email/Mailmenu.gif" style="max-width: auto; height: 50px;">
+        <img src="https://mugmanfr.neocities.org/Images/Nouvelles/Email/Mailmenu.gif" style="max-width: auto; height: 50px;">
       </a>
+
       <span>© MORÓN MADRID 2026</span>
+
     </section>
 
   </main>
