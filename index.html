@@ -529,7 +529,7 @@ header a:hover {
   position: relative;
   flex-shrink: 0;
   transform-style: preserve-3d;
-  animation: cube-rotate 14s ease-in-out infinite;
+  animation: cube-rotate 18s cubic-bezier(.45, 0, .55, 1) infinite;
 }
 
 .cube-face {
@@ -579,31 +579,39 @@ header a:hover {
 @keyframes cube-rotate {
 
   0% {
-    transform: rotateX(0deg) rotateY(0deg);
+    transform: rotateX(-8deg) rotateY(12deg);
   }
 
-  16% {
-    transform: rotateX(0deg) rotateY(90deg);
+  12% {
+    transform: rotateX(-8deg) rotateY(102deg);
   }
 
-  32% {
-    transform: rotateX(-90deg) rotateY(90deg);
+  25% {
+    transform: rotateX(-98deg) rotateY(102deg);
   }
 
-  48% {
-    transform: rotateX(-90deg) rotateY(180deg);
+  38% {
+    transform: rotateX(-98deg) rotateY(12deg);
   }
 
-  64% {
-    transform: rotateX(-180deg) rotateY(180deg);
+  50% {
+    transform: rotateX(-188deg) rotateY(12deg);
   }
 
-  80% {
-    transform: rotateX(-180deg) rotateY(270deg);
+  63% {
+    transform: rotateX(-188deg) rotateY(-78deg);
+  }
+
+  76% {
+    transform: rotateX(-98deg) rotateY(-78deg);
+  }
+
+  88% {
+    transform: rotateX(-8deg) rotateY(-78deg);
   }
 
   100% {
-    transform: rotateX(-270deg) rotateY(360deg);
+    transform: rotateX(-8deg) rotateY(-348deg);
   }
 
 }
