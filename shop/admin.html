@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Morón Madrid — Admin</title>
+
   <style>
     * { box-sizing: border-box; }
 
@@ -21,7 +22,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 80px;
+      margin-bottom: 70px;
     }
 
     header img { width: 65px; }
@@ -40,25 +41,47 @@
     h2 {
       font-size: 16px;
       font-weight: 400;
-      margin: 45px 0 20px;
+      margin: 40px 0 20px;
     }
 
-    input, button {
+    input, textarea, button {
+      width: 100%;
       padding: 13px;
       font: inherit;
       border: 1px solid #000;
       background: transparent;
     }
 
-    input { width: 100%; }
+    input, textarea { margin-bottom: 14px; }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    input[type="file"] {
+      border: 1px solid #ccc;
+      background: #fff;
+    }
+
+    label {
+      display: block;
+      margin: 18px 0 8px;
+    }
 
     button {
       cursor: pointer;
       background: #000;
       color: #fff;
+      margin-bottom: 12px;
     }
 
     button:hover { opacity: .7; }
+
+    button.secondary {
+      background: transparent;
+      color: #000;
+    }
 
     .product {
       display: flex;
@@ -70,20 +93,42 @@
     }
 
     .product-name { font-weight: 500; }
-    .product-info { color: #666; margin-top: 6px; }
+
+    .product-info {
+      color: #666;
+      margin-top: 6px;
+    }
+
+    .product button {
+      width: auto;
+      min-width: 90px;
+    }
+
+    .form-section {
+      border-top: 1px solid #ccc;
+      margin-top: 35px;
+      padding-top: 20px;
+    }
+
+    .hint {
+      color: #777;
+      font-size: 12px;
+      line-height: 1.5;
+      margin: -5px 0 15px;
+    }
 
     #message {
-      margin-top: 20px;
+      margin: 20px 0;
       line-height: 1.5;
     }
 
-    #logout { margin-top: 35px; }
+    #logout { margin-top: 50px; }
 
     [hidden] { display: none !important; }
 
     @media (max-width: 550px) {
       body { padding: 20px; }
-      header { margin-bottom: 60px; }
+      header { margin-bottom: 50px; }
       .product { align-items: flex-start; }
     }
   </style>
@@ -100,6 +145,7 @@
   <main>
     <section id="login">
       <h1>Acceso privado</h1>
+
       <form id="login-form">
         <input
           id="password"
@@ -116,9 +162,57 @@
       <h1>Morón Madrid — Administración</h1>
 
       <h2>Productos</h2>
-      <button id="refresh">Actualizar lista</button>
+      <button id="refresh" class="secondary">Actualizar lista</button>
 
       <div id="products"></div>
+
+      <div class="form-section">
+        <h2 id="form-title">Nuevo producto</h2>
+
+        <form id="product-form">
+          <label for="name">Nombre del producto</label>
+          <input id="name" type="text" required maxlength="200">
+
+          <label for="slug">Identificador / URL</label>
+          <input
+            id="slug"
+            type="text"
+            placeholder="ejemplo-cartera"
+            pattern="[a-z0-9-]+"
+            required
+          >
+
+          <label for="price">Precio en pesos argentinos</label>
+          <input id="price" type="number" min="0" step="1" required>
+
+          <label for="description">Descripción</label>
+          <textarea id="description"></textarea>
+
+          <label for="image">Foto principal</label>
+          <input id="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+          <p class="hint" id="image-hint">Elegí la foto principal del producto. Máximo 6 MB.</p>
+
+          <label for="image-hover">Segunda foto para el hover</label>
+          <input id="image-hover" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+          <p class="hint" id="hover-hint">Foto alternativa que aparece al pasar el cursor.</p>
+
+          <label for="gallery">Galería de fotos del producto</label>
+          <input
+            id="gallery"
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            multiple
+          >
+          <p class="hint" id="gallery-hint">
+            Podés seleccionar varias fotos a la vez. Máximo 30 fotos en total.
+          </p>
+
+          <button type="submit" id="save-button">Guardar producto</button>
+          <button type="button" id="cancel-edit" class="secondary" hidden>
+            Cancelar edición
+          </button>
+        </form>
+      </div>
 
       <button id="logout">Cerrar sesión</button>
     </section>
@@ -128,15 +222,32 @@
 
   <script>
     const API = "https://moron-madrid-api.moronmadrid.workers.dev";
+
     const loginSection = document.getElementById("login");
     const dashboard = document.getElementById("dashboard");
     const message = document.getElementById("message");
     const productsBox = document.getElementById("products");
+    const productForm = document.getElementById("product-form");
+
+    let editingId = null;
+    let currentImage = null;
+    let currentHover = null;
+    let currentGallery = [];
+
+    function token() {
+      return sessionStorage.getItem("mm_admin_token");
+    }
 
     function showLogin() {
       loginSection.hidden = false;
       dashboard.hidden = true;
       sessionStorage.removeItem("mm_admin_token");
+    }
+
+    async function showDashboard() {
+      loginSection.hidden = true;
+      dashboard.hidden = false;
+      await loadProducts();
     }
 
     async function loadProducts() {
@@ -145,9 +256,9 @@
 
       try {
         const response = await fetch(API + "/products");
-        if (!response.ok) throw new Error();
-
         const data = await response.json();
+
+        if (!response.ok) throw new Error(data.error);
 
         if (!data.products || data.products.length === 0) {
           message.textContent = "Todavía no hay productos.";
@@ -161,6 +272,7 @@
           const info = document.createElement("div");
           const name = document.createElement("div");
           const details = document.createElement("div");
+          const edit = document.createElement("button");
 
           name.className = "product-name";
           name.textContent = product.name;
@@ -170,43 +282,196 @@
             product.slug + " · $" +
             Number(product.price).toLocaleString("es-AR");
 
+          edit.textContent = "Editar";
+          edit.addEventListener("click", () => editProduct(product));
+
           info.append(name, details);
-          item.append(info);
+          item.append(info, edit);
           productsBox.append(item);
         });
 
         message.textContent = data.products.length +
-          (data.products.length === 1 ? " producto encontrado." : " productos encontrados.");
+          (data.products.length === 1
+            ? " producto encontrado."
+            : " productos encontrados.");
 
-      } catch {
-        message.textContent = "No pudimos cargar los productos.";
+      } catch (error) {
+        message.textContent = error.message || "No pudimos cargar los productos.";
       }
     }
 
-    async function showDashboard() {
-      loginSection.hidden = true;
-      dashboard.hidden = false;
-      await loadProducts();
+    function resetForm() {
+      productForm.reset();
+      editingId = null;
+      currentImage = null;
+      currentHover = null;
+      currentGallery = [];
+
+      document.getElementById("form-title").textContent = "Nuevo producto";
+      document.getElementById("save-button").textContent = "Guardar producto";
+      document.getElementById("cancel-edit").hidden = true;
+
+      document.getElementById("image-hint").textContent =
+        "Elegí la foto principal del producto. Máximo 6 MB.";
+
+      document.getElementById("hover-hint").textContent =
+        "Foto alternativa que aparece al pasar el cursor.";
+
+      document.getElementById("gallery-hint").textContent =
+        "Podés seleccionar varias fotos a la vez. Máximo 30 fotos en total.";
     }
 
-    async function checkSession() {
-      const token = sessionStorage.getItem("mm_admin_token");
-      if (!token) return;
+    function editProduct(product) {
+      editingId = product.id;
+      currentImage = product.image;
+      currentHover = product.image_hover;
+      currentGallery = product.gallery || [];
+
+      document.getElementById("name").value = product.name || "";
+      document.getElementById("slug").value = product.slug || "";
+      document.getElementById("price").value = product.price;
+      document.getElementById("description").value = product.description || "";
+
+      document.getElementById("form-title").textContent = "Editar producto";
+      document.getElementById("save-button").textContent = "Guardar cambios";
+      document.getElementById("cancel-edit").hidden = false;
+
+      document.getElementById("image-hint").textContent =
+        currentImage ? "Ya hay una foto principal. Si elegís otra, se reemplazará." :
+        "Todavía no hay foto principal.";
+
+      document.getElementById("hover-hint").textContent =
+        currentHover ? "Ya hay una segunda foto. Si elegís otra, se reemplazará." :
+        "Todavía no hay segunda foto.";
+
+      document.getElementById("gallery-hint").textContent =
+        currentGallery.length + " fotos en la galería. Las nuevas se agregarán a las existentes.";
+
+      document.getElementById("form-title").scrollIntoView({
+        behavior: "smooth"
+      });
+    }
+
+    async function uploadImage(file) {
+      if (file.size > 6 * 1024 * 1024) {
+        throw new Error("Una de las imágenes supera los 6 MB.");
+      }
+
+      const form = new FormData();
+      form.append("image", file);
+
+      const response = await fetch(API + "/admin/upload", {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + token()
+        },
+        body: form
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudo subir una imagen.");
+      }
+
+      return data.url;
+    }
+
+    productForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const saveButton = document.getElementById("save-button");
+      saveButton.disabled = true;
+      saveButton.textContent = "Guardando...";
+      message.textContent = "Preparando producto e imágenes...";
 
       try {
-        const response = await fetch(API + "/admin/me", {
-          headers: { Authorization: "Bearer " + token }
+        const mainFile = document.getElementById("image").files[0];
+        const hoverFile = document.getElementById("image-hover").files[0];
+        const galleryFiles = Array.from(
+          document.getElementById("gallery").files
+        );
+
+        if (currentGallery.length + galleryFiles.length > 30) {
+          throw new Error("La galería admite un máximo de 30 fotos.");
+        }
+
+        let image = currentImage;
+        let imageHover = currentHover;
+
+        if (mainFile) {
+          message.textContent = "Subiendo foto principal...";
+          image = await uploadImage(mainFile);
+        }
+
+        if (hoverFile) {
+          message.textContent = "Subiendo segunda foto...";
+          imageHover = await uploadImage(hoverFile);
+        }
+
+        const gallery = [...currentGallery];
+
+        for (const file of galleryFiles) {
+          message.textContent = "Subiendo galería de fotos...";
+          const imageUrl = await uploadImage(file);
+
+          gallery.push({
+            image_url: imageUrl,
+            alt_text: document.getElementById("name").value
+          });
+        }
+
+        const body = {
+          name: document.getElementById("name").value.trim(),
+          slug: document.getElementById("slug").value.trim(),
+          price: Number(document.getElementById("price").value),
+          description: document.getElementById("description").value,
+          image,
+          image_hover: imageHover,
+          gallery
+        };
+
+        message.textContent = "Guardando producto en la base de datos...";
+
+        const endpoint = editingId
+          ? API + "/admin/products/" + editingId
+          : API + "/admin/products";
+
+        const response = await fetch(endpoint, {
+          method: editingId ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token()
+          },
+          body: JSON.stringify(body)
         });
 
-        if (response.ok) {
-          await showDashboard();
-        } else {
-          showLogin();
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "No se pudo guardar el producto.");
         }
-      } catch {
-        message.textContent = "No se pudo conectar con el servidor.";
+
+        message.textContent = editingId
+          ? "¡Producto actualizado correctamente!"
+          : "¡Producto creado correctamente!";
+
+        resetForm();
+        await loadProducts();
+
+      } catch (error) {
+        message.textContent = error.message || "Ocurrió un error.";
+      } finally {
+        saveButton.disabled = false;
+        saveButton.textContent = editingId
+          ? "Guardar cambios"
+          : "Guardar producto";
       }
-    }
+    });
+
+    document.getElementById("cancel-edit").addEventListener("click", resetForm);
+
+    document.getElementById("refresh").addEventListener("click", loadProducts);
 
     document.getElementById("login-form").addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -233,30 +498,50 @@
         await showDashboard();
 
       } catch {
-        message.textContent = "Error de conexión. Intentá nuevamente.";
+        message.textContent = "Error de conexión.";
       }
     });
 
-    document.getElementById("refresh").addEventListener("click", loadProducts);
-
     document.getElementById("logout").addEventListener("click", async () => {
-      const token = sessionStorage.getItem("mm_admin_token");
-
       try {
         await fetch(API + "/admin/logout", {
           method: "POST",
-          headers: { Authorization: "Bearer " + token }
+          headers: {
+            Authorization: "Bearer " + token()
+          }
         });
       } finally {
+        resetForm();
         showLogin();
         message.textContent = "Sesión cerrada.";
       }
     });
 
+    async function checkSession() {
+      if (!token()) return;
+
+      try {
+        const response = await fetch(API + "/admin/me", {
+          headers: {
+            Authorization: "Bearer " + token()
+          }
+        });
+
+        if (response.ok) {
+          await showDashboard();
+        } else {
+          showLogin();
+        }
+      } catch {
+        message.textContent = "No se pudo conectar con el servidor.";
+      }
+    }
+
     checkSession();
   </script>
 </body>
 </html>
+
 
     checkSession();
   </script>
