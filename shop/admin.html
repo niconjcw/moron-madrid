@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Morón Madrid — Admin</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 30px;
+      background: #f5f5f5;
+      color: #000;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 100px;
+    }
+
+    header img { width: 65px; }
+
+    main {
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 18px;
+      font-weight: 400;
+      margin-bottom: 35px;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 12px;
+      font: inherit;
+      border: 1px solid #000;
+      background: transparent;
+    }
+
+    button {
+      background: #000;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    button:hover { opacity: .7; }
+
+    #message {
+      margin-top: 20px;
+      line-height: 1.5;
+    }
+
+    [hidden] { display: none !important; }
+  </style>
+</head>
+
+<body>
+  <header>
+    <a href="./">
+      <img src="../sticker.png" alt="Morón Madrid">
+    </a>
+    <span>ADMIN / 01</span>
+  </header>
+
+  <main>
+    <section id="login">
+      <h1>Acceso privado</h1>
+
+      <form id="login-form">
+        <input
+          id="password"
+          type="password"
+          placeholder="Contraseña"
+          autocomplete="current-password"
+          required
+        >
+        <button type="submit">Entrar</button>
+      </form>
+    </section>
+
+    <section id="dashboard" hidden>
+      <h1>Morón Madrid — Administración</h1>
+      <p>Sesión iniciada correctamente.</p>
+      <button id="logout">Cerrar sesión</button>
+    </section>
+
+    <p id="message" role="status"></p>
+  </main>
+
+  <script>
+    const API = "https://moron-madrid-api.moronmadrid.workers.dev";
+    const loginSection = document.getElementById("login");
+    const dashboard = document.getElementById("dashboard");
+    const message = document.getElementById("message");
+    const form = document.getElementById("login-form");
+
+    function showDashboard() {
+      loginSection.hidden = true;
+      dashboard.hidden = false;
+      message.textContent = "";
+    }
+
+    function showLogin() {
+      loginSection.hidden = false;
+      dashboard.hidden = true;
+      sessionStorage.removeItem("mm_admin_token");
+    }
+
+    async function checkSession() {
+      const token = sessionStorage.getItem("mm_admin_token");
+      if (!token) return;
+
+      try {
+        const response = await fetch(API + "/admin/me", {
+          headers: { Authorization: "Bearer " + token }
+        });
+
+        if (response.ok) {
+          showDashboard();
+        } else {
+          showLogin();
+        }
+      } catch {
+        message.textContent = "No se pudo conectar con el servidor.";
+      }
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      message.textContent = "Verificando...";
+
+      try {
+        const response = await fetch(API + "/admin/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            password: document.getElementById("password").value
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          message.textContent = data.error || "No se pudo iniciar sesión.";
+          return;
+        }
+
+        sessionStorage.setItem("mm_admin_token", data.token);
+        document.getElementById("password").value = "";
+        showDashboard();
+
+      } catch {
+        message.textContent = "Error de conexión. Intentá nuevamente.";
+      }
+    });
+
+    document.getElementById("logout").addEventListener("click", async () => {
+      const token = sessionStorage.getItem("mm_admin_token");
+
+      try {
+        await fetch(API + "/admin/logout", {
+          method: "POST",
+          headers: { Authorization: "Bearer " + token }
+        });
+      } finally {
+        showLogin();
+        message.textContent = "Sesión cerrada.";
+      }
+    });
+
+    checkSession();
+  </script>
+</body>
+</html>
