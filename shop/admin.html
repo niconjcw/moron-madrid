@@ -21,45 +21,71 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 100px;
+      margin-bottom: 80px;
     }
 
     header img { width: 65px; }
 
     main {
-      max-width: 420px;
+      max-width: 850px;
       margin: 0 auto;
     }
 
     h1 {
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 400;
       margin-bottom: 35px;
     }
 
+    h2 {
+      font-size: 16px;
+      font-weight: 400;
+      margin: 45px 0 20px;
+    }
+
     input, button {
-      width: 100%;
-      padding: 14px;
-      margin-bottom: 12px;
+      padding: 13px;
       font: inherit;
       border: 1px solid #000;
       background: transparent;
     }
 
+    input { width: 100%; }
+
     button {
+      cursor: pointer;
       background: #000;
       color: #fff;
-      cursor: pointer;
     }
 
     button:hover { opacity: .7; }
+
+    .product {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 18px 0;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .product-name { font-weight: 500; }
+    .product-info { color: #666; margin-top: 6px; }
 
     #message {
       margin-top: 20px;
       line-height: 1.5;
     }
 
+    #logout { margin-top: 35px; }
+
     [hidden] { display: none !important; }
+
+    @media (max-width: 550px) {
+      body { padding: 20px; }
+      header { margin-bottom: 60px; }
+      .product { align-items: flex-start; }
+    }
   </style>
 </head>
 
@@ -74,7 +100,6 @@
   <main>
     <section id="login">
       <h1>Acceso privado</h1>
-
       <form id="login-form">
         <input
           id="password"
@@ -89,7 +114,12 @@
 
     <section id="dashboard" hidden>
       <h1>Morón Madrid — Administración</h1>
-      <p>Sesión iniciada correctamente.</p>
+
+      <h2>Productos</h2>
+      <button id="refresh">Actualizar lista</button>
+
+      <div id="products"></div>
+
       <button id="logout">Cerrar sesión</button>
     </section>
 
@@ -101,18 +131,62 @@
     const loginSection = document.getElementById("login");
     const dashboard = document.getElementById("dashboard");
     const message = document.getElementById("message");
-    const form = document.getElementById("login-form");
-
-    function showDashboard() {
-      loginSection.hidden = true;
-      dashboard.hidden = false;
-      message.textContent = "";
-    }
+    const productsBox = document.getElementById("products");
 
     function showLogin() {
       loginSection.hidden = false;
       dashboard.hidden = true;
       sessionStorage.removeItem("mm_admin_token");
+    }
+
+    async function loadProducts() {
+      message.textContent = "Cargando productos...";
+      productsBox.replaceChildren();
+
+      try {
+        const response = await fetch(API + "/products");
+        if (!response.ok) throw new Error();
+
+        const data = await response.json();
+
+        if (!data.products || data.products.length === 0) {
+          message.textContent = "Todavía no hay productos.";
+          return;
+        }
+
+        data.products.forEach(product => {
+          const item = document.createElement("div");
+          item.className = "product";
+
+          const info = document.createElement("div");
+          const name = document.createElement("div");
+          const details = document.createElement("div");
+
+          name.className = "product-name";
+          name.textContent = product.name;
+
+          details.className = "product-info";
+          details.textContent =
+            product.slug + " · $" +
+            Number(product.price).toLocaleString("es-AR");
+
+          info.append(name, details);
+          item.append(info);
+          productsBox.append(item);
+        });
+
+        message.textContent = data.products.length +
+          (data.products.length === 1 ? " producto encontrado." : " productos encontrados.");
+
+      } catch {
+        message.textContent = "No pudimos cargar los productos.";
+      }
+    }
+
+    async function showDashboard() {
+      loginSection.hidden = true;
+      dashboard.hidden = false;
+      await loadProducts();
     }
 
     async function checkSession() {
@@ -125,7 +199,7 @@
         });
 
         if (response.ok) {
-          showDashboard();
+          await showDashboard();
         } else {
           showLogin();
         }
@@ -134,7 +208,7 @@
       }
     }
 
-    form.addEventListener("submit", async (event) => {
+    document.getElementById("login-form").addEventListener("submit", async (event) => {
       event.preventDefault();
       message.textContent = "Verificando...";
 
@@ -156,12 +230,14 @@
 
         sessionStorage.setItem("mm_admin_token", data.token);
         document.getElementById("password").value = "";
-        showDashboard();
+        await showDashboard();
 
       } catch {
         message.textContent = "Error de conexión. Intentá nuevamente.";
       }
     });
+
+    document.getElementById("refresh").addEventListener("click", loadProducts);
 
     document.getElementById("logout").addEventListener("click", async () => {
       const token = sessionStorage.getItem("mm_admin_token");
@@ -176,6 +252,11 @@
         message.textContent = "Sesión cerrada.";
       }
     });
+
+    checkSession();
+  </script>
+</body>
+</html>
 
     checkSession();
   </script>
