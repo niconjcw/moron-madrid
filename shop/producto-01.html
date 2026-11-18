@@ -46,61 +46,54 @@
     }
 
     /* CONTROLES */
-    
-.carousel-controls {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  pointer-events: none;
-  z-index: 2;
-}
+    .carousel-controls {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+      z-index: 2;
+    }
 
-.carousel-arrow {
-  pointer-events: auto;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #fff;
-  border-radius: 50%;
-  background: rgba(245, 245, 245, 0.85);
-  color: #000;
-  font-size: 24px;
-  line-height: 1;
-  cursor: pointer;
-  padding: 0;
-}
+    .carousel-arrow {
+      pointer-events: auto;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #fff;
+      border-radius: 50%;
+      background: rgba(245, 245, 245, 0.85);
+      color: #000;
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0;
+    }
 
-.carousel-arrow:first-child {
-  margin-left: 12px;
-}
+    .carousel-arrow:first-child {
+      margin-left: 12px;
+    }
 
-.carousel-arrow:last-child {
-  margin-right: 12px;
-}
+    .carousel-arrow:last-child {
+      margin-right: 12px;
+    }
 
-.carousel-arrow:disabled {
-  opacity: 0.3;
-  cursor: default;
-}
+    .carousel-counter {
+      display: none;
+    }
 
-.carousel-counter {
-  display: none;
-}
+    @media (max-width: 600px) {
+      .carousel-arrow:first-child {
+        margin-left: 8px;
+      }
 
-@media (max-width: 600px) {
-  .carousel-arrow:first-child {
-    margin-left: 8px;
-  }
-
-  .carousel-arrow:last-child {
-    margin-right: 8px;
-  }
-}
-
+      .carousel-arrow:last-child {
+        margin-right: 8px;
+      }
+    }
   </style>
 </head>
 
@@ -139,7 +132,6 @@
 
     function renderProduct(product) {
       document.title = product.name + " — Morón Madrid";
-
       page.innerHTML = "";
 
       // GALERÍA
@@ -241,6 +233,7 @@
 
           const maxIndex = Math.max(0, total - slidesPerView);
 
+          // Mantener el índice dentro del rango si cambia el tamaño
           currentIndex = Math.min(currentIndex, maxIndex);
 
           track.style.transform =
@@ -255,28 +248,36 @@
           counter.textContent =
             `${firstVisible}–${lastVisible} / ${total}`;
 
-          prevButton.disabled = currentIndex === 0;
-          nextButton.disabled = currentIndex >= maxIndex;
+          // Las flechas ya no se deshabilitan: el carrusel es infinito
+          prevButton.disabled = false;
+          nextButton.disabled = false;
 
           controls.style.display =
             total > slidesPerView ? "flex" : "none";
         }
 
+        // FLECHA IZQUIERDA: vuelve a la última posición
         prevButton.addEventListener("click", () => {
-          if (currentIndex > 0) {
-            currentIndex--;
-            updateCarousel();
-          }
+          const total = track.querySelectorAll(".carousel-slide").length;
+          const maxIndex = Math.max(0, total - getSlidesPerView());
+
+          currentIndex = currentIndex <= 0
+            ? maxIndex
+            : currentIndex - 1;
+
+          updateCarousel();
         });
 
+        // FLECHA DERECHA: vuelve al principio al llegar al final
         nextButton.addEventListener("click", () => {
           const total = track.querySelectorAll(".carousel-slide").length;
           const maxIndex = Math.max(0, total - getSlidesPerView());
 
-          if (currentIndex < maxIndex) {
-            currentIndex++;
-            updateCarousel();
-          }
+          currentIndex = currentIndex >= maxIndex
+            ? 0
+            : currentIndex + 1;
+
+          updateCarousel();
         });
 
         window.addEventListener("resize", updateCarousel);
