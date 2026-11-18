@@ -125,8 +125,6 @@
 
     #logout { margin-top: 50px; }
 
-    /* TALLES Y STOCK */
-
     .variants-section {
       border-top: 1px solid #ccc;
       margin-top: 35px;
@@ -134,6 +132,34 @@
     }
 
     .variants-section h2 {
+      margin-top: 0;
+    }
+
+    .stock-mode {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 20px 0;
+      cursor: pointer;
+    }
+
+    .stock-mode input {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      flex: 0 0 auto;
+    }
+
+    .stock-mode span {
+      font-size: 14px;
+    }
+
+    .single-stock {
+      max-width: 250px;
+      margin: 20px 0;
+    }
+
+    .single-stock label {
       margin-top: 0;
     }
 
@@ -292,28 +318,52 @@
             Podés seleccionar varias fotos a la vez. Máximo 30 fotos en total.
           </p>
 
-          <!-- TALLES Y STOCK -->
           <div class="variants-section">
             <h2>Talles y stock</h2>
 
             <p class="hint">
-              Agregá cada talle y definí cuántas unidades tenés disponibles.
-              El SKU es opcional.
+              Elegí si el producto tiene talles o si se vende por unidad.
             </p>
 
-            <div id="variants-container"></div>
+            <label class="stock-mode" for="no-sizes">
+              <input type="checkbox" id="no-sizes">
+              <span>Este producto no lleva talle</span>
+            </label>
 
-            <p id="variants-empty" class="variant-empty">
-              Este producto todavía no tiene talles cargados.
-            </p>
+            <div id="single-stock" class="single-stock" hidden>
+              <label for="stock-quantity">Stock disponible</label>
+              <input
+                id="stock-quantity"
+                type="number"
+                min="0"
+                step="1"
+                value="0"
+              >
+              <p class="hint">
+                Cantidad total de unidades disponibles de este producto.
+              </p>
+            </div>
 
-            <button
-              type="button"
-              id="add-variant"
-              class="secondary"
-            >
-              + Agregar talle
-            </button>
+            <div id="sizes-section">
+              <p class="hint">
+                Agregá cada talle y definí cuántas unidades tenés disponibles.
+                El SKU es opcional.
+              </p>
+
+              <div id="variants-container"></div>
+
+              <p id="variants-empty" class="variant-empty">
+                Este producto todavía no tiene talles cargados.
+              </p>
+
+              <button
+                type="button"
+                id="add-variant"
+                class="secondary"
+              >
+                + Agregar talle
+              </button>
+            </div>
           </div>
 
           <button type="submit" id="save-button">
@@ -349,6 +399,11 @@
     const variantsContainer = document.getElementById("variants-container");
     const variantsEmpty = document.getElementById("variants-empty");
 
+    const noSizesCheckbox = document.getElementById("no-sizes");
+    const singleStock = document.getElementById("single-stock");
+    const sizesSection = document.getElementById("sizes-section");
+    const stockQuantity = document.getElementById("stock-quantity");
+
     let editingId = null;
     let currentImage = null;
     let currentHover = null;
@@ -370,7 +425,22 @@
       await loadProducts();
     }
 
-    // ACTUALIZAR MENSAJE DE VARIANTES
+    // CAMBIAR ENTRE PRODUCTO CON TALLE Y SIN TALLE
+    function updateStockMode() {
+      const withoutSizes = noSizesCheckbox.checked;
+
+      singleStock.hidden = !withoutSizes;
+      sizesSection.hidden = withoutSizes;
+
+      stockQuantity.required = withoutSizes;
+
+      variantsContainer.querySelectorAll("input").forEach(input => {
+        input.required = !withoutSizes && input.classList.contains("variant-stock");
+      });
+    }
+
+    noSizesCheckbox.addEventListener("change", updateStockMode);
+
     function updateVariantsEmpty() {
       variantsEmpty.hidden = variantsContainer.children.length > 0;
     }
@@ -438,12 +508,7 @@
         updateVariantsEmpty();
       });
 
-      row.append(
-        sizeField,
-        skuField,
-        stockField,
-        removeButton
-      );
+      row.append(sizeField, skuField, stockField, removeButton);
 
       variantsContainer.append(row);
       updateVariantsEmpty();
@@ -451,6 +516,25 @@
 
     // LEER VARIANTES DEL FORMULARIO
     function getVariants() {
+      // Producto sin talle: se guarda como una única variante interna.
+      if (noSizesCheckbox.checked) {
+        const stockValue = stockQuantity.value;
+
+        if (
+          stockValue === "" ||
+          !Number.isSafeInteger(Number(stockValue)) ||
+          Number(stockValue) < 0
+        ) {
+          throw new Error("El stock debe ser un número entero igual o mayor a cero.");
+        }
+
+        return [{
+          size: "Único",
+          sku: "",
+          stock: Number(stockValue)
+        }];
+      }
+
       const rows = Array.from(variantsContainer.children);
       const variants = [];
 
@@ -459,7 +543,6 @@
         const sku = row.querySelector(".variant-sku").value.trim();
         const stockValue = row.querySelector(".variant-stock").value;
 
-        // Ignorar una fila completamente vacía
         if (!size && !sku && !stockValue) {
           continue;
         }
@@ -468,7 +551,11 @@
           throw new Error("Completá el talle de cada variante.");
         }
 
-        if (stockValue === "" || !Number.isSafeInteger(Number(stockValue)) || Number(stockValue) < 0) {
+        if (
+          stockValue === "" ||
+          !Number.isSafeInteger(Number(stockValue)) ||
+          Number(stockValue) < 0
+        ) {
           throw new Error("El stock debe ser un número entero igual o mayor a cero.");
         }
 
@@ -479,7 +566,6 @@
         });
       }
 
-      // Comprobar talles duplicados
       const sizes = variants.map(v => v.size.toLowerCase());
 
       if (new Set(sizes).size !== sizes.length) {
@@ -523,15 +609,27 @@
           name.className = "product-name";
           name.textContent = product.name;
 
-          const variantCount = (product.variants || []).length;
+          const variants = product.variants || [];
+          const isSingleStock =
+            variants.length === 1 &&
+            variants[0].size.toLowerCase() === "único";
+
+          let stockDescription;
+
+          if (isSingleStock) {
+            stockDescription = variants[0].stock + " unidades";
+          } else {
+            stockDescription =
+              variants.length +
+              (variants.length === 1 ? " talle" : " talles");
+          }
 
           details.className = "product-info";
           details.textContent =
             product.slug + " · $" +
             Number(product.price).toLocaleString("es-AR") +
             " · " +
-            variantCount +
-            (variantCount === 1 ? " talle" : " talles");
+            stockDescription;
 
           edit.textContent = "Editar";
           edit.addEventListener("click", () => editProduct(product));
@@ -561,7 +659,11 @@
       currentGallery = [];
 
       variantsContainer.replaceChildren();
+      noSizesCheckbox.checked = false;
+      stockQuantity.value = "0";
+
       updateVariantsEmpty();
+      updateStockMode();
 
       document.getElementById("form-title").textContent = "Nuevo producto";
       document.getElementById("save-button").textContent = "Guardar producto";
@@ -589,14 +691,23 @@
       document.getElementById("price").value = product.price;
       document.getElementById("description").value = product.description || "";
 
-      // CARGAR VARIANTES EXISTENTES
+      const variants = product.variants || [];
+
+      const isSingleStock =
+        variants.length === 1 &&
+        variants[0].size.toLowerCase() === "único";
+
+      noSizesCheckbox.checked = isSingleStock;
+      stockQuantity.value = isSingleStock ? variants[0].stock : 0;
+
       variantsContainer.replaceChildren();
 
-      (product.variants || []).forEach(variant => {
-        addVariantRow(variant);
-      });
+      if (!isSingleStock) {
+        variants.forEach(variant => addVariantRow(variant));
+      }
 
       updateVariantsEmpty();
+      updateStockMode();
 
       document.getElementById("form-title").textContent = "Editar producto";
       document.getElementById("save-button").textContent = "Guardar cambios";
@@ -680,7 +791,6 @@
       message.textContent = "Preparando producto e imágenes...";
 
       try {
-        // OBTENER VARIANTES
         const variants = getVariants();
 
         const mainFile = document.getElementById("image").files[0];
@@ -863,6 +973,7 @@
       }
     }
 
+    updateStockMode();
     checkSession();
   </script>
 </body>
