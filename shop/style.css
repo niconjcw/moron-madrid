@@ -61,7 +61,7 @@ header a:hover {
 /* LOGO FLOTANTE */
 
 .logo {
-  position: absolute;
+  position: sticky;
   top: 40px;
   left: 20px;
   z-index: 101;
