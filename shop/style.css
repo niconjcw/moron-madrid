@@ -37,6 +37,27 @@ nav {
   font-weight: 300;
 }
 
+.tienda-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tienda-link img {
+  width: auto;
+  height: 20px;
+  margin-top: -1px;
+}
+
+header a {
+  color: #000;
+  text-decoration: none;
+}
+
+header a:hover {
+  text-decoration: underline;
+}
+
 /* LOGO SEPARADO DE LA BARRA */
 
 .logo {
@@ -55,27 +76,6 @@ nav {
 
 .logo:hover img {
   transform: rotate(360deg) scale(1.05);
-}
-
-.tienda-link {
-  display: flex;
-  align-items: flex-start;
-  gap: 4px;
-}
-
-.tienda-link img {
-  width: auto;
-  height: 20px;
-  margin-top: -1px;
-}
-
-header a {
-  color: #000;
-  text-decoration: none;
-}
-
-header a:hover {
-  text-decoration: underline;
 }
 
 /* CATÁLOGO */
@@ -136,40 +136,6 @@ header a:hover {
   justify-content: space-between;
   padding: 12px 10px 16px;
   font-size: 0.85rem;
-}
-
-/* MOBILE */
-
-@media (max-width: 700px) {
-  @media (max-width: 700px) {
-  header {
-    height: 30px;
-    padding: 0 12px;
-  }
-
-  nav {
-    flex-direction: row;
-    gap: 15px;
-    margin: 0;
-    align-items: center;
-  }
-
-  header a {
-    text-align: right;
-    font-size: 0.75rem;
-  }
-
-  .logo {
-    margin: 10px;
-  }
-
-  .logo img {
-    width: 70px;
-  }
-}
-  .catalog {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 /* PÁGINA DE PRODUCTO */
@@ -257,6 +223,35 @@ header a:hover {
 /* MOBILE */
 
 @media (max-width: 700px) {
+  header {
+    height: 30px;
+    padding: 0 12px;
+  }
+
+  nav {
+    flex-direction: row;
+    gap: 15px;
+    margin: 0;
+    align-items: center;
+  }
+
+  header a {
+    text-align: right;
+    font-size: 0.75rem;
+  }
+
+  .logo {
+    margin: 10px;
+  }
+
+  .logo img {
+    width: 70px;
+  }
+
+  .catalog {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .product-page {
     grid-template-columns: 1fr;
   }
