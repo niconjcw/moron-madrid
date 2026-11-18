@@ -6,6 +6,133 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Producto — Morón Madrid</title>
   <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* CARRUSEL DE PRODUCTO */
+
+    .product-gallery {
+      position: relative;
+      display: block;
+      width: 100%;
+      min-width: 0;
+      overflow: hidden;
+      background: #fff;
+      align-self: start;
+    }
+
+    .carousel-viewport {
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .carousel-track {
+      display: flex;
+      gap: 1px;
+      width: 100%;
+      background: #fff;
+      transition: transform 0.45s ease;
+    }
+
+    .carousel-slide {
+      flex: 0 0 100%;
+      width: 100%;
+      min-width: 0;
+      aspect-ratio: 4 / 5;
+      background: #f5f5f5;
+    }
+
+    .carousel-slide img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #f5f5f5;
+    }
+
+    .carousel-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 5;
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: rgba(245, 245, 245, 0.85);
+      color: #000;
+      font-family: Arial, sans-serif;
+      font-size: 25px;
+      font-weight: 300;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.2s ease;
+    }
+
+    .carousel-arrow:hover {
+      opacity: 0.6;
+    }
+
+    .carousel-prev {
+      left: 15px;
+    }
+
+    .carousel-next {
+      right: 15px;
+    }
+
+    .carousel-arrow:disabled {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .carousel-counter {
+      position: absolute;
+      bottom: 15px;
+      right: 18px;
+      z-index: 5;
+      font-size: 0.75rem;
+      color: #000;
+      background: rgba(245, 245, 245, 0.8);
+      padding: 5px 8px;
+    }
+
+    .product-details {
+      min-width: 0;
+      align-self: start;
+    }
+
+    @media (max-width: 700px) {
+      .product-gallery {
+        width: 100%;
+      }
+
+      .carousel-slide {
+        aspect-ratio: 4 / 5;
+      }
+
+      .carousel-arrow {
+        width: 36px;
+        height: 36px;
+        font-size: 22px;
+      }
+
+      .carousel-prev {
+        left: 10px;
+      }
+
+      .carousel-next {
+        right: 10px;
+      }
+
+      .product-details {
+        align-self: stretch;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -41,17 +168,111 @@
       return "$ " + Number(price).toLocaleString("es-AR");
     }
 
-    function addImage(container, url, alt) {
-      if (!url) return;
+    function createCarousel(images, productName) {
+      const gallery = document.createElement("section");
+      gallery.className = "product-gallery";
 
-      const img = document.createElement("img");
-      img.src = url;
-      img.alt = alt;
-      img.loading = "lazy";
+      if (images.length === 0) {
+        const empty = document.createElement("p");
+        empty.textContent = "imágenes próximamente";
+        gallery.appendChild(empty);
+        return gallery;
+      }
 
-      img.onerror = () => img.remove();
+      const viewport = document.createElement("div");
+      viewport.className = "carousel-viewport";
 
-      container.appendChild(img);
+      const track = document.createElement("div");
+      track.className = "carousel-track";
+
+      images.forEach((url, index) => {
+        const slide = document.createElement("div");
+        slide.className = "carousel-slide";
+
+        const img = document.createElement("img");
+        img.src = url;
+        img.alt = productName + " — vista " + (index + 1);
+        img.loading = index === 0 ? "eager" : "lazy";
+
+        img.onerror = () => {
+          slide.remove();
+          updateCarousel();
+        };
+
+        slide.appendChild(img);
+        track.appendChild(slide);
+      });
+
+      viewport.appendChild(track);
+      gallery.appendChild(viewport);
+
+      let currentIndex = 0;
+
+      const prevButton = document.createElement("button");
+      prevButton.className = "carousel-arrow carousel-prev";
+      prevButton.type = "button";
+      prevButton.textContent = "‹";
+      prevButton.setAttribute("aria-label", "Imagen anterior");
+
+      const nextButton = document.createElement("button");
+      nextButton.className = "carousel-arrow carousel-next";
+      nextButton.type = "button";
+      nextButton.textContent = "›";
+      nextButton.setAttribute("aria-label", "Imagen siguiente");
+
+      const counter = document.createElement("div");
+      counter.className = "carousel-counter";
+
+      function updateCarousel() {
+        const slides = track.querySelectorAll(".carousel-slide");
+        const total = slides.length;
+
+        if (total === 0) {
+          counter.textContent = "";
+          prevButton.style.display = "none";
+          nextButton.style.display = "none";
+          return;
+        }
+
+        if (currentIndex >= total) {
+          currentIndex = total - 1;
+        }
+
+        track.style.transform =
+          `translateX(calc(${currentIndex} * -100% - ${currentIndex}px))`;
+
+        counter.textContent = (currentIndex + 1) + " / " + total;
+
+        prevButton.disabled = currentIndex === 0;
+        nextButton.disabled = currentIndex === total - 1;
+
+        const showControls = total > 1;
+        prevButton.style.display = showControls ? "flex" : "none";
+        nextButton.style.display = showControls ? "flex" : "none";
+        counter.style.display = showControls ? "block" : "none";
+      }
+
+      prevButton.addEventListener("click", () => {
+        if (currentIndex > 0) {
+          currentIndex--;
+          updateCarousel();
+        }
+      });
+
+      nextButton.addEventListener("click", () => {
+        const total = track.querySelectorAll(".carousel-slide").length;
+
+        if (currentIndex < total - 1) {
+          currentIndex++;
+          updateCarousel();
+        }
+      });
+
+      gallery.append(prevButton, nextButton, counter);
+
+      updateCarousel();
+
+      return gallery;
     }
 
     function renderProduct(product) {
@@ -59,17 +280,14 @@
 
       page.innerHTML = "";
 
-      // GALERÍA
-      const gallery = document.createElement("section");
-      gallery.className = "product-gallery";
-
+      // REUNIR TODAS LAS IMÁGENES
       const images = [];
 
       if (product.image) images.push(product.image);
       if (product.image_hover) images.push(product.image_hover);
 
       if (Array.isArray(product.gallery)) {
-        product.gallery
+        [...product.gallery]
           .sort((a, b) => a.sort_order - b.sort_order)
           .forEach(item => {
             if (item.image_url) images.push(item.image_url);
@@ -78,15 +296,8 @@
 
       const uniqueImages = [...new Set(images)];
 
-      uniqueImages.forEach((url, index) => {
-        addImage(gallery, url, product.name + " — vista " + (index + 1));
-      });
-
-      if (uniqueImages.length === 0) {
-        const empty = document.createElement("p");
-        empty.textContent = "imágenes próximamente";
-        gallery.appendChild(empty);
-      }
+      // CARRUSEL
+      const gallery = createCarousel(uniqueImages, product.name);
 
       // INFORMACIÓN
       const details = document.createElement("section");
@@ -123,8 +334,6 @@
         ? product.variants
         : [];
 
-      // Detectar productos sin talle.
-      // Se identifican por la variante interna "Único".
       const isSingleProduct =
         variants.length === 1 &&
         String(variants[0].size || "").toLowerCase() === "único";
@@ -133,7 +342,6 @@
       let selectedVariant = null;
 
       if (isSingleProduct) {
-        // PRODUCTO SIN TALLE
         selectedVariant = variants[0];
 
         if (Number(selectedVariant.stock) <= 0) {
@@ -144,7 +352,6 @@
         }
 
       } else if (variants.length > 0) {
-        // PRODUCTO CON TALLES
         const label = document.createElement("label");
         label.htmlFor = "size";
         label.textContent = "talle";
@@ -161,7 +368,6 @@
           const option = document.createElement("option");
 
           option.value = variant.id || variant.size || "";
-
           option.textContent = variant.size || "opción";
 
           if (Number(variant.stock) <= 0) {
