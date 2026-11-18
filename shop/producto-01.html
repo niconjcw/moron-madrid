@@ -8,128 +8,86 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
-    /* CARRUSEL DE PRODUCTO */
-
+    /* CARRUSEL */
     .product-gallery {
       position: relative;
-      display: block;
       width: 100%;
       min-width: 0;
-      overflow: hidden;
-      background: #fff;
-      align-self: start;
-    }
-
-    .carousel-viewport {
-      width: 100%;
       overflow: hidden;
     }
 
     .carousel-track {
       display: flex;
-      gap: 1px;
       width: 100%;
-      background: #fff;
-      transition: transform 0.45s ease;
+      gap: 1px;
+      transform: translateX(0);
+      transition: transform 0.4s ease;
+      will-change: transform;
     }
 
     .carousel-slide {
-      flex: 0 0 100%;
-      width: 100%;
+      flex: 0 0 calc((100% - 1px) / 2);
+      width: calc((100% - 1px) / 2);
       min-width: 0;
-      aspect-ratio: 4 / 5;
+      overflow: hidden;
       background: #f5f5f5;
     }
 
     .carousel-slide img {
       display: block;
       width: 100%;
-      height: 100%;
+      height: auto;
+      aspect-ratio: 4 / 5;
       object-fit: contain;
-      background: #f5f5f5;
+    }
+
+    .carousel-controls {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 2;
     }
 
     .carousel-arrow {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 5;
-      width: 42px;
-      height: 42px;
-      padding: 0;
-      border: none;
-      border-radius: 50%;
-      background: rgba(245, 245, 245, 0.85);
-      color: #000;
-      font-family: Arial, sans-serif;
-      font-size: 25px;
-      font-weight: 300;
-      line-height: 1;
-      cursor: pointer;
+      width: 32px;
+      height: 32px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: opacity 0.2s ease;
-    }
-
-    .carousel-arrow:hover {
-      opacity: 0.6;
-    }
-
-    .carousel-prev {
-      left: 15px;
-    }
-
-    .carousel-next {
-      right: 15px;
+      border: 1px solid #fff;
+      border-radius: 50%;
+      background: rgba(245, 245, 245, 0.85);
+      color: #000;
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0;
     }
 
     .carousel-arrow:disabled {
-      opacity: 0;
-      pointer-events: none;
+      opacity: 0.3;
+      cursor: default;
     }
 
     .carousel-counter {
-      position: absolute;
-      bottom: 15px;
-      right: 18px;
-      z-index: 5;
-      font-size: 0.75rem;
+      font-size: 11px;
       color: #000;
-      background: rgba(245, 245, 245, 0.8);
-      padding: 5px 8px;
+      background: rgba(245, 245, 245, 0.85);
+      padding: 5px 7px;
     }
 
-    .product-details {
-      min-width: 0;
-      align-self: start;
-    }
-
-    @media (max-width: 700px) {
-      .product-gallery {
-        width: 100%;
-      }
-
+    @media (max-width: 600px) {
       .carousel-slide {
-        aspect-ratio: 4 / 5;
+        flex: 0 0 calc((100% - 1px) / 2);
+        width: calc((100% - 1px) / 2);
       }
 
-      .carousel-arrow {
-        width: 36px;
-        height: 36px;
-        font-size: 22px;
-      }
-
-      .carousel-prev {
-        left: 10px;
-      }
-
-      .carousel-next {
-        right: 10px;
-      }
-
-      .product-details {
-        align-self: stretch;
+      .carousel-controls {
+        right: 8px;
+        bottom: 8px;
       }
     }
   </style>
@@ -168,126 +126,22 @@
       return "$ " + Number(price).toLocaleString("es-AR");
     }
 
-    function createCarousel(images, productName) {
-      const gallery = document.createElement("section");
-      gallery.className = "product-gallery";
-
-      if (images.length === 0) {
-        const empty = document.createElement("p");
-        empty.textContent = "imágenes próximamente";
-        gallery.appendChild(empty);
-        return gallery;
-      }
-
-      const viewport = document.createElement("div");
-      viewport.className = "carousel-viewport";
-
-      const track = document.createElement("div");
-      track.className = "carousel-track";
-
-      images.forEach((url, index) => {
-        const slide = document.createElement("div");
-        slide.className = "carousel-slide";
-
-        const img = document.createElement("img");
-        img.src = url;
-        img.alt = productName + " — vista " + (index + 1);
-        img.loading = index === 0 ? "eager" : "lazy";
-
-        img.onerror = () => {
-          slide.remove();
-          updateCarousel();
-        };
-
-        slide.appendChild(img);
-        track.appendChild(slide);
-      });
-
-      viewport.appendChild(track);
-      gallery.appendChild(viewport);
-
-      let currentIndex = 0;
-
-      const prevButton = document.createElement("button");
-      prevButton.className = "carousel-arrow carousel-prev";
-      prevButton.type = "button";
-      prevButton.textContent = "‹";
-      prevButton.setAttribute("aria-label", "Imagen anterior");
-
-      const nextButton = document.createElement("button");
-      nextButton.className = "carousel-arrow carousel-next";
-      nextButton.type = "button";
-      nextButton.textContent = "›";
-      nextButton.setAttribute("aria-label", "Imagen siguiente");
-
-      const counter = document.createElement("div");
-      counter.className = "carousel-counter";
-
-      function updateCarousel() {
-        const slides = track.querySelectorAll(".carousel-slide");
-        const total = slides.length;
-
-        if (total === 0) {
-          counter.textContent = "";
-          prevButton.style.display = "none";
-          nextButton.style.display = "none";
-          return;
-        }
-
-        if (currentIndex >= total) {
-          currentIndex = total - 1;
-        }
-
-        track.style.transform =
-          `translateX(calc(${currentIndex} * -100% - ${currentIndex}px))`;
-
-        counter.textContent = (currentIndex + 1) + " / " + total;
-
-        prevButton.disabled = currentIndex === 0;
-        nextButton.disabled = currentIndex === total - 1;
-
-        const showControls = total > 1;
-        prevButton.style.display = showControls ? "flex" : "none";
-        nextButton.style.display = showControls ? "flex" : "none";
-        counter.style.display = showControls ? "block" : "none";
-      }
-
-      prevButton.addEventListener("click", () => {
-        if (currentIndex > 0) {
-          currentIndex--;
-          updateCarousel();
-        }
-      });
-
-      nextButton.addEventListener("click", () => {
-        const total = track.querySelectorAll(".carousel-slide").length;
-
-        if (currentIndex < total - 1) {
-          currentIndex++;
-          updateCarousel();
-        }
-      });
-
-      gallery.append(prevButton, nextButton, counter);
-
-      updateCarousel();
-
-      return gallery;
-    }
-
     function renderProduct(product) {
       document.title = product.name + " — Morón Madrid";
 
       page.innerHTML = "";
 
-      // REUNIR TODAS LAS IMÁGENES
+      // GALERÍA
+      const gallery = document.createElement("section");
+      gallery.className = "product-gallery";
+
       const images = [];
 
       if (product.image) images.push(product.image);
       if (product.image_hover) images.push(product.image_hover);
 
       if (Array.isArray(product.gallery)) {
-        [...product.gallery]
+        product.gallery
           .sort((a, b) => a.sort_order - b.sort_order)
           .forEach(item => {
             if (item.image_url) images.push(item.image_url);
@@ -296,8 +150,103 @@
 
       const uniqueImages = [...new Set(images)];
 
-      // CARRUSEL
-      const gallery = createCarousel(uniqueImages, product.name);
+      if (uniqueImages.length === 0) {
+        const empty = document.createElement("p");
+        empty.textContent = "imágenes próximamente";
+        gallery.appendChild(empty);
+      } else {
+        const track = document.createElement("div");
+        track.className = "carousel-track";
+
+        let currentIndex = 0;
+
+        uniqueImages.forEach((url, index) => {
+          const slide = document.createElement("div");
+          slide.className = "carousel-slide";
+
+          const img = document.createElement("img");
+          img.src = url;
+          img.alt = product.name + " — vista " + (index + 1);
+          img.loading = index < 2 ? "eager" : "lazy";
+
+          img.onerror = () => {
+            slide.remove();
+            updateCarousel();
+          };
+
+          slide.appendChild(img);
+          track.appendChild(slide);
+        });
+
+        gallery.appendChild(track);
+
+        // CONTROLES
+        const controls = document.createElement("div");
+        controls.className = "carousel-controls";
+
+        const counter = document.createElement("span");
+        counter.className = "carousel-counter";
+
+        const prevButton = document.createElement("button");
+        prevButton.type = "button";
+        prevButton.className = "carousel-arrow";
+        prevButton.textContent = "‹";
+        prevButton.setAttribute("aria-label", "Imágenes anteriores");
+
+        const nextButton = document.createElement("button");
+        nextButton.type = "button";
+        nextButton.className = "carousel-arrow";
+        nextButton.textContent = "›";
+        nextButton.setAttribute("aria-label", "Imágenes siguientes");
+
+        controls.append(prevButton, counter, nextButton);
+        gallery.appendChild(controls);
+
+        function updateCarousel() {
+          const slides = track.querySelectorAll(".carousel-slide");
+          const total = slides.length;
+          const maxIndex = Math.max(0, total - 2);
+
+          currentIndex = Math.min(currentIndex, maxIndex);
+
+          const slideWidth = slides[0]
+            ? slides[0].getBoundingClientRect().width
+            : 0;
+
+          track.style.transform =
+            `translateX(-${currentIndex * (slideWidth + 1)}px)`;
+
+          counter.textContent =
+            `${Math.min(currentIndex + 1, total)}–${Math.min(currentIndex + 2, total)} / ${total}`;
+
+          prevButton.disabled = currentIndex === 0;
+          nextButton.disabled = currentIndex >= maxIndex;
+
+          const showControls = total > 2;
+
+          controls.style.display = showControls ? "flex" : "none";
+        }
+
+        prevButton.addEventListener("click", () => {
+          if (currentIndex > 0) {
+            currentIndex--;
+            updateCarousel();
+          }
+        });
+
+        nextButton.addEventListener("click", () => {
+          const total = track.querySelectorAll(".carousel-slide").length;
+
+          if (currentIndex < total - 2) {
+            currentIndex++;
+            updateCarousel();
+          }
+        });
+
+        window.addEventListener("resize", updateCarousel);
+
+        updateCarousel();
+      }
 
       // INFORMACIÓN
       const details = document.createElement("section");
@@ -334,6 +283,7 @@
         ? product.variants
         : [];
 
+      // Detectar productos sin talle
       const isSingleProduct =
         variants.length === 1 &&
         String(variants[0].size || "").toLowerCase() === "único";
@@ -342,6 +292,7 @@
       let selectedVariant = null;
 
       if (isSingleProduct) {
+        // PRODUCTO SIN TALLE
         selectedVariant = variants[0];
 
         if (Number(selectedVariant.stock) <= 0) {
@@ -352,6 +303,7 @@
         }
 
       } else if (variants.length > 0) {
+        // PRODUCTO CON TALLES
         const label = document.createElement("label");
         label.htmlFor = "size";
         label.textContent = "talle";
