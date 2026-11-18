@@ -58,12 +58,16 @@ header a:hover {
   text-decoration: underline;
 }
 
-/* LOGO SEPARADO DE LA BARRA */
+/* LOGO FLOTANTE */
 
 .logo {
+  position: absolute;
+  top: 40px;
+  left: 20px;
+  z-index: 101;
   display: block;
   width: fit-content;
-  margin: 20px;
+  margin: 0;
 }
 
 .logo img {
@@ -78,6 +82,16 @@ header a:hover {
   transform: rotate(360deg) scale(1.05);
 }
 
+@media (max-width: 700px) {
+  .logo {
+    top: 40px;
+    left: 10px;
+  }
+
+  .logo img {
+    width: 70px;
+  }
+}
 /* CATÁLOGO */
 
 .catalog {
@@ -87,6 +101,7 @@ header a:hover {
   background: #fff;
   width: 100%;
   margin: 0;
+  margin-top:0px;
   padding: 0;
 }
 
