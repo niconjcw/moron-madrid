@@ -64,6 +64,7 @@
       gallery.className = "product-gallery";
 
       const images = [];
+
       if (product.image) images.push(product.image);
       if (product.image_hover) images.push(product.image_hover);
 
@@ -106,6 +107,7 @@
 
       heading.append(category, title, price);
 
+      // DESCRIPCIÓN
       const description = document.createElement("div");
       description.className = "product-description";
 
@@ -113,6 +115,7 @@
       descriptionText.textContent = product.description || "";
       description.appendChild(descriptionText);
 
+      // OPCIONES Y STOCK
       const options = document.createElement("div");
       options.className = "product-options";
 
@@ -120,9 +123,28 @@
         ? product.variants
         : [];
 
-      let sizeSelect = null;
+      // Detectar productos sin talle.
+      // Se identifican por la variante interna "Único".
+      const isSingleProduct =
+        variants.length === 1 &&
+        String(variants[0].size || "").toLowerCase() === "único";
 
-      if (variants.length > 0) {
+      let sizeSelect = null;
+      let selectedVariant = null;
+
+      if (isSingleProduct) {
+        // PRODUCTO SIN TALLE
+        selectedVariant = variants[0];
+
+        if (Number(selectedVariant.stock) <= 0) {
+          const stockMessage = document.createElement("p");
+          stockMessage.className = "product-stock";
+          stockMessage.textContent = "sin stock";
+          options.appendChild(stockMessage);
+        }
+
+      } else if (variants.length > 0) {
+        // PRODUCTO CON TALLES
         const label = document.createElement("label");
         label.htmlFor = "size";
         label.textContent = "talle";
@@ -138,18 +160,11 @@
         variants.forEach(variant => {
           const option = document.createElement("option");
 
-          option.value = variant.id || variant.size || variant.name || "";
-          option.textContent =
-            variant.size ||
-            variant.name ||
-            variant.label ||
-            variant.value ||
-            "opción";
+          option.value = variant.id || variant.size || "";
 
-          if (
-            variant.stock !== undefined &&
-            Number(variant.stock) <= 0
-          ) {
+          option.textContent = variant.size || "opción";
+
+          if (Number(variant.stock) <= 0) {
             option.disabled = true;
             option.textContent += " — sin stock";
           }
@@ -157,16 +172,40 @@
           sizeSelect.appendChild(option);
         });
 
+        sizeSelect.addEventListener("change", () => {
+          selectedVariant = variants.find(variant =>
+            String(variant.id || variant.size || "") === sizeSelect.value
+          ) || null;
+
+          buyButton.disabled =
+            !selectedVariant || Number(selectedVariant.stock) <= 0;
+        });
+
         options.append(label, sizeSelect);
       }
 
+      // BOTÓN DE COMPRA
       const buyButton = document.createElement("button");
       buyButton.type = "button";
       buyButton.textContent = "comprar";
 
+      const hasStock = isSingleProduct
+        ? Number(selectedVariant.stock) > 0
+        : variants.length === 0 || variants.some(v => Number(v.stock) > 0);
+
+      buyButton.disabled = !hasStock;
+
+      if (!hasStock) {
+        buyButton.textContent = "sin stock";
+      }
+
       buyButton.addEventListener("click", () => {
         if (sizeSelect && !sizeSelect.value) {
           alert("Seleccioná un talle antes de continuar.");
+          return;
+        }
+
+        if (isSingleProduct && Number(selectedVariant.stock) <= 0) {
           return;
         }
 
@@ -175,6 +214,7 @@
 
       options.appendChild(buyButton);
 
+      // VOLVER
       const back = document.createElement("a");
       back.href = "./";
       back.className = "back-link";
