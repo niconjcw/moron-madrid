@@ -26,86 +26,96 @@
     </nav>
   </header>
 
-  <main class="catalog">
-
-    
-<!-- PRODUCTO 01 -->
-<article class="product">
-  <a href="producto-01.html" class="product-link">
-    <div class="product-images">
-      <img src="images/producto-01.jpg" alt="Producto 1" class="primary-image">
-      <img src="images/producto-01-back.jpg" alt="Producto 1 vista trasera" class="secondary-image">
-    </div>
-
-    <div class="product-info">
-      <span>nombre del producto</span>
-      <span>$ —</span>
-    </div>
-  </a>
-</article>
-
-
-    <!-- PRODUCTO 02 -->
-    <article class="product">
-      <div class="product-images">
-        <img src="images/producto-02.jpg" alt="Producto 2" class="primary-image">
-        <img src="images/producto-02-back.jpg" alt="Producto 2 vista trasera" class="secondary-image">
-      </div>
-      <div class="product-info">
-        <span>nombre del producto</span>
-        <span>$ —</span>
-      </div>
-    </article>
-
-    <!-- PRODUCTO 03 -->
-    <article class="product">
-      <div class="product-images">
-        <img src="images/producto-03.jpg" alt="Producto 3" class="primary-image">
-        <img src="images/producto-03-back.jpg" alt="Producto 3 vista trasera" class="secondary-image">
-      </div>
-      <div class="product-info">
-        <span>nombre del producto</span>
-        <span>$ —</span>
-      </div>
-    </article>
-
-    <!-- PRODUCTO 04 -->
-    <article class="product">
-      <div class="product-images">
-        <img src="images/producto-04.jpg" alt="Producto 4" class="primary-image">
-        <img src="images/producto-04-back.jpg" alt="Producto 4 vista trasera" class="secondary-image">
-      </div>
-      <div class="product-info">
-        <span>nombre del producto</span>
-        <span>$ —</span>
-      </div>
-    </article>
-
-    <!-- PRODUCTO 05 -->
-    <article class="product">
-      <div class="product-images">
-        <img src="images/producto-05.jpg" alt="Producto 5" class="primary-image">
-        <img src="images/producto-05-back.jpg" alt="Producto 5 vista trasera" class="secondary-image">
-      </div>
-      <div class="product-info">
-        <span>nombre del producto</span>
-        <span>$ —</span>
-      </div>
-    </article>
-
-    <!-- PRODUCTO 06 -->
-    <article class="product">
-      <div class="product-images">
-        <img src="images/producto-06.jpg" alt="Producto 6" class="primary-image">
-        <img src="images/producto-06-back.jpg" alt="Producto 6 vista trasera" class="secondary-image">
-      </div>
-      <div class="product-info">
-        <span>nombre del producto</span>
-        <span>$ —</span>
-      </div>
-    </article>
-
+  <main class="catalog" id="catalog">
+    <p id="catalog-message">cargando productos...</p>
   </main>
+
+  <script>
+    const API_URL = "https://moron-madrid-api.moronmadrid.workers.dev";
+
+    const catalog = document.getElementById("catalog");
+    const message = document.getElementById("catalog-message");
+
+    function formatPrice(price) {
+      return "$ " + Number(price).toLocaleString("es-AR");
+    }
+
+    function createProduct(product) {
+      const article = document.createElement("article");
+      article.className = "product";
+
+      const link = document.createElement("a");
+      link.className = "product-link";
+      link.href = `producto-01.html?slug=${encodeURIComponent(product.slug)}`;
+
+      const images = document.createElement("div");
+      images.className = "product-images";
+
+      const primary = document.createElement("img");
+      primary.className = "primary-image";
+      primary.src = product.image || "";
+      primary.alt = product.name;
+      primary.loading = "lazy";
+
+      images.appendChild(primary);
+
+      if (product.image_hover) {
+        const secondary = document.createElement("img");
+        secondary.className = "secondary-image";
+        secondary.src = product.image_hover;
+        secondary.alt = product.name + " — segunda vista";
+        secondary.loading = "lazy";
+        images.appendChild(secondary);
+      }
+
+      const info = document.createElement("div");
+      info.className = "product-info";
+
+      const name = document.createElement("span");
+      name.textContent = product.name;
+
+      const price = document.createElement("span");
+      price.textContent = formatPrice(product.price);
+
+      info.appendChild(name);
+      info.appendChild(price);
+
+      link.appendChild(images);
+      link.appendChild(info);
+      article.appendChild(link);
+
+      return article;
+    }
+
+    async function loadProducts() {
+      try {
+        const response = await fetch(`${API_URL}/products`);
+
+        if (!response.ok) {
+          throw new Error("Error al consultar los productos");
+        }
+
+        const products = await response.json();
+
+        catalog.innerHTML = "";
+
+        if (!Array.isArray(products) || products.length === 0) {
+          catalog.textContent = "próximamente";
+          return;
+        }
+
+        products.forEach(product => {
+          catalog.appendChild(createProduct(product));
+        });
+
+      } catch (error) {
+        console.error(error);
+        catalog.textContent = "no pudimos cargar los productos. intentá nuevamente.";
+      }
+    }
+
+    loadProducts();
+  </script>
 
 </body>
 </html>
