@@ -8,41 +8,44 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
-    /* CARRUSEL */
-    
-.product-gallery {
-  display: block !important;
-  position: relative;
-  width: 100%;
-  min-width: 0;
-  overflow: hidden;
-}
+    /* GALERÍA */
+    .product-gallery {
+      display: block !important;
+      position: relative;
+      width: 100%;
+      min-width: 0;
+      overflow: hidden;
+    }
 
-.carousel-track {
-  display: flex !important;
-  flex-wrap: nowrap !important;
-  width: max-content !important;
-  gap: 1px;
-  transition: transform 0.4s ease;
-  will-change: transform;
-}
+    .carousel-track {
+      display: flex !important;
+      flex-wrap: nowrap !important;
+      width: max-content !important;
+      max-width: none !important;
+      gap: 1px;
+      transition: transform 0.4s ease;
+      will-change: transform;
+    }
 
-.carousel-slide {
-  display: block !important;
-  flex: 0 0 auto !important;
-  min-width: 0;
-  overflow: hidden;
-  background: #f5f5f5;
-}
+    .carousel-slide {
+      display: block !important;
+      flex: 0 0 auto !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      overflow: hidden;
+      background: #f5f5f5;
+    }
 
-.carousel-slide img {
-  display: block !important;
-  width: 100% !important;
-  height: auto;
-  aspect-ratio: 4 / 5;
-  object-fit: contain;
-}
+    .carousel-slide img {
+      display: block !important;
+      width: 100% !important;
+      max-width: none !important;
+      height: auto;
+      aspect-ratio: 4 / 5;
+      object-fit: contain;
+    }
 
+    /* CONTROLES */
     .carousel-controls {
       position: absolute;
       right: 12px;
@@ -81,13 +84,7 @@
       padding: 5px 7px;
     }
 
-    /* MOBILE: UNA IMAGEN POR VEZ */
     @media (max-width: 600px) {
-      .carousel-slide {
-        flex: 0 0 100%;
-        width: 100%;
-      }
-
       .carousel-controls {
         right: 8px;
         bottom: 8px;
@@ -105,7 +102,7 @@
 
     <nav>
       <span class="tienda-link">
-        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEguX14GzmThK94GeMibceKA7zICqad06YxNNfXdMDJWfekWmO24pdYg9z9BdkouOws5N-Haa-0IfN-U79hTyy7-EB1WS40G4UsRYDb8xFVnx9iB5SYvx0J5BH5a5E35dx3srcSqWHckxVBJ/s1600/nuevo-2.gif" alt="">
+        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEguX14GzmThK94GeMibceKA7zICqad06YxNNfXdMDJWfekWmO24pdYg9z9BdkouOws5N-Haa0-IfN-U79hTyy7-EB1WS40G4UsRYDb8xFVnx9iB5SYvx0J5BH5a5E35dx3srcSqWHckxVBJ/s1600/nuevo-2.gif" alt="">
         <a href="./">tienda</a>
       </span>
       <a href="../#estudio">archivo</a>
@@ -206,42 +203,39 @@
         controls.append(prevButton, counter, nextButton);
         gallery.appendChild(controls);
 
-        // CANTIDAD DE IMÁGENES VISIBLES
-        
-const slidesPerView = getSlidesPerView();
-const slideWidth = gallery.clientWidth / slidesPerView;
+        // UNA FOTO EN MOBILE, DOS EN DESKTOP
+        function getSlidesPerView() {
+          return window.matchMedia("(max-width: 600px)").matches ? 1 : 2;
+        }
 
-slides.forEach(slide => {
-  slide.style.width = `${slideWidth}px`;
-});
-
-const maxIndex = Math.max(0, total - slidesPerView);
-currentIndex = Math.min(currentIndex, maxIndex);
-
-track.style.transform =
-  `translateX(-${currentIndex * (slideWidth + 1)}px)`;
-
-        // ACTUALIZAR CARRUSEL
+        // ACTUALIZAR ANCHOS Y POSICIÓN
         function updateCarousel() {
-          const slides = track.querySelectorAll(".carousel-slide");
+          const slides = Array.from(
+            track.querySelectorAll(".carousel-slide")
+          );
+
           const total = slides.length;
           const slidesPerView = getSlidesPerView();
+
+          const galleryWidth = gallery.clientWidth;
+          const slideWidth = Math.max(
+            0,
+            (galleryWidth - (slidesPerView - 1)) / slidesPerView
+          );
+
+          slides.forEach(slide => {
+            slide.style.width = `${slideWidth}px`;
+            slide.style.flexBasis = `${slideWidth}px`;
+          });
 
           const maxIndex = Math.max(0, total - slidesPerView);
 
           currentIndex = Math.min(currentIndex, maxIndex);
 
-          const slideWidth = slides[0]
-            ? slides[0].getBoundingClientRect().width
-            : 0;
-
           track.style.transform =
             `translateX(-${currentIndex * (slideWidth + 1)}px)`;
 
-          const firstVisible = total > 0
-            ? currentIndex + 1
-            : 0;
-
+          const firstVisible = total > 0 ? currentIndex + 1 : 0;
           const lastVisible = Math.min(
             currentIndex + slidesPerView,
             total
@@ -253,12 +247,10 @@ track.style.transform =
           prevButton.disabled = currentIndex === 0;
           nextButton.disabled = currentIndex >= maxIndex;
 
-          const showControls = total > slidesPerView;
-
-          controls.style.display = showControls ? "flex" : "none";
+          controls.style.display =
+            total > slidesPerView ? "flex" : "none";
         }
 
-        // FLECHA ANTERIOR
         prevButton.addEventListener("click", () => {
           if (currentIndex > 0) {
             currentIndex--;
@@ -266,7 +258,6 @@ track.style.transform =
           }
         });
 
-        // FLECHA SIGUIENTE
         nextButton.addEventListener("click", () => {
           const total = track.querySelectorAll(".carousel-slide").length;
           const maxIndex = Math.max(0, total - getSlidesPerView());
@@ -277,10 +268,14 @@ track.style.transform =
           }
         });
 
-        // ADAPTAR AL CAMBIAR EL TAMAÑO DE PANTALLA
         window.addEventListener("resize", updateCarousel);
 
         updateCarousel();
+
+        // Recalcular cuando termina de cargar una imagen
+        track.querySelectorAll("img").forEach(img => {
+          img.addEventListener("load", updateCarousel);
+        });
       }
 
       // INFORMACIÓN
@@ -318,7 +313,6 @@ track.style.transform =
         ? product.variants
         : [];
 
-      // DETECTAR PRODUCTOS SIN TALLE
       const isSingleProduct =
         variants.length === 1 &&
         String(variants[0].size || "").toLowerCase() === "único";
@@ -327,7 +321,6 @@ track.style.transform =
       let selectedVariant = null;
 
       if (isSingleProduct) {
-        // PRODUCTO SIN TALLE
         selectedVariant = variants[0];
 
         if (Number(selectedVariant.stock) <= 0) {
@@ -338,7 +331,6 @@ track.style.transform =
         }
 
       } else if (variants.length > 0) {
-        // PRODUCTO CON TALLES
         const label = document.createElement("label");
         label.htmlFor = "size";
         label.textContent = "talle";
