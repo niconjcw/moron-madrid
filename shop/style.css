@@ -76,11 +76,15 @@ header a:hover {
   gap: 1px;
   background: #fff;
   width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .product {
   background: #f5f5f5;
   min-width: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .product-images {
@@ -152,7 +156,6 @@ header a:hover {
     grid-template-columns: repeat(2, 1fr);
   }
 }
-
 
 /* PÁGINA DE PRODUCTO */
 
@@ -257,17 +260,15 @@ header a:hover {
     min-height: 450px;
   }
 
-  
-.product-link {
-  display: block;
-  color: inherit;
-  text-decoration: none;
-}
+  .product-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
 
-.product-link:hover .product-info {
-  text-decoration: underline;
-}
-
+  .product-link:hover .product-info {
+    text-decoration: underline;
+  }
 
   .product-description {
     margin: 35px 0;
