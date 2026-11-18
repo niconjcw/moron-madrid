@@ -1,4 +1,4 @@
-```html
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -125,12 +125,84 @@
 
     #logout { margin-top: 50px; }
 
+    /* TALLES Y STOCK */
+
+    .variants-section {
+      border-top: 1px solid #ccc;
+      margin-top: 35px;
+      padding-top: 20px;
+    }
+
+    .variants-section h2 {
+      margin-top: 0;
+    }
+
+    .variant-row {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr .7fr 42px;
+      gap: 10px;
+      align-items: end;
+      margin-bottom: 12px;
+    }
+
+    .variant-field label {
+      margin: 0 0 7px;
+      font-size: 12px;
+      color: #666;
+    }
+
+    .variant-field input {
+      margin: 0;
+      min-width: 0;
+      background: #fff;
+    }
+
+    .remove-variant {
+      width: 42px;
+      height: 43px;
+      padding: 0;
+      margin: 0;
+      background: transparent;
+      color: #000;
+      border: 1px solid #ccc;
+      font-size: 18px;
+    }
+
+    #add-variant {
+      margin-top: 8px;
+    }
+
+    .variant-empty {
+      color: #777;
+      font-size: 12px;
+      margin: 15px 0;
+    }
+
     [hidden] { display: none !important; }
 
     @media (max-width: 550px) {
       body { padding: 20px; }
+
       header { margin-bottom: 50px; }
+
       .product { align-items: flex-start; }
+
+      .variant-row {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .variant-field input {
+        width: 100%;
+      }
+
+      .remove-variant {
+        width: 100%;
+        height: 40px;
+        grid-column: 2;
+      }
     }
   </style>
 </head>
@@ -190,12 +262,24 @@
           <textarea id="description"></textarea>
 
           <label for="image">Foto principal</label>
-          <input id="image" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
-          <p class="hint" id="image-hint">Elegí la foto principal del producto. Máximo 6 MB.</p>
+          <input
+            id="image"
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+          >
+          <p class="hint" id="image-hint">
+            Elegí la foto principal del producto. Máximo 6 MB.
+          </p>
 
           <label for="image-hover">Segunda foto para el hover</label>
-          <input id="image-hover" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
-          <p class="hint" id="hover-hint">Foto alternativa que aparece al pasar el cursor.</p>
+          <input
+            id="image-hover"
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+          >
+          <p class="hint" id="hover-hint">
+            Foto alternativa que aparece al pasar el cursor.
+          </p>
 
           <label for="gallery">Galería de fotos del producto</label>
           <input
@@ -208,8 +292,40 @@
             Podés seleccionar varias fotos a la vez. Máximo 30 fotos en total.
           </p>
 
-          <button type="submit" id="save-button">Guardar producto</button>
-          <button type="button" id="cancel-edit" class="secondary" hidden>
+          <!-- TALLES Y STOCK -->
+          <div class="variants-section">
+            <h2>Talles y stock</h2>
+
+            <p class="hint">
+              Agregá cada talle y definí cuántas unidades tenés disponibles.
+              El SKU es opcional.
+            </p>
+
+            <div id="variants-container"></div>
+
+            <p id="variants-empty" class="variant-empty">
+              Este producto todavía no tiene talles cargados.
+            </p>
+
+            <button
+              type="button"
+              id="add-variant"
+              class="secondary"
+            >
+              + Agregar talle
+            </button>
+          </div>
+
+          <button type="submit" id="save-button">
+            Guardar producto
+          </button>
+
+          <button
+            type="button"
+            id="cancel-edit"
+            class="secondary"
+            hidden
+          >
             Cancelar edición
           </button>
         </form>
@@ -229,6 +345,9 @@
     const message = document.getElementById("message");
     const productsBox = document.getElementById("products");
     const productForm = document.getElementById("product-form");
+
+    const variantsContainer = document.getElementById("variants-container");
+    const variantsEmpty = document.getElementById("variants-empty");
 
     let editingId = null;
     let currentImage = null;
@@ -251,6 +370,130 @@
       await loadProducts();
     }
 
+    // ACTUALIZAR MENSAJE DE VARIANTES
+    function updateVariantsEmpty() {
+      variantsEmpty.hidden = variantsContainer.children.length > 0;
+    }
+
+    // AGREGAR UNA FILA DE TALLE
+    function addVariantRow(variant = {}) {
+      const row = document.createElement("div");
+      row.className = "variant-row";
+
+      const sizeField = document.createElement("div");
+      sizeField.className = "variant-field";
+
+      const sizeLabel = document.createElement("label");
+      sizeLabel.textContent = "Talle";
+
+      const sizeInput = document.createElement("input");
+      sizeInput.type = "text";
+      sizeInput.className = "variant-size";
+      sizeInput.placeholder = "Ej. S, M, L";
+      sizeInput.maxLength = 50;
+      sizeInput.value = variant.size || "";
+
+      sizeField.append(sizeLabel, sizeInput);
+
+      const skuField = document.createElement("div");
+      skuField.className = "variant-field";
+
+      const skuLabel = document.createElement("label");
+      skuLabel.textContent = "SKU (opcional)";
+
+      const skuInput = document.createElement("input");
+      skuInput.type = "text";
+      skuInput.className = "variant-sku";
+      skuInput.placeholder = "Código";
+      skuInput.maxLength = 100;
+      skuInput.value = variant.sku || "";
+
+      skuField.append(skuLabel, skuInput);
+
+      const stockField = document.createElement("div");
+      stockField.className = "variant-field";
+
+      const stockLabel = document.createElement("label");
+      stockLabel.textContent = "Stock";
+
+      const stockInput = document.createElement("input");
+      stockInput.type = "number";
+      stockInput.className = "variant-stock";
+      stockInput.min = "0";
+      stockInput.step = "1";
+      stockInput.required = true;
+      stockInput.value = variant.stock ?? 0;
+
+      stockField.append(stockLabel, stockInput);
+
+      const removeButton = document.createElement("button");
+      removeButton.type = "button";
+      removeButton.className = "remove-variant";
+      removeButton.textContent = "×";
+      removeButton.title = "Eliminar talle";
+      removeButton.setAttribute("aria-label", "Eliminar talle");
+
+      removeButton.addEventListener("click", () => {
+        row.remove();
+        updateVariantsEmpty();
+      });
+
+      row.append(
+        sizeField,
+        skuField,
+        stockField,
+        removeButton
+      );
+
+      variantsContainer.append(row);
+      updateVariantsEmpty();
+    }
+
+    // LEER VARIANTES DEL FORMULARIO
+    function getVariants() {
+      const rows = Array.from(variantsContainer.children);
+      const variants = [];
+
+      for (const row of rows) {
+        const size = row.querySelector(".variant-size").value.trim();
+        const sku = row.querySelector(".variant-sku").value.trim();
+        const stockValue = row.querySelector(".variant-stock").value;
+
+        // Ignorar una fila completamente vacía
+        if (!size && !sku && !stockValue) {
+          continue;
+        }
+
+        if (!size) {
+          throw new Error("Completá el talle de cada variante.");
+        }
+
+        if (stockValue === "" || !Number.isSafeInteger(Number(stockValue)) || Number(stockValue) < 0) {
+          throw new Error("El stock debe ser un número entero igual o mayor a cero.");
+        }
+
+        variants.push({
+          size,
+          sku,
+          stock: Number(stockValue)
+        });
+      }
+
+      // Comprobar talles duplicados
+      const sizes = variants.map(v => v.size.toLowerCase());
+
+      if (new Set(sizes).size !== sizes.length) {
+        throw new Error("No podés cargar dos veces el mismo talle.");
+      }
+
+      if (variants.length > 30) {
+        throw new Error("Podés agregar hasta 30 talles por producto.");
+      }
+
+      return variants;
+    }
+
+    // CARGAR PRODUCTOS
     async function loadProducts() {
       message.textContent = "Cargando productos...";
       productsBox.replaceChildren();
@@ -280,10 +523,15 @@
           name.className = "product-name";
           name.textContent = product.name;
 
+          const variantCount = (product.variants || []).length;
+
           details.className = "product-info";
           details.textContent =
             product.slug + " · $" +
-            Number(product.price).toLocaleString("es-AR");
+            Number(product.price).toLocaleString("es-AR") +
+            " · " +
+            variantCount +
+            (variantCount === 1 ? " talle" : " talles");
 
           edit.textContent = "Editar";
           edit.addEventListener("click", () => editProduct(product));
@@ -303,12 +551,17 @@
       }
     }
 
+    // REINICIAR FORMULARIO
     function resetForm() {
       productForm.reset();
+
       editingId = null;
       currentImage = null;
       currentHover = null;
       currentGallery = [];
+
+      variantsContainer.replaceChildren();
+      updateVariantsEmpty();
 
       document.getElementById("form-title").textContent = "Nuevo producto";
       document.getElementById("save-button").textContent = "Guardar producto";
@@ -324,6 +577,7 @@
         "Podés seleccionar varias fotos a la vez. Máximo 30 fotos en total.";
     }
 
+    // EDITAR PRODUCTO
     function editProduct(product) {
       editingId = product.id;
       currentImage = product.image;
@@ -334,6 +588,15 @@
       document.getElementById("slug").value = product.slug || "";
       document.getElementById("price").value = product.price;
       document.getElementById("description").value = product.description || "";
+
+      // CARGAR VARIANTES EXISTENTES
+      variantsContainer.replaceChildren();
+
+      (product.variants || []).forEach(variant => {
+        addVariantRow(variant);
+      });
+
+      updateVariantsEmpty();
 
       document.getElementById("form-title").textContent = "Editar producto";
       document.getElementById("save-button").textContent = "Guardar cambios";
@@ -358,6 +621,7 @@
       });
     }
 
+    // SUBIR IMAGEN
     async function uploadImage(file) {
       if (file.size > 6 * 1024 * 1024) {
         throw new Error("Una de las imágenes supera los 6 MB.");
@@ -404,6 +668,7 @@
       return data.url;
     }
 
+    // GUARDAR PRODUCTO
     productForm.addEventListener("submit", async (event) => {
       event.preventDefault();
 
@@ -415,6 +680,9 @@
       message.textContent = "Preparando producto e imágenes...";
 
       try {
+        // OBTENER VARIANTES
+        const variants = getVariants();
+
         const mainFile = document.getElementById("image").files[0];
         const hoverFile = document.getElementById("image-hover").files[0];
 
@@ -459,7 +727,8 @@
           description: document.getElementById("description").value,
           image,
           image_hover: imageHover,
-          gallery
+          gallery,
+          variants
         };
 
         message.textContent = "Guardando producto en la base de datos...";
@@ -500,10 +769,18 @@
       }
     });
 
+    // AGREGAR TALLE
+    document.getElementById("add-variant").addEventListener("click", () => {
+      addVariantRow();
+    });
+
+    // CANCELAR EDICIÓN
     document.getElementById("cancel-edit").addEventListener("click", resetForm);
 
+    // ACTUALIZAR LISTA
     document.getElementById("refresh").addEventListener("click", loadProducts);
 
+    // INICIAR SESIÓN
     document.getElementById("login-form").addEventListener("submit", async (event) => {
       event.preventDefault();
 
@@ -549,6 +826,7 @@
       }
     });
 
+    // CERRAR SESIÓN
     document.getElementById("logout").addEventListener("click", async () => {
       try {
         await fetch(API + "/admin/logout", {
@@ -564,6 +842,7 @@
       }
     });
 
+    // COMPROBAR SESIÓN EXISTENTE
     async function checkSession() {
       if (!token()) return;
 
@@ -588,4 +867,3 @@
   </script>
 </body>
 </html>
-```
