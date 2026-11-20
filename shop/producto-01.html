@@ -4,197 +4,110 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Producto / Morón Madrid</title>
+  <title>Producto — Morón Madrid</title>
   <link rel="stylesheet" href="style.css">
-
-  <style>
-    /* BARRA Y LOGO */
-
-    header {
-      position: sticky;
-      top: 0;
-      width: 100%;
-      height: 30px;
-      padding: 0 16px;
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      background: #f5f5f5;
-      z-index: 100;
-    }
-
-    header nav {
-      display: flex;
-      align-items: center;
-      gap: 50px;
-      margin: 0;
-    }
-
-    .logo {
-  position: fixed;
-  top: 40px;
-  left: 20px;
-  z-index: 101;
-  display: block;
-  width: fit-content;
-  margin: 0;
-}
-
-.logo img {
-  width: 100px;
-  height: auto;
-  display: block;
-  transition: transform 0.7s cubic-bezier(.2, .8, .2, 1);
-}
-
-.logo:hover img {
-  transform: rotate(360deg) scale(1.05);
-}
-
-@media (max-width: 700px) {
-  .logo {
-    top: 40px;
-    left: 10px;
-  }
-
-  .logo img {
-    width: 70px;
-  }
-}
-    /* GALERÍA */
-
-    .product-gallery {
-      display: block !important;
-      position: relative;
-      width: 100%;
-      min-width: 0;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-    }
-
-    .carousel-track {
-      display: flex !important;
-      flex-wrap: nowrap !important;
-      width: max-content !important;
-      max-width: none !important;
-      gap: 1px;
-      margin: 0;
-      padding: 0;
-      transition: transform 0.4s ease;
-      will-change: transform;
-    }
-
-    .carousel-slide {
-      display: block !important;
-      flex: 0 0 auto !important;
-      min-width: 0 !important;
-      max-width: none !important;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background: #f5f5f5;
-    }
-
-    .carousel-slide img {
-      display: block !important;
-      width: 100% !important;
-      max-width: none !important;
-      height: auto;
-      margin: 0;
-      padding: 0;
-      aspect-ratio: 4 / 5;
-      object-fit: cover;
-    }
-
-    /* CONTROLES */
-
-    .carousel-controls {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      pointer-events: none;
-      z-index: 2;
-    }
-
-    .carousel-arrow {
-      pointer-events: auto;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: transparent;
-      border: none;
-      color: #000;
-      font-size: 24px;
-      line-height: 1;
-      cursor: pointer;
-      padding: 0;
-    }
-
-    .carousel-arrow:first-child {
-      margin-left: 12px;
-    }
-
-    .carousel-arrow:last-child {
-      margin-right: 12px;
-    }
-
-    .carousel-counter {
-      display: none;
-    }
-
-    @media (max-width: 700px) {
-      header {
-        height: 30px;
-        padding: 0 12px;
-      }
-
-      header nav {
-        flex-direction: row;
-        gap: 15px;
-        margin: 0;
-        align-items: center;
-      }
-
-      header a {
-        font-size: 0.75rem;
-        text-align: right;
-      }
-    }
-
-    @media (max-width: 600px) {
-      .carousel-arrow:first-child {
-        margin-left: 8px;
-      }
-
-      .carousel-arrow:last-child {
-        margin-right: 8px;
-      }
-    }
-  </style>
 </head>
-
 <body>
 
-  <header>
-    <nav>
-      <span class="tienda-link">
-        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEguX14GzmThK94GeMibceKA7zICqad06YxNNfXdMDJWfekWmO24pdYg9z9BdkouOws5N-Haa0-IfN-U79hTyy7-EB1WS40G4UsRYDb8xFVnx9iB5SYvx0J5BH5a5E35dx3srcSqWHckxVBJ/s1600/nuevo-2.gif" alt="">
-        <a href="./">tienda</a>
-      </span>
-      <a href="../#estudio">archivo</a>
-      <a href="../#nosotros">nosotros</a>
-      <a href="../#contacto">contacto</a>
-    </nav>
+  <div class="announcement-bar">
+    3 cuotas sin interés / -5% por transferencia / envíos a todo el país
+  </div>
+
+  <!-- HEADER -->
+  <header class="site-header">
+
+    <div class="header-left">
+      <a href="./">inicio</a>
+
+      <button type="button" class="nav-button"
+        id="products-toggle" aria-expanded="false">
+        productos
+      </button>
+    </div>
+
+    <a href="./" class="logo" aria-label="Morón Madrid — Inicio">
+      <img src="../sticker.png" alt="morón madrid">
+    </a>
+
+    <div class="header-right">
+      <button type="button" class="nav-button"
+        id="info-toggle" aria-expanded="false">
+        información
+      </button>
+
+      <a href="https://moronmadrid.com.ar/#contacto">contacto</a>
+
+      <button type="button" class="nav-button cart-button"
+        id="cart-toggle" aria-label="Carrito">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.7a2 2 0 0 0 2-1.6L21 8H6"/>
+          <circle cx="10" cy="20" r="1"/>
+          <circle cx="18" cy="20" r="1"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="header-dropdown products-dropdown"
+      id="products-dropdown" hidden>
+      <a href="./">ver todo</a>
+      <div id="dynamic-categories"></div>
+    </div>
+
+    <div class="header-dropdown info-dropdown"
+      id="info-dropdown" hidden>
+      <a href="https://moronmadrid.com.ar/nosotros">nosotros</a>
+      <a href="https://moronmadrid.com.ar/comprasenvios">compras / envíos</a>
+      <a href="https://moronmadrid.com.ar/devoluciones">devoluciones</a>
+    </div>
+
+    <div class="cart-dropdown" id="cart-dropdown" hidden>
+      <p>el carrito estará disponible próximamente.</p>
+    </div>
+
+    <button type="button" class="mobile-menu-button"
+      id="mobile-menu-toggle" aria-expanded="false">
+      menú
+    </button>
+
+    <div class="mobile-header-actions">
+      <button type="button" class="nav-button cart-button"
+        id="mobile-cart-toggle" aria-label="Carrito">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.7a2 2 0 0 0 2-1.6L21 8H6"/>
+          <circle cx="10" cy="20" r="1"/>
+          <circle cx="18" cy="20" r="1"/>
+        </svg>
+      </button>
+    </div>
+
   </header>
 
-  <a href="../" class="logo">
-    <img src="../sticker.png" alt="morón madrid">
-  </a>
+  <!-- MENÚ LATERAL MOBILE -->
+  <nav class="mobile-panel" id="mobile-panel" hidden>
+    <a href="./">inicio</a>
+
+    <button type="button" class="mobile-section-title"
+      id="mobile-products-toggle">productos</button>
+
+    <div id="mobile-categories"></div>
+
+    <div class="mobile-divider"></div>
+
+    <button type="button" class="mobile-section-title"
+      id="mobile-info-toggle">información</button>
+
+    <div id="mobile-info-links">
+      <a class="mobile-subitem"
+        href="https://moronmadrid.com.ar/nosotros">nosotros</a>
+      <a class="mobile-subitem"
+        href="https://moronmadrid.com.ar/comprasenvios">compras / envíos</a>
+      <a class="mobile-subitem"
+        href="https://moronmadrid.com.ar/devoluciones">devoluciones</a>
+    </div>
+
+    <div class="mobile-divider"></div>
+    <a href="https://moronmadrid.com.ar/#contacto">contacto</a>
+  </nav>
 
   <main class="product-page" id="product-page">
     <p id="loading-message">cargando producto...</p>
@@ -207,15 +120,156 @@
     const params = new URLSearchParams(window.location.search);
     const slug = params.get("slug");
 
+    const productsDropdown = document.getElementById("products-dropdown");
+    const infoDropdown = document.getElementById("info-dropdown");
+    const mobilePanel = document.getElementById("mobile-panel");
+
     function formatPrice(price) {
       return "$ " + Number(price).toLocaleString("es-AR");
     }
 
+    /* MENÚS */
+
+    function closeMenus() {
+      productsDropdown.hidden = true;
+      infoDropdown.hidden = true;
+      document.getElementById("cart-dropdown").hidden = true;
+
+      document.getElementById("products-toggle")
+        .setAttribute("aria-expanded", "false");
+
+      document.getElementById("info-toggle")
+        .setAttribute("aria-expanded", "false");
+    }
+
+    function toggleMenu(menu, button) {
+      const wasOpen = !menu.hidden;
+      closeMenus();
+
+      if (!wasOpen) {
+        menu.hidden = false;
+        button.setAttribute("aria-expanded", "true");
+      }
+    }
+
+    document.getElementById("products-toggle").addEventListener(
+      "click",
+      () => toggleMenu(
+        productsDropdown,
+        document.getElementById("products-toggle")
+      )
+    );
+
+    document.getElementById("info-toggle").addEventListener(
+      "click",
+      () => toggleMenu(
+        infoDropdown,
+        document.getElementById("info-toggle")
+      )
+    );
+
+    function toggleCart() {
+      const cart = document.getElementById("cart-dropdown");
+      const wasOpen = !cart.hidden;
+      closeMenus();
+      cart.hidden = wasOpen;
+    }
+
+    document.getElementById("cart-toggle")
+      .addEventListener("click", toggleCart);
+
+    document.getElementById("mobile-cart-toggle")
+      .addEventListener("click", toggleCart);
+
+    document.getElementById("mobile-menu-toggle")
+      .addEventListener("click", () => {
+        const button = document.getElementById("mobile-menu-toggle");
+        const opening = mobilePanel.hidden;
+
+        closeMenus();
+        mobilePanel.hidden = !opening;
+        button.setAttribute("aria-expanded", String(opening));
+      });
+
+    document.getElementById("mobile-products-toggle")
+      .addEventListener("click", () => {
+        const categories = document.getElementById("mobile-categories");
+        categories.hidden = !categories.hidden;
+      });
+
+    document.getElementById("mobile-info-toggle")
+      .addEventListener("click", () => {
+        const links = document.getElementById("mobile-info-links");
+        links.hidden = !links.hidden;
+      });
+
+    document.addEventListener("click", event => {
+      if (
+        !event.target.closest(".site-header") &&
+        !event.target.closest(".mobile-panel")
+      ) {
+        closeMenus();
+        mobilePanel.hidden = true;
+
+        document.getElementById("mobile-menu-toggle")
+          .setAttribute("aria-expanded", "false");
+      }
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") {
+        closeMenus();
+        mobilePanel.hidden = true;
+
+        document.getElementById("mobile-menu-toggle")
+          .setAttribute("aria-expanded", "false");
+      }
+    });
+
+    /* CATEGORÍAS */
+
+    async function loadCategories() {
+      try {
+        const response = await fetch(`${API_URL}/categories`);
+        if (!response.ok) return;
+
+        const data = await response.json();
+        const categories = Array.isArray(data.categories)
+          ? data.categories
+          : [];
+
+        const desktop = document.getElementById("dynamic-categories");
+        const mobile = document.getElementById("mobile-categories");
+
+        desktop.replaceChildren();
+        mobile.replaceChildren();
+
+        categories.forEach(category => {
+          const link = document.createElement("a");
+          link.href = `./?categoria=${encodeURIComponent(category.id)}`;
+          link.textContent = category.name.toLowerCase();
+          desktop.appendChild(link);
+
+          const mobileLink = document.createElement("a");
+          mobileLink.className = "mobile-subitem";
+          mobileLink.href = link.href;
+          mobileLink.textContent = category.name.toLowerCase();
+          mobile.appendChild(mobileLink);
+        });
+
+      } catch (error) {
+        console.error("Error al cargar categorías:", error);
+      }
+    }
+
+    /* PRODUCTO */
+
     function renderProduct(product) {
       document.title = product.name + " — Morón Madrid";
-      page.innerHTML = "";
+      page.replaceChildren();
 
-      // GALERÍA
+      /* GALERÍA */
+
       const gallery = document.createElement("section");
       gallery.className = "product-gallery";
 
@@ -265,7 +319,6 @@
 
         gallery.appendChild(track);
 
-        // CONTROLES
         const controls = document.createElement("div");
         controls.className = "carousel-controls";
 
@@ -287,12 +340,10 @@
         controls.append(prevButton, counter, nextButton);
         gallery.appendChild(controls);
 
-        // UNA FOTO EN MOBILE, DOS EN DESKTOP
         function getSlidesPerView() {
           return window.matchMedia("(max-width: 600px)").matches ? 1 : 2;
         }
 
-        // ACTUALIZAR CARRUSEL
         function updateCarousel() {
           const slides = Array.from(
             track.querySelectorAll(".carousel-slide")
@@ -300,8 +351,8 @@
 
           const total = slides.length;
           const slidesPerView = getSlidesPerView();
-
           const galleryWidth = gallery.clientWidth;
+
           const slideWidth = Math.max(
             0,
             (galleryWidth - (slidesPerView - 1)) / slidesPerView
@@ -313,29 +364,21 @@
           });
 
           const maxIndex = Math.max(0, total - slidesPerView);
-
           currentIndex = Math.min(currentIndex, maxIndex);
 
           track.style.transform =
             `translateX(-${currentIndex * (slideWidth + 1)}px)`;
 
-          const firstVisible = total > 0 ? currentIndex + 1 : 0;
-          const lastVisible = Math.min(
-            currentIndex + slidesPerView,
-            total
-          );
-
           counter.textContent =
-            `${firstVisible}–${lastVisible} / ${total}`;
-
-          prevButton.disabled = false;
-          nextButton.disabled = false;
+            `${total ? currentIndex + 1 : 0}–${Math.min(
+              currentIndex + slidesPerView,
+              total
+            )} / ${total}`;
 
           controls.style.display =
             total > slidesPerView ? "flex" : "none";
         }
 
-        // FLECHA IZQUIERDA
         prevButton.addEventListener("click", () => {
           const total = track.querySelectorAll(".carousel-slide").length;
           const maxIndex = Math.max(0, total - getSlidesPerView());
@@ -347,7 +390,6 @@
           updateCarousel();
         });
 
-        // FLECHA DERECHA
         nextButton.addEventListener("click", () => {
           const total = track.querySelectorAll(".carousel-slide").length;
           const maxIndex = Math.max(0, total - getSlidesPerView());
@@ -361,14 +403,15 @@
 
         window.addEventListener("resize", updateCarousel);
 
-        updateCarousel();
-
         track.querySelectorAll("img").forEach(img => {
           img.addEventListener("load", updateCarousel);
         });
+
+        updateCarousel();
       }
 
-      // INFORMACIÓN
+      /* INFORMACIÓN */
+
       const details = document.createElement("section");
       details.className = "product-details";
 
@@ -387,7 +430,8 @@
 
       heading.append(category, title, price);
 
-      // DESCRIPCIÓN
+      /* DESCRIPCIÓN */
+
       const description = document.createElement("div");
       description.className = "product-description";
 
@@ -395,7 +439,8 @@
       descriptionText.textContent = product.description || "";
       description.appendChild(descriptionText);
 
-      // OPCIONES Y STOCK
+      /* TALLES Y STOCK */
+
       const options = document.createElement("div");
       options.className = "product-options";
 
@@ -409,6 +454,7 @@
 
       let sizeSelect = null;
       let selectedVariant = null;
+      let buyButton = null;
 
       if (isSingleProduct) {
         selectedVariant = variants[0];
@@ -447,20 +493,12 @@
           sizeSelect.appendChild(option);
         });
 
-        sizeSelect.addEventListener("change", () => {
-          selectedVariant = variants.find(variant =>
-            String(variant.id || variant.size || "") === sizeSelect.value
-          ) || null;
-
-          buyButton.disabled =
-            !selectedVariant || Number(selectedVariant.stock) <= 0;
-        });
-
         options.append(label, sizeSelect);
       }
 
-      // BOTÓN DE COMPRA
-      const buyButton = document.createElement("button");
+      /* BOTÓN COMPRAR */
+
+      buyButton = document.createElement("button");
       buyButton.type = "button";
       buyButton.textContent = "comprar";
 
@@ -472,6 +510,17 @@
 
       if (!hasStock) {
         buyButton.textContent = "sin stock";
+      }
+
+      if (sizeSelect) {
+        sizeSelect.addEventListener("change", () => {
+          selectedVariant = variants.find(variant =>
+            String(variant.id || variant.size || "") === sizeSelect.value
+          ) || null;
+
+          buyButton.disabled =
+            !selectedVariant || Number(selectedVariant.stock) <= 0;
+        });
       }
 
       buyButton.addEventListener("click", () => {
@@ -489,7 +538,8 @@
 
       options.appendChild(buyButton);
 
-      // VOLVER
+      /* VOLVER */
+
       const back = document.createElement("a");
       back.href = "./";
       back.className = "back-link";
@@ -526,10 +576,12 @@
 
       } catch (error) {
         console.error(error);
-        page.textContent = "no pudimos cargar el producto. intentá nuevamente.";
+        page.textContent =
+          "no pudimos cargar el producto. intentá nuevamente.";
       }
     }
 
+    loadCategories();
     loadProduct();
   </script>
 
