@@ -1,4 +1,3 @@
-
 * {
   box-sizing: border-box;
 }
@@ -14,7 +13,6 @@ body {
 }
 
 /* BARRA DE NAVEGACIÓN */
-
 header {
   position: sticky;
   top: 0;
@@ -59,7 +57,6 @@ header a:hover {
 }
 
 /* LOGO FIJO */
-
 .logo {
   position: fixed;
   top: 40px;
@@ -82,8 +79,38 @@ header a:hover {
   transform: rotate(360deg) scale(1.05);
 }
 
-/* CATÁLOGO */
+/* MENÚ DE CATEGORÍAS */
+.category-menu {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  padding: 18px 16px 14px;
+  background: #f5f5f5;
+}
 
+.category-filter {
+  width: auto;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: #000;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 300;
+  cursor: pointer;
+  text-transform: lowercase;
+}
+
+.category-filter:hover,
+.category-filter.active {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* CATÁLOGO */
 .catalog {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -91,8 +118,12 @@ header a:hover {
   background: #fff;
   width: 100%;
   margin: 0;
-  margin-top: 0;
   padding: 0;
+}
+
+.catalog-message {
+  grid-column: 1 / -1;
+  margin: 20px 16px;
 }
 
 .product {
@@ -100,6 +131,12 @@ header a:hover {
   min-width: 0;
   margin: 0;
   padding: 0;
+}
+
+.product-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
 }
 
 .product-images {
@@ -135,16 +172,19 @@ header a:hover {
 }
 
 /* INFORMACIÓN */
-
 .product-info {
   display: flex;
   justify-content: space-between;
+  gap: 8px;
   padding: 12px 10px 16px;
   font-size: 0.85rem;
 }
 
-/* PÁGINA DE PRODUCTO */
+.product-link:hover .product-info {
+  text-decoration: underline;
+}
 
+/* PÁGINA DE PRODUCTO */
 .product-page {
   display: grid;
   grid-template-columns: 65% 35%;
@@ -226,7 +266,6 @@ header a:hover {
 }
 
 /* MOBILE */
-
 @media (max-width: 700px) {
   header {
     height: 30px;
@@ -255,6 +294,16 @@ header a:hover {
     width: 70px;
   }
 
+  .category-menu {
+    gap: 13px;
+    padding: 18px 12px 12px;
+    padding-left: 95px;
+  }
+
+  .category-filter {
+    font-size: 0.72rem;
+  }
+
   .catalog {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -266,16 +315,6 @@ header a:hover {
   .product-details {
     padding: 35px 20px;
     min-height: 450px;
-  }
-
-  .product-link {
-    display: block;
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .product-link:hover .product-info {
-    text-decoration: underline;
   }
 
   .product-description {
