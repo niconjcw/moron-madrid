@@ -629,3 +629,20 @@ button, a {
     font-size: .7rem;
   }
 }
+
+/* DESPLEGABLES: HOVER SOLO EN DESKTOP */
+
+@media (min-width: 701px) {
+  .nav-group:hover > .header-dropdown[hidden],
+  .nav-group:focus-within > .header-dropdown[hidden] {
+    display: flex !important;
+  }
+}
+
+/* MOBILE: CONSERVAR APERTURA POR TOQUE */
+
+@media (max-width: 700px) {
+  .header-dropdown[hidden] {
+    display: none !important;
+  }
+}
