@@ -181,6 +181,20 @@ button, a {
   gap: 15px;
 }
 
+/* HOVER SOLO EN DESKTOP */
+
+@media (min-width: 701px) {
+  .nav-group:hover .header-dropdown,
+  .nav-group:focus-within .header-dropdown {
+    display: flex;
+  }
+
+  .nav-group:hover > .nav-button i,
+  .nav-group:focus-within > .nav-button i {
+    transform: rotate(180deg);
+  }
+}
+
 /* MOBILE HEADER */
 
 .mobile-header,
