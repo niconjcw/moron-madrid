@@ -13,386 +13,339 @@
     3 cuotas sin interés / -5% por transferencia / envíos a todo el país
   </div>
 
-  <!-- HEADER -->
   <header class="site-header">
 
     <div class="header-left">
       <a href="./">inicio</a>
 
-      <button type="button" class="nav-button"
-        id="products-toggle" aria-expanded="false">
-        productos
-      </button>
+      <div class="nav-group">
+        <button class="nav-button" id="products-toggle" type="button">
+          productos
+        </button>
+
+        <div class="header-dropdown" id="products-dropdown" hidden>
+          <button class="category-filter active" data-category="all">
+            ver todo
+          </button>
+          <div id="dynamic-categories"></div>
+        </div>
+      </div>
     </div>
 
-    <a href="./" class="logo" aria-label="Morón Madrid — Inicio">
+    <a href="./" class="logo" aria-label="Morón Madrid">
       <img src="../sticker.png" alt="morón madrid">
     </a>
 
     <div class="header-right">
-      <button type="button" class="nav-button"
-        id="info-toggle" aria-expanded="false">
-        información
-      </button>
+      <div class="nav-group">
+        <button class="nav-button" id="info-toggle" type="button">
+          información
+        </button>
+
+        <div class="header-dropdown" id="info-dropdown" hidden>
+          <a href="https://moronmadrid.com.ar/nosotros">nosotros</a>
+          <a href="https://moronmadrid.com.ar/comprasenvios">compras / envíos</a>
+          <a href="https://moronmadrid.com.ar/devoluciones">devoluciones</a>
+        </div>
+      </div>
 
       <a href="https://moronmadrid.com.ar/#contacto">contacto</a>
 
-      <button type="button" class="nav-button cart-button"
-        id="cart-toggle" aria-label="Carrito">
+      <a href="#" class="cart-icon" title="Carrito">
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.7a2 2 0 0 0 2-1.6L21 8H6"/>
+          <path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.7a2 2 0 0 0 1.9-1.4L22 8H6"/>
           <circle cx="10" cy="20" r="1"/>
           <circle cx="18" cy="20" r="1"/>
         </svg>
+      </a>
+    </div>
+
+    <div class="mobile-header">
+      <button class="mobile-menu-button" id="mobile-menu-toggle" aria-label="Abrir menú">
+        <span></span><span></span><span></span>
       </button>
+
+      <a href="./" class="mobile-logo">
+        <img src="../sticker.png" alt="morón madrid">
+      </a>
+
+      <a href="#" class="cart-icon mobile-cart" title="Carrito">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.7a2 2 0 0 0 1.9-1.4L22 8H6"/>
+          <circle cx="10" cy="20" r="1"/>
+          <circle cx="18" cy="20" r="1"/>
+        </svg>
+      </a>
     </div>
 
-    <!-- MENÚ PRODUCTOS -->
-    <div class="header-dropdown products-dropdown"
-      id="products-dropdown" hidden>
-      <button type="button" class="category-filter active"
-        data-category="all">ver todo</button>
-      <div id="dynamic-categories"></div>
+  </header>
+
+  <nav class="mobile-panel" id="mobile-panel" hidden>
+    <button class="mobile-close" id="mobile-close" aria-label="Cerrar menú">×</button>
+
+    <a href="./">inicio</a>
+
+    <button class="mobile-section-button" id="mobile-products-toggle">
+      productos
+    </button>
+    <div class="mobile-submenu" id="mobile-categories">
+      <a href="./">ver todo</a>
     </div>
 
-    <!-- MENÚ INFORMACIÓN -->
-    <div class="header-dropdown info-dropdown"
-      id="info-dropdown" hidden>
+    <button class="mobile-section-button" id="mobile-info-toggle">
+      información
+    </button>
+    <div class="mobile-submenu" id="mobile-info-links">
       <a href="https://moronmadrid.com.ar/nosotros">nosotros</a>
       <a href="https://moronmadrid.com.ar/comprasenvios">compras / envíos</a>
       <a href="https://moronmadrid.com.ar/devoluciones">devoluciones</a>
     </div>
 
-    <!-- CARRITO -->
-    <div class="cart-dropdown" id="cart-dropdown" hidden>
-      <p>el carrito estará disponible próximamente.</p>
-    </div>
-
-    <!-- BOTONES MOBILE -->
-    <button type="button" class="mobile-menu-button"
-      id="mobile-menu-toggle" aria-expanded="false">
-      menú
-    </button>
-
-    <div class="mobile-header-actions">
-      <button type="button" class="nav-button cart-button"
-        id="mobile-cart-toggle" aria-label="Carrito">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.7a2 2 0 0 0 2-1.6L21 8H6"/>
-          <circle cx="10" cy="20" r="1"/>
-          <circle cx="18" cy="20" r="1"/>
-        </svg>
-      </button>
-    </div>
-
-  </header>
-
-  <!-- MENÚ LATERAL MOBILE -->
-  <nav class="mobile-panel" id="mobile-panel" hidden>
-    <a href="./">inicio</a>
-
-    <button type="button" class="mobile-section-title"
-      id="mobile-products-toggle">productos</button>
-
-    <div id="mobile-categories"></div>
-
-    <div class="mobile-divider"></div>
-
-    <button type="button" class="mobile-section-title"
-      id="mobile-info-toggle">información</button>
-
-    <div id="mobile-info-links">
-      <a class="mobile-subitem"
-        href="https://moronmadrid.com.ar/nosotros">nosotros</a>
-      <a class="mobile-subitem"
-        href="https://moronmadrid.com.ar/comprasenvios">compras / envíos</a>
-      <a class="mobile-subitem"
-        href="https://moronmadrid.com.ar/devoluciones">devoluciones</a>
-    </div>
-
-    <div class="mobile-divider"></div>
     <a href="https://moronmadrid.com.ar/#contacto">contacto</a>
   </nav>
 
-  <!-- CATÁLOGO -->
   <main class="catalog" id="catalog">
     <p class="catalog-message">cargando productos...</p>
   </main>
 
-  <script>
-    const API_URL = "https://moron-madrid-api.moronmadrid.workers.dev";
+<script>
+const API_URL = "https://moron-madrid-api.moronmadrid.workers.dev";
 
-    const catalog = document.getElementById("catalog");
-    const productsToggle = document.getElementById("products-toggle");
-    const infoToggle = document.getElementById("info-toggle");
-    const productsDropdown = document.getElementById("products-dropdown");
-    const infoDropdown = document.getElementById("info-dropdown");
-    const dynamicCategories = document.getElementById("dynamic-categories");
-    const mobilePanel = document.getElementById("mobile-panel");
+const catalog = document.getElementById("catalog");
+const productsDropdown = document.getElementById("products-dropdown");
+const dynamicCategories = document.getElementById("dynamic-categories");
 
-    let allProducts = [];
-    let selectedCategory =
-      new URLSearchParams(window.location.search).get("categoria") || "all";
+let allProducts = [];
+let selectedCategory = "all";
 
-    function formatPrice(price) {
-      return "$ " + Number(price).toLocaleString("es-AR");
-    }
+function formatPrice(price) {
+  return "$ " + Number(price).toLocaleString("es-AR");
+}
 
-    function closeMenus() {
-      productsDropdown.hidden = true;
-      infoDropdown.hidden = true;
-      document.getElementById("cart-dropdown").hidden = true;
+/* MENÚ MOBILE */
 
-      productsToggle.setAttribute("aria-expanded", "false");
-      infoToggle.setAttribute("aria-expanded", "false");
-    }
+const mobilePanel = document.getElementById("mobile-panel");
 
-    function toggleMenu(menu, button) {
-      const wasOpen = !menu.hidden;
-      closeMenus();
+function openMobileMenu() {
+  mobilePanel.hidden = false;
+  requestAnimationFrame(() => mobilePanel.classList.add("is-open"));
+  document.body.style.overflow = "hidden";
+}
 
-      if (!wasOpen) {
-        menu.hidden = false;
-        button.setAttribute("aria-expanded", "true");
-      }
-    }
+function closeMobileMenu() {
+  mobilePanel.classList.remove("is-open");
+  document.body.style.overflow = "";
 
-    productsToggle.addEventListener("click", () =>
-      toggleMenu(productsDropdown, productsToggle)
-    );
-
-    infoToggle.addEventListener("click", () =>
-      toggleMenu(infoDropdown, infoToggle)
-    );
-
-    function toggleCart() {
-      const cart = document.getElementById("cart-dropdown");
-      const wasOpen = !cart.hidden;
-      closeMenus();
-      cart.hidden = wasOpen;
-    }
-
-    document.getElementById("cart-toggle")
-      .addEventListener("click", toggleCart);
-
-    document.getElementById("mobile-cart-toggle")
-      .addEventListener("click", toggleCart);
-
-    document.getElementById("mobile-menu-toggle")
-      .addEventListener("click", () => {
-        const button = document.getElementById("mobile-menu-toggle");
-        const opening = mobilePanel.hidden;
-
-        closeMenus();
-        mobilePanel.hidden = !opening;
-        button.setAttribute("aria-expanded", String(opening));
-      });
-
-    document.getElementById("mobile-products-toggle")
-      .addEventListener("click", () => {
-        const categories = document.getElementById("mobile-categories");
-        categories.hidden = !categories.hidden;
-      });
-
-    document.getElementById("mobile-info-toggle")
-      .addEventListener("click", () => {
-        const links = document.getElementById("mobile-info-links");
-        links.hidden = !links.hidden;
-      });
-
-    document.addEventListener("click", event => {
-      if (
-        !event.target.closest(".site-header") &&
-        !event.target.closest(".mobile-panel")
-      ) {
-        closeMenus();
-        mobilePanel.hidden = true;
-        document.getElementById("mobile-menu-toggle")
-          .setAttribute("aria-expanded", "false");
-      }
-    });
-
-    document.addEventListener("keydown", event => {
-      if (event.key === "Escape") {
-        closeMenus();
-        mobilePanel.hidden = true;
-        document.getElementById("mobile-menu-toggle")
-          .setAttribute("aria-expanded", "false");
-      }
-    });
-
-    function createProduct(product) {
-      const article = document.createElement("article");
-      article.className = "product";
-
-      const link = document.createElement("a");
-      link.className = "product-link";
-      link.href = `producto-01.html?slug=${encodeURIComponent(product.slug)}`;
-
-      const images = document.createElement("div");
-      images.className = "product-images";
-
-      const primary = document.createElement("img");
-      primary.className = "primary-image";
-      primary.src = product.image || "";
-      primary.alt = product.name;
-      primary.loading = "lazy";
-      images.appendChild(primary);
-
-      if (product.image_hover) {
-        const secondary = document.createElement("img");
-        secondary.className = "secondary-image";
-        secondary.src = product.image_hover;
-        secondary.alt = product.name + " — segunda vista";
-        secondary.loading = "lazy";
-        images.appendChild(secondary);
-      }
-
-      const info = document.createElement("div");
-      info.className = "product-info";
-
-      const name = document.createElement("span");
-      name.textContent = product.name;
-
-      const price = document.createElement("span");
-      price.textContent = formatPrice(product.price);
-
-      info.append(name, price);
-      link.append(images, info);
-      article.append(link);
-
-      return article;
-    }
-
-    function renderProducts() {
-      catalog.replaceChildren();
-
-      const products = selectedCategory === "all"
-        ? allProducts
-        : allProducts.filter(product =>
-            String(product.category_id) === String(selectedCategory)
-          );
-
-      if (!products.length) {
-        const empty = document.createElement("p");
-        empty.className = "catalog-message";
-        empty.textContent = allProducts.length
-          ? "no hay productos en esta categoría"
-          : "próximamente";
-
-        catalog.append(empty);
-        return;
-      }
-
-      products.forEach(product => {
-        catalog.appendChild(createProduct(product));
-      });
-    }
-
-    function selectCategory(categoryId, button) {
-      selectedCategory = String(categoryId);
-
-      document.querySelectorAll(".category-filter").forEach(item => {
-        item.classList.toggle(
-          "active",
-          item.dataset.category === selectedCategory
-        );
-      });
-
-      closeMenus();
+  setTimeout(() => {
+    if (!mobilePanel.classList.contains("is-open")) {
       mobilePanel.hidden = true;
-      renderProducts();
+    }
+  }, 350);
+}
 
-      const url = new URL(window.location.href);
+document.getElementById("mobile-menu-toggle")
+  .addEventListener("click", openMobileMenu);
 
-      if (selectedCategory === "all") {
-        url.searchParams.delete("categoria");
-      } else {
-        url.searchParams.set("categoria", selectedCategory);
-      }
+document.getElementById("mobile-close")
+  .addEventListener("click", closeMobileMenu);
 
-      history.replaceState({}, "", url);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") closeMobileMenu();
+});
+
+document.getElementById("mobile-products-toggle")
+  .addEventListener("click", () => {
+    document.getElementById("mobile-categories")
+      .classList.toggle("is-open");
+  });
+
+document.getElementById("mobile-info-toggle")
+  .addEventListener("click", () => {
+    document.getElementById("mobile-info-links")
+      .classList.toggle("is-open");
+  });
+
+/* PRODUCTOS */
+
+function createProduct(product) {
+  const article = document.createElement("article");
+  article.className = "product";
+
+  const link = document.createElement("a");
+  link.className = "product-link";
+  link.href = `producto-01.html?slug=${encodeURIComponent(product.slug)}`;
+
+  const images = document.createElement("div");
+  images.className = "product-images";
+
+  const primary = document.createElement("img");
+  primary.className = "primary-image";
+  primary.src = product.image || "";
+  primary.alt = product.name;
+  primary.loading = "lazy";
+  images.appendChild(primary);
+
+  if (product.image_hover) {
+    const secondary = document.createElement("img");
+    secondary.className = "secondary-image";
+    secondary.src = product.image_hover;
+    secondary.alt = product.name + " — segunda vista";
+    secondary.loading = "lazy";
+    images.appendChild(secondary);
+  }
+
+  const info = document.createElement("div");
+  info.className = "product-info";
+
+  const name = document.createElement("span");
+  name.textContent = product.name;
+
+  const price = document.createElement("span");
+  price.textContent = formatPrice(product.price);
+
+  info.append(name, price);
+  link.append(images, info);
+  article.append(link);
+
+  return article;
+}
+
+function renderProducts() {
+  catalog.replaceChildren();
+
+  const products = selectedCategory === "all"
+    ? allProducts
+    : allProducts.filter(product =>
+        String(product.category_id) === String(selectedCategory)
+      );
+
+  if (!products.length) {
+    const empty = document.createElement("p");
+    empty.className = "catalog-message";
+    empty.textContent = allProducts.length
+      ? "no hay productos en esta categoría"
+      : "próximamente";
+    catalog.append(empty);
+    return;
+  }
+
+  products.forEach(product => {
+    catalog.appendChild(createProduct(product));
+  });
+}
+
+function selectCategory(categoryId) {
+  selectedCategory = categoryId;
+  renderProducts();
+  closeMobileMenu();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+/* CATEGORÍAS */
+
+function renderCategoryMenu(categories) {
+  dynamicCategories.replaceChildren();
+
+  const mobileCategories = document.getElementById("mobile-categories");
+  mobileCategories.replaceChildren();
+
+  const allButton = document.createElement("button");
+  allButton.type = "button";
+  allButton.className = "category-filter";
+  allButton.textContent = "ver todo";
+  allButton.addEventListener("click", () => selectCategory("all"));
+  mobileCategories.appendChild(allButton);
+
+  categories.forEach(category => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "category-filter";
+    button.dataset.category = category.id;
+    button.textContent = category.name.toLowerCase();
+    button.addEventListener("click", () => selectCategory(category.id));
+    dynamicCategories.appendChild(button);
+
+    const mobileLink = document.createElement("button");
+    mobileLink.type = "button";
+    mobileLink.textContent = category.name.toLowerCase();
+    mobileLink.addEventListener("click", () => selectCategory(category.id));
+    mobileCategories.appendChild(mobileLink);
+  });
+}
+
+/* DESPLEGABLES DESKTOP */
+
+const productsToggle = document.getElementById("products-toggle");
+const infoToggle = document.getElementById("info-toggle");
+const infoDropdown = document.getElementById("info-dropdown");
+
+productsToggle.addEventListener("click", () => {
+  const opening = productsDropdown.hidden;
+  productsDropdown.hidden = !opening;
+  infoDropdown.hidden = true;
+  productsToggle.setAttribute("aria-expanded", String(opening));
+  infoToggle.setAttribute("aria-expanded", "false");
+});
+
+infoToggle.addEventListener("click", () => {
+  const opening = infoDropdown.hidden;
+  infoDropdown.hidden = !opening;
+  productsDropdown.hidden = true;
+  infoToggle.setAttribute("aria-expanded", String(opening));
+  productsToggle.setAttribute("aria-expanded", "false");
+});
+
+document.addEventListener("click", event => {
+  if (!event.target.closest(".nav-group")) {
+    productsDropdown.hidden = true;
+    infoDropdown.hidden = true;
+    productsToggle.setAttribute("aria-expanded", "false");
+    infoToggle.setAttribute("aria-expanded", "false");
+  }
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") {
+    productsDropdown.hidden = true;
+    infoDropdown.hidden = true;
+  }
+});
+
+/* CARGA DE LA TIENDA */
+
+async function loadStore() {
+  try {
+    const [productsResponse, categoriesResponse] = await Promise.all([
+      fetch(`${API_URL}/products`),
+      fetch(`${API_URL}/categories`)
+    ]);
+
+    if (!productsResponse.ok || !categoriesResponse.ok) {
+      throw new Error("No se pudo cargar la tienda.");
     }
 
-    productsDropdown.addEventListener("click", event => {
-      const button = event.target.closest(".category-filter");
-      if (button) selectCategory(button.dataset.category, button);
-    });
+    const productsData = await productsResponse.json();
+    const categoriesData = await categoriesResponse.json();
 
-    function renderCategoryMenu(categories) {
-      dynamicCategories.replaceChildren();
+    allProducts = Array.isArray(productsData.products)
+      ? productsData.products
+      : [];
 
-      const mobileCategories =
-        document.getElementById("mobile-categories");
+    const categories = Array.isArray(categoriesData.categories)
+      ? categoriesData.categories
+      : [];
 
-      mobileCategories.replaceChildren();
+    renderCategoryMenu(categories);
+    renderProducts();
 
-      categories.forEach(category => {
-        const button = document.createElement("button");
-        button.type = "button";
-        button.className = "category-filter";
-        button.dataset.category = category.id;
-        button.textContent = category.name.toLowerCase();
+  } catch (error) {
+    console.error(error);
+    catalog.textContent = "no pudimos cargar la tienda. intentá nuevamente.";
+  }
+}
 
-        dynamicCategories.appendChild(button);
-
-        const mobileLink = document.createElement("a");
-        mobileLink.className = "mobile-subitem";
-        mobileLink.href = `./?categoria=${encodeURIComponent(category.id)}`;
-        mobileLink.textContent = category.name.toLowerCase();
-
-        mobileCategories.appendChild(mobileLink);
-      });
-    }
-
-    async function loadStore() {
-      try {
-        const [productsResponse, categoriesResponse] = await Promise.all([
-          fetch(`${API_URL}/products`),
-          fetch(`${API_URL}/categories`)
-        ]);
-
-        if (!productsResponse.ok || !categoriesResponse.ok) {
-          throw new Error("No se pudo cargar la tienda.");
-        }
-
-        const productsData = await productsResponse.json();
-        const categoriesData = await categoriesResponse.json();
-
-        allProducts = Array.isArray(productsData.products)
-          ? productsData.products
-          : [];
-
-        const categories = Array.isArray(categoriesData.categories)
-          ? categoriesData.categories
-          : [];
-
-        renderCategoryMenu(categories);
-
-        const exists = categories.some(category =>
-          String(category.id) === String(selectedCategory)
-        );
-
-        if (selectedCategory !== "all" && !exists) {
-          selectedCategory = "all";
-        }
-
-        document.querySelector(
-          '.category-filter[data-category="all"]'
-        ).classList.toggle("active", selectedCategory === "all");
-
-        renderProducts();
-
-      } catch (error) {
-        console.error(error);
-        catalog.textContent =
-          "no pudimos cargar la tienda. intentá nuevamente.";
-      }
-    }
-
-    loadStore();
-  </script>
+loadStore();
+</script>
 
 </body>
 </html>
