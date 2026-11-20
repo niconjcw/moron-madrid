@@ -6,11 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Producto — Morón Madrid</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
 
   <div class="announcement-bar">
-    3 cuotas sin interés / -5% por transferencia / envíos a todo el país
+    <marquee>3 cuotas sin interés / -5% por transferencia / envíos a todo el país /</marquee>
   </div>
 
   <!-- HEADER -->
@@ -20,8 +21,8 @@
       <a href="./">inicio</a>
 
       <div class="nav-group">
-        <button type="button" class="nav-button" id="products-toggle">
-          productos
+        <button type="button" class="nav-button" id="products-toggle" aria-expanded="false">
+          productos <i class="fas fa-angle-down"></i>
         </button>
 
         <div class="header-dropdown" id="products-dropdown" hidden>
@@ -38,8 +39,8 @@
     <div class="header-right">
 
       <div class="nav-group">
-        <button type="button" class="nav-button" id="info-toggle">
-          información
+        <button type="button" class="nav-button" id="info-toggle" aria-expanded="false">
+          información <i class="fas fa-angle-down"></i>
         </button>
 
         <div class="header-dropdown" id="info-dropdown" hidden>
@@ -110,7 +111,7 @@
       id="mobile-products-toggle"
       aria-expanded="false"
     >
-      productos
+      productos <i class="fas fa-angle-down"></i>
     </button>
 
     <div class="mobile-submenu" id="mobile-categories">
@@ -123,7 +124,7 @@
       id="mobile-info-toggle"
       aria-expanded="false"
     >
-      información
+      información <i class="fas fa-angle-down"></i>
     </button>
 
     <div class="mobile-submenu" id="mobile-info-links">
@@ -158,23 +159,37 @@
 
     /* MENÚ DESKTOP */
 
+    const productsToggle = document.getElementById("products-toggle");
+    const infoToggle = document.getElementById("info-toggle");
+
+    productsToggle.addEventListener("click", () => {
+      const opening = productsDropdown.hidden;
+
+      productsDropdown.hidden = !opening;
+      infoDropdown.hidden = true;
+
+      productsToggle.setAttribute("aria-expanded", String(opening));
+      infoToggle.setAttribute("aria-expanded", "false");
+    });
+
+    infoToggle.addEventListener("click", () => {
+      const opening = infoDropdown.hidden;
+
+      infoDropdown.hidden = !opening;
+      productsDropdown.hidden = true;
+
+      infoToggle.setAttribute("aria-expanded", String(opening));
+      productsToggle.setAttribute("aria-expanded", "false");
+    });
+
     document.addEventListener("click", event => {
       if (!event.target.closest(".nav-group")) {
         productsDropdown.hidden = true;
         infoDropdown.hidden = true;
+
+        productsToggle.setAttribute("aria-expanded", "false");
+        infoToggle.setAttribute("aria-expanded", "false");
       }
-    });
-
-    document.getElementById("products-toggle").addEventListener("click", () => {
-      const opening = productsDropdown.hidden;
-      productsDropdown.hidden = !opening;
-      infoDropdown.hidden = true;
-    });
-
-    document.getElementById("info-toggle").addEventListener("click", () => {
-      const opening = infoDropdown.hidden;
-      infoDropdown.hidden = !opening;
-      productsDropdown.hidden = true;
     });
 
     /* MENÚ MOBILE */
@@ -209,29 +224,30 @@
     document.getElementById("mobile-close")
       .addEventListener("click", closeMobileMenu);
 
-    document.getElementById("mobile-products-toggle")
-      .addEventListener("click", event => {
-        const submenu = document.getElementById("mobile-categories");
+    function toggleMobileSection(buttonId, submenuId) {
+      const button = document.getElementById(buttonId);
+      const submenu = document.getElementById(submenuId);
+
+      button.addEventListener("click", () => {
         const opening = !submenu.classList.contains("is-open");
 
         submenu.classList.toggle("is-open", opening);
-        event.currentTarget.setAttribute("aria-expanded", String(opening));
+        button.setAttribute("aria-expanded", String(opening));
       });
+    }
 
-    document.getElementById("mobile-info-toggle")
-      .addEventListener("click", event => {
-        const submenu = document.getElementById("mobile-info-links");
-        const opening = !submenu.classList.contains("is-open");
-
-        submenu.classList.toggle("is-open", opening);
-        event.currentTarget.setAttribute("aria-expanded", String(opening));
-      });
+    toggleMobileSection("mobile-products-toggle", "mobile-categories");
+    toggleMobileSection("mobile-info-toggle", "mobile-info-links");
 
     document.addEventListener("keydown", event => {
       if (event.key === "Escape") {
         closeMobileMenu();
+
         productsDropdown.hidden = true;
         infoDropdown.hidden = true;
+
+        productsToggle.setAttribute("aria-expanded", "false");
+        infoToggle.setAttribute("aria-expanded", "false");
       }
     });
 
@@ -257,27 +273,18 @@
         desktop.replaceChildren();
         mobile.replaceChildren();
 
-        const allDesktop = document.createElement("a");
-        allDesktop.href = "./";
-        allDesktop.textContent = "ver todo";
-        desktop.appendChild(allDesktop);
-
-        const allMobile = document.createElement("a");
-        allMobile.href = "./";
-        allMobile.textContent = "ver todo";
-        mobile.appendChild(allMobile);
-
         categories.forEach(category => {
           const href = `./?category=${encodeURIComponent(category.id)}`;
 
           const desktopLink = document.createElement("a");
           desktopLink.href = href;
           desktopLink.textContent = category.name.toLowerCase();
-          desktop.appendChild(desktopLink);
 
           const mobileLink = document.createElement("a");
           mobileLink.href = href;
           mobileLink.textContent = category.name.toLowerCase();
+
+          desktop.appendChild(desktopLink);
           mobile.appendChild(mobileLink);
         });
 
@@ -352,13 +359,13 @@
         const prevButton = document.createElement("button");
         prevButton.type = "button";
         prevButton.className = "carousel-arrow";
-        prevButton.textContent = "‹";
+        prevButton.innerHTML = '<i class="fas fa-angle-left"></i>';
         prevButton.setAttribute("aria-label", "Imágenes anteriores");
 
         const nextButton = document.createElement("button");
         nextButton.type = "button";
         nextButton.className = "carousel-arrow";
-        nextButton.textContent = "›";
+        nextButton.innerHTML = '<i class="fas fa-angle-right"></i>';
         nextButton.setAttribute("aria-label", "Imágenes siguientes");
 
         controls.append(prevButton, counter, nextButton);
