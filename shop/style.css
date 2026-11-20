@@ -1,3 +1,4 @@
+
 * {
   box-sizing: border-box;
 }
@@ -12,66 +13,90 @@ body {
   line-height: 1.2;
 }
 
-/* BARRA DE NAVEGACIÓN */
-header {
-  position: sticky;
-  top: 0;
-  width: 100%;
-  height: 30px;
-  padding: 0 16px;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  background: #f5f5f5;
-  z-index: 100;
-}
+/* BARRA DE PROMOCIONES */
 
-nav {
+.announcement-bar {
+  width: 100%;
+  min-height: 25px;
   display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 50px;
-  margin: 0;
-  font-size: 0.9rem;
+  padding: 5px 12px;
+  background: #000;
+  color: #fff;
+  text-align: center;
+  font-size: 0.72rem;
   font-weight: 300;
 }
 
-.tienda-link {
+/* HEADER */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  height: 105px;
+  padding: 0 30px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  background: #f5f5f5;
+}
+
+.header-left,
+.header-right {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 28px;
 }
 
-.tienda-link img {
-  width: auto;
-  height: 20px;
-  margin-top: -1px;
+.header-right {
+  justify-content: flex-end;
 }
 
-header a {
+.site-header a,
+.nav-button {
   color: #000;
   text-decoration: none;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 300;
+  white-space: nowrap;
 }
 
-header a:hover {
+.site-header a:hover,
+.nav-button:hover {
   text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
-/* LOGO FIJO */
+.nav-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.cart-placeholder {
+  font-size: 0.85rem;
+  white-space: nowrap;
+  opacity: 0.45;
+}
+
+/* LOGO */
+
 .logo {
-  position: fixed;
-  top: 40px;
-  left: 20px;
-  z-index: 101;
   display: block;
-  width: fit-content;
-  margin: 0;
+  width: 76px;
+  justify-self: center;
+  grid-column: 2;
 }
 
 .logo img {
-  width: 100px;
-  height: auto;
   display: block;
-  margin: 0;
+  width: 100%;
+  height: auto;
   transition: transform 0.7s cubic-bezier(.2, .8, .2, 1);
 }
 
@@ -79,38 +104,57 @@ header a:hover {
   transform: rotate(360deg) scale(1.05);
 }
 
-/* MENÚ DE CATEGORÍAS */
-.category-menu {
+/* MENÚS DESPLEGABLES */
+
+.header-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 110;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 18px;
-  width: 100%;
-  padding: 18px 16px 14px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 13px;
+  min-width: 220px;
+  padding: 20px 30px 25px;
   background: #f5f5f5;
 }
 
+.header-dropdown[hidden] {
+  display: none;
+}
+
+.header-dropdown a,
 .category-filter {
-  width: auto;
   padding: 0;
-  margin: 0;
   border: 0;
   background: transparent;
   color: #000;
   font: inherit;
   font-size: 0.82rem;
   font-weight: 300;
-  cursor: pointer;
+  text-decoration: none;
+  text-align: left;
   text-transform: lowercase;
+  cursor: pointer;
 }
 
+.header-dropdown a:hover,
 .category-filter:hover,
 .category-filter.active {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
+#dynamic-categories {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 13px;
+}
+
 /* CATÁLOGO */
+
 .catalog {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -171,7 +215,8 @@ header a:hover {
   }
 }
 
-/* INFORMACIÓN */
+/* INFORMACIÓN DE PRODUCTOS */
+
 .product-info {
   display: flex;
   justify-content: space-between;
@@ -185,6 +230,7 @@ header a:hover {
 }
 
 /* PÁGINA DE PRODUCTO */
+
 .product-page {
   display: grid;
   grid-template-columns: 65% 35%;
@@ -266,46 +312,58 @@ header a:hover {
 }
 
 /* MOBILE */
+
 @media (max-width: 700px) {
-  header {
-    height: 30px;
-    padding: 0 12px;
+
+  .announcement-bar {
+    min-height: 24px;
+    font-size: 0.62rem;
+    padding: 5px 8px;
   }
 
-  nav {
-    flex-direction: row;
-    gap: 15px;
-    margin: 0;
-    align-items: center;
+  .site-header {
+    height: 78px;
+    padding: 0 14px;
   }
 
-  header a {
-    text-align: right;
-    font-size: 0.75rem;
+  .header-left,
+  .header-right {
+    gap: 12px;
+  }
+
+  .site-header a,
+  .nav-button,
+  .cart-placeholder {
+    font-size: 0.72rem;
   }
 
   .logo {
-    top: 40px;
-    left: 10px;
-    margin: 0;
+    width: 58px;
   }
 
-  .logo img {
-    width: 70px;
+  .header-dropdown {
+    width: 100%;
+    min-width: 0;
+    padding: 20px 16px 24px;
+    gap: 16px;
   }
 
-  .category-menu {
-    gap: 13px;
-    padding: 18px 12px 12px;
-    padding-left: 95px;
-  }
-
+  .header-dropdown a,
   .category-filter {
-    font-size: 0.72rem;
+    font-size: 0.78rem;
+  }
+
+  #dynamic-categories {
+    gap: 16px;
   }
 
   .catalog {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .product-info {
+    padding: 10px 7px 14px;
+    font-size: 0.75rem;
   }
 
   .product-page {
@@ -319,5 +377,28 @@ header a:hover {
 
   .product-description {
     margin: 35px 0;
+  }
+}
+
+/* PANTALLAS MUY CHICAS */
+
+@media (max-width: 380px) {
+  .site-header {
+    padding: 0 10px;
+  }
+
+  .header-left,
+  .header-right {
+    gap: 8px;
+  }
+
+  .site-header a,
+  .nav-button,
+  .cart-placeholder {
+    font-size: 0.68rem;
+  }
+
+  .logo {
+    width: 52px;
   }
 }
