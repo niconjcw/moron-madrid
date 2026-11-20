@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -7,9 +6,7 @@
   <title>Morón Madrid — Tienda</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-
   <header>
     <nav>
       <span class="tienda-link">
@@ -21,9 +18,14 @@
       <a href="../#contacto">contacto</a>
     </nav>
   </header>
-    <a href="../" class="logo">
-      <img src="../sticker.png" alt="morón madrid">
-    </a>
+
+  <a href="../" class="logo">
+    <img src="../sticker.png" alt="morón madrid">
+  </a>
+
+  <div class="category-menu" id="category-menu" aria-label="Categorías">
+    <button type="button" class="category-filter active" data-category="all">todos</button>
+  </div>
 
   <main class="catalog" id="catalog">
     <p id="catalog-message">cargando productos...</p>
@@ -31,9 +33,10 @@
 
   <script>
     const API_URL = "https://moron-madrid-api.moronmadrid.workers.dev";
-
     const catalog = document.getElementById("catalog");
-    const message = document.getElementById("catalog-message");
+    const categoryMenu = document.getElementById("category-menu");
+    let allProducts = [];
+    let selectedCategory = "all";
 
     function formatPrice(price) {
       return "$ " + Number(price).toLocaleString("es-AR");
@@ -55,7 +58,6 @@
       primary.src = product.image || "";
       primary.alt = product.name;
       primary.loading = "lazy";
-
       images.appendChild(primary);
 
       if (product.image_hover) {
@@ -76,46 +78,86 @@
       const price = document.createElement("span");
       price.textContent = formatPrice(product.price);
 
-      info.appendChild(name);
-      info.appendChild(price);
-
-      link.appendChild(images);
-      link.appendChild(info);
-      article.appendChild(link);
-
+      info.append(name, price);
+      link.append(images, info);
+      article.append(link);
       return article;
     }
 
-    async function loadProducts() {
-      try {
-        const response = await fetch(`${API_URL}/products`);
+    function renderProducts() {
+      catalog.replaceChildren();
 
-        if (!response.ok) {
-          throw new Error("Error al consultar los productos");
-        }
+      const products = selectedCategory === "all"
+        ? allProducts
+        : allProducts.filter(product => product.category_id === selectedCategory);
 
-        const data = await response.json();
-const products = data.products;
-        
-        catalog.innerHTML = "";
+      if (!products.length) {
+        const empty = document.createElement("p");
+        empty.className = "catalog-message";
+        empty.textContent = allProducts.length
+          ? "no hay productos en esta categoría"
+          : "próximamente";
+        catalog.append(empty);
+        return;
+      }
 
-        if (!Array.isArray(products) || products.length === 0) {
-          catalog.textContent = "próximamente";
-          return;
-        }
+      products.forEach(product => catalog.appendChild(createProduct(product)));
+    }
 
-        products.forEach(product => {
-          catalog.appendChild(createProduct(product));
+    function renderCategoryMenu(categories) {
+      categoryMenu.replaceChildren();
+
+      const allButton = document.createElement("button");
+      allButton.type = "button";
+      allButton.className = "category-filter active";
+      allButton.dataset.category = "all";
+      allButton.textContent = "todos";
+      categoryMenu.append(allButton);
+
+      categories.forEach(category => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "category-filter";
+        button.dataset.category = category.id;
+        button.textContent = category.name.toLowerCase();
+        categoryMenu.append(button);
+      });
+
+      categoryMenu.addEventListener("click", event => {
+        const button = event.target.closest(".category-filter");
+        if (!button) return;
+
+        selectedCategory = button.dataset.category;
+        categoryMenu.querySelectorAll(".category-filter").forEach(item => {
+          item.classList.toggle("active", item === button);
         });
+        renderProducts();
+      });
+    }
 
+    async function loadStore() {
+      try {
+        const [productsResponse, categoriesResponse] = await Promise.all([
+          fetch(`${API_URL}/products`),
+          fetch(`${API_URL}/categories`)
+        ]);
+
+        if (!productsResponse.ok) throw new Error("No se pudieron cargar los productos.");
+        if (!categoriesResponse.ok) throw new Error("No se pudieron cargar las categorías.");
+
+        const productsData = await productsResponse.json();
+        const categoriesData = await categoriesResponse.json();
+
+        allProducts = Array.isArray(productsData.products) ? productsData.products : [];
+        renderCategoryMenu(Array.isArray(categoriesData.categories) ? categoriesData.categories : []);
+        renderProducts();
       } catch (error) {
         console.error(error);
-        catalog.textContent = "no pudimos cargar los productos. intentá nuevamente.";
+        catalog.textContent = "no pudimos cargar la tienda. intentá nuevamente.";
       }
     }
 
-    loadProducts();
+    loadStore();
   </script>
-
 </body>
 </html>
