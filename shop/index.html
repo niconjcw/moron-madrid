@@ -6,11 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Morón Madrid — Tienda</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
 
   <div class="announcement-bar">
-    <marquee> 3 cuotas sin interés / -5% por transferencia / envíos a todo el país /</marquee>
+    <marquee>3 cuotas sin interés / -5% por transferencia / envíos a todo el país /</marquee>
   </div>
 
   <header class="site-header">
@@ -19,14 +20,12 @@
       <a href="./">inicio</a>
 
       <div class="nav-group">
-        <button class="nav-button" id="products-toggle" type="button">
-          productos
+        <button class="nav-button" id="products-toggle" type="button" aria-expanded="false">
+          productos <i class="fas fa-angle-down"></i>
         </button>
 
         <div class="header-dropdown" id="products-dropdown" hidden>
-          <button class="category-filter active" data-category="all">
-            ver todo
-          </button>
+          <button class="category-filter active" data-category="all">ver todo</button>
           <div id="dynamic-categories"></div>
         </div>
       </div>
@@ -38,8 +37,8 @@
 
     <div class="header-right">
       <div class="nav-group">
-        <button class="nav-button" id="info-toggle" type="button">
-          información
+        <button class="nav-button" id="info-toggle" type="button" aria-expanded="false">
+          información <i class="fas fa-angle-down"></i>
         </button>
 
         <div class="header-dropdown" id="info-dropdown" hidden>
@@ -85,16 +84,18 @@
 
     <a href="./">inicio</a>
 
-    <button class="mobile-section-button" id="mobile-products-toggle">
-      productos
+    <button class="mobile-section-button" id="mobile-products-toggle" aria-expanded="false">
+      productos <i class="fas fa-angle-down"></i>
     </button>
+
     <div class="mobile-submenu" id="mobile-categories">
-      <a href="./">ver todo</a>
+      <button type="button" class="mobile-category" data-category="all">ver todo</button>
     </div>
 
-    <button class="mobile-section-button" id="mobile-info-toggle">
-      información
+    <button class="mobile-section-button" id="mobile-info-toggle" aria-expanded="false">
+      información <i class="fas fa-angle-down"></i>
     </button>
+
     <div class="mobile-submenu" id="mobile-info-links">
       <a href="https://moronmadrid.com.ar/nosotros">nosotros</a>
       <a href="https://moronmadrid.com.ar/comprasenvios">compras / envíos</a>
@@ -150,20 +151,26 @@ document.getElementById("mobile-close")
   .addEventListener("click", closeMobileMenu);
 
 document.addEventListener("keydown", event => {
-  if (event.key === "Escape") closeMobileMenu();
+  if (event.key === "Escape") {
+    closeMobileMenu();
+    productsDropdown.hidden = true;
+    infoDropdown.hidden = true;
+  }
 });
 
-document.getElementById("mobile-products-toggle")
-  .addEventListener("click", () => {
-    document.getElementById("mobile-categories")
-      .classList.toggle("is-open");
-  });
+function toggleMobileSection(buttonId, submenuId) {
+  const button = document.getElementById(buttonId);
+  const submenu = document.getElementById(submenuId);
 
-document.getElementById("mobile-info-toggle")
-  .addEventListener("click", () => {
-    document.getElementById("mobile-info-links")
-      .classList.toggle("is-open");
+  button.addEventListener("click", () => {
+    const opening = !submenu.classList.contains("is-open");
+    submenu.classList.toggle("is-open", opening);
+    button.setAttribute("aria-expanded", String(opening));
   });
+}
+
+toggleMobileSection("mobile-products-toggle", "mobile-categories");
+toggleMobileSection("mobile-info-toggle", "mobile-info-links");
 
 /* PRODUCTOS */
 
@@ -265,11 +272,12 @@ function renderCategoryMenu(categories) {
     button.addEventListener("click", () => selectCategory(category.id));
     dynamicCategories.appendChild(button);
 
-    const mobileLink = document.createElement("button");
-    mobileLink.type = "button";
-    mobileLink.textContent = category.name.toLowerCase();
-    mobileLink.addEventListener("click", () => selectCategory(category.id));
-    mobileCategories.appendChild(mobileLink);
+    const mobileButton = document.createElement("button");
+    mobileButton.type = "button";
+    mobileButton.className = "mobile-category";
+    mobileButton.textContent = category.name.toLowerCase();
+    mobileButton.addEventListener("click", () => selectCategory(category.id));
+    mobileCategories.appendChild(mobileButton);
   });
 }
 
@@ -301,13 +309,6 @@ document.addEventListener("click", event => {
     infoDropdown.hidden = true;
     productsToggle.setAttribute("aria-expanded", "false");
     infoToggle.setAttribute("aria-expanded", "false");
-  }
-});
-
-document.addEventListener("keydown", event => {
-  if (event.key === "Escape") {
-    productsDropdown.hidden = true;
-    infoDropdown.hidden = true;
   }
 });
 
