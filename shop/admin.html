@@ -204,6 +204,47 @@
       margin: 15px 0;
     }
 
+
+    .category-manager {
+      border-top: 1px solid #ccc;
+      margin: 30px 0 35px;
+      padding-top: 20px;
+    }
+    .category-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #ddd;
+    }
+    .category-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .category-actions button {
+      width: auto;
+      min-width: 76px;
+      margin: 0;
+      padding: 9px 12px;
+    }
+    .category-add {
+      display: grid;
+      grid-template-columns: 1fr 130px;
+      gap: 10px;
+      align-items: center;
+      margin-top: 15px;
+    }
+    .category-add input { margin: 0; }
+    .category-add button { margin: 0; }
+    .category-select {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #000;
+      background: #fff;
+      font: inherit;
+      margin-bottom: 14px;
+    }
     [hidden] { display: none !important; }
 
     @media (max-width: 550px) {
@@ -260,6 +301,16 @@
     <section id="dashboard" hidden>
       <h1>Morón Madrid — Administración</h1>
 
+      <section class="category-manager">
+        <h2 style="margin-top:0">Categorías</h2>
+        <p class="hint">Creá y administrá las categorías de la tienda. Cada producto puede pertenecer a una sola categoría.</p>
+        <div id="categories-list"></div>
+        <form id="category-form" class="category-add">
+          <input id="new-category-name" type="text" maxlength="80" placeholder="Nueva categoría" required>
+          <button type="submit">Agregar</button>
+        </form>
+      </section>
+
       <h2>Productos</h2>
       <button id="refresh" class="secondary">Actualizar lista</button>
 
@@ -283,6 +334,11 @@
 
           <label for="price">Precio en pesos argentinos</label>
           <input id="price" type="number" min="0" step="1" required>
+
+          <label for="category">Categoría</label>
+          <select id="category" class="category-select">
+            <option value="">Sin categoría</option>
+          </select>
 
           <label for="description">Descripción</label>
           <textarea id="description"></textarea>
@@ -408,6 +464,7 @@
     let currentImage = null;
     let currentHover = null;
     let currentGallery = [];
+    let categories = [];
 
     function token() {
       return sessionStorage.getItem("mm_admin_token");
@@ -422,6 +479,7 @@
     async function showDashboard() {
       loginSection.hidden = true;
       dashboard.hidden = false;
+      await loadCategories();
       await loadProducts();
     }
 
@@ -579,6 +637,142 @@
       return variants;
     }
 
+    // CATEGORÍAS
+    async function loadCategories() {
+      const response = await fetch(API + "/admin/categories", {
+        headers: { Authorization: "Bearer " + token() }
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "No se pudieron cargar las categorías.");
+
+      categories = data.categories || [];
+      renderCategories();
+      renderCategorySelect();
+    }
+
+    function renderCategorySelect(selectedId = document.getElementById("category").value) {
+      const select = document.getElementById("category");
+      select.replaceChildren();
+      const empty = document.createElement("option");
+      empty.value = "";
+      empty.textContent = "Sin categoría";
+      select.append(empty);
+
+      categories.forEach(category => {
+        const option = document.createElement("option");
+        option.value = category.id;
+        option.textContent = category.name;
+        select.append(option);
+      });
+      select.value = selectedId || "";
+    }
+
+    function renderCategories() {
+      const box = document.getElementById("categories-list");
+      box.replaceChildren();
+
+      if (!categories.length) {
+        const empty = document.createElement("p");
+        empty.className = "hint";
+        empty.textContent = "Todavía no hay categorías.";
+        box.append(empty);
+        return;
+      }
+
+      categories.forEach(category => {
+        const row = document.createElement("div");
+        row.className = "category-row";
+
+        const name = document.createElement("span");
+        name.textContent = category.name;
+
+        const actions = document.createElement("div");
+        actions.className = "category-actions";
+
+        const edit = document.createElement("button");
+        edit.type = "button";
+        edit.className = "secondary";
+        edit.textContent = "Renombrar";
+        edit.addEventListener("click", () => renameCategory(category));
+
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "secondary";
+        remove.textContent = "Eliminar";
+        remove.addEventListener("click", () => deleteCategory(category));
+
+        actions.append(edit, remove);
+        row.append(name, actions);
+        box.append(row);
+      });
+    }
+
+    async function renameCategory(category) {
+      const name = prompt("Nuevo nombre de la categoría:", category.name);
+      if (name === null) return;
+      const cleanName = name.trim();
+      if (!cleanName) {
+        message.textContent = "El nombre no puede quedar vacío.";
+        return;
+      }
+
+      const response = await fetch(API + "/admin/categories/" + category.id, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token()
+        },
+        body: JSON.stringify({ name: cleanName })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        message.textContent = data.error || "No se pudo renombrar la categoría.";
+        return;
+      }
+      await loadCategories();
+      message.textContent = "Categoría actualizada.";
+    }
+
+    async function deleteCategory(category) {
+      if (!confirm('¿Eliminar la categoría "' + category.name + '"?')) return;
+
+      const response = await fetch(API + "/admin/categories/" + category.id, {
+        method: "DELETE",
+        headers: { Authorization: "Bearer " + token() }
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        message.textContent = data.error || "No se pudo eliminar la categoría.";
+        return;
+      }
+      await loadCategories();
+      message.textContent = "Categoría eliminada.";
+    }
+
+    document.getElementById("category-form").addEventListener("submit", async event => {
+      event.preventDefault();
+      const input = document.getElementById("new-category-name");
+      const name = input.value.trim();
+      if (!name) return;
+
+      const response = await fetch(API + "/admin/categories", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token()
+        },
+        body: JSON.stringify({ name })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        message.textContent = data.error || "No se pudo crear la categoría.";
+        return;
+      }
+      input.value = "";
+      await loadCategories();
+      message.textContent = "Categoría creada.";
+    });
+
     // CARGAR PRODUCTOS
     async function loadProducts() {
       message.textContent = "Cargando productos...";
@@ -626,10 +820,10 @@
 
           details.className = "product-info";
           details.textContent =
-            product.slug + " · $" +
+            product.slug + " · " +
+            (product.category_name || "Sin categoría") + " · $" +
             Number(product.price).toLocaleString("es-AR") +
-            " · " +
-            stockDescription;
+            " · " + stockDescription;
 
           edit.textContent = "Editar";
           edit.addEventListener("click", () => editProduct(product));
@@ -657,6 +851,7 @@
       currentImage = null;
       currentHover = null;
       currentGallery = [];
+      document.getElementById("category").value = "";
 
       variantsContainer.replaceChildren();
       noSizesCheckbox.checked = false;
@@ -690,6 +885,7 @@
       document.getElementById("slug").value = product.slug || "";
       document.getElementById("price").value = product.price;
       document.getElementById("description").value = product.description || "";
+      document.getElementById("category").value = product.category_id || "";
 
       const variants = product.variants || [];
 
@@ -835,6 +1031,7 @@
           slug: document.getElementById("slug").value.trim(),
           price: Number(document.getElementById("price").value),
           description: document.getElementById("description").value,
+          category_id: document.getElementById("category").value || null,
           image,
           image_hover: imageHover,
           gallery,
