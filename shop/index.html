@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -7,40 +8,136 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <nav>
-      <span class="tienda-link">
-        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEguX14GzmThK94GeMibceKA7zICqad06YxNNfXdMDJWfekWmO24pdYg9z9BdkouOws5N-Haa-0IfN-U79hTyy7-EB1WS40G4UsRYDb8xFVnx9iB5SYvx0J5BH5a5E35dx3srcSqWHckxVBJ/s1600/nuevo-2.gif" alt="">
-        <a href="./">tienda</a>
-      </span>
-      <a href="../#estudio">archivo</a>
-      <a href="../#nosotros">nosotros</a>
-      <a href="../#contacto">contacto</a>
-    </nav>
-  </header>
 
-  <a href="../" class="logo">
-    <img src="../sticker.png" alt="morón madrid">
-  </a>
-
-  <div class="category-menu" id="category-menu" aria-label="Categorías">
-    <button type="button" class="category-filter active" data-category="all">todos</button>
+  <!-- BARRA DE PROMOCIONES -->
+  <div class="announcement-bar">
+    3 cuotas sin interés / -5% por transferencia / envíos a todo el país
   </div>
 
+  <!-- HEADER -->
+  <header class="site-header">
+
+    <div class="header-left">
+      <button
+        type="button"
+        class="nav-button"
+        id="products-toggle"
+        aria-expanded="false"
+        aria-controls="products-dropdown"
+      >
+        productos
+      </button>
+
+      <button
+        type="button"
+        class="nav-button"
+        id="info-toggle"
+        aria-expanded="false"
+        aria-controls="info-dropdown"
+      >
+        información
+      </button>
+    </div>
+
+    <a href="./" class="logo" aria-label="Morón Madrid — Inicio">
+      <img src="../sticker.png" alt="morón madrid">
+    </a>
+
+    <div class="header-right">
+      <a href="https://moronmadrid.com.ar/#contacto">contacto</a>
+      <span class="cart-placeholder" title="Carrito: próximamente">carrito</span>
+    </div>
+
+    <!-- DESPLEGABLE PRODUCTOS -->
+    <div class="header-dropdown products-dropdown" id="products-dropdown" hidden>
+      <button
+        type="button"
+        class="category-filter active"
+        data-category="all"
+      >
+        ver todo
+      </button>
+
+      <div id="dynamic-categories"></div>
+    </div>
+
+    <!-- DESPLEGABLE INFORMACIÓN -->
+    <div class="header-dropdown info-dropdown" id="info-dropdown" hidden>
+      <a href="https://moronmadrid.com.ar/nosotros">nosotros</a>
+      <a href="https://moronmadrid.com.ar/comprasenvios">compras / envíos</a>
+      <a href="https://moronmadrid.com.ar/devoluciones">devoluciones</a>
+    </div>
+
+  </header>
+
+  <!-- CATÁLOGO -->
   <main class="catalog" id="catalog">
     <p id="catalog-message">cargando productos...</p>
   </main>
 
   <script>
     const API_URL = "https://moron-madrid-api.moronmadrid.workers.dev";
+
     const catalog = document.getElementById("catalog");
-    const categoryMenu = document.getElementById("category-menu");
+    const productsToggle = document.getElementById("products-toggle");
+    const infoToggle = document.getElementById("info-toggle");
+    const productsDropdown = document.getElementById("products-dropdown");
+    const infoDropdown = document.getElementById("info-dropdown");
+    const dynamicCategories = document.getElementById("dynamic-categories");
+
     let allProducts = [];
     let selectedCategory = "all";
 
     function formatPrice(price) {
       return "$ " + Number(price).toLocaleString("es-AR");
     }
+
+    function closeMenus() {
+      productsDropdown.hidden = true;
+      infoDropdown.hidden = true;
+
+      productsToggle.setAttribute("aria-expanded", "false");
+      infoToggle.setAttribute("aria-expanded", "false");
+    }
+
+    function toggleMenu(menu, button, otherMenu, otherButton) {
+      const isOpen = !menu.hidden;
+
+      closeMenus();
+
+      if (!isOpen) {
+        menu.hidden = false;
+        button.setAttribute("aria-expanded", "true");
+      }
+    }
+
+    productsToggle.addEventListener("click", () => {
+      toggleMenu(
+        productsDropdown,
+        productsToggle,
+        infoDropdown,
+        infoToggle
+      );
+    });
+
+    infoToggle.addEventListener("click", () => {
+      toggleMenu(
+        infoDropdown,
+        infoToggle,
+        productsDropdown,
+        productsToggle
+      );
+    });
+
+    document.addEventListener("click", event => {
+      if (!event.target.closest(".site-header")) {
+        closeMenus();
+      }
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeMenus();
+    });
 
     function createProduct(product) {
       const article = document.createElement("article");
@@ -81,6 +178,7 @@
       info.append(name, price);
       link.append(images, info);
       article.append(link);
+
       return article;
     }
 
@@ -89,7 +187,9 @@
 
       const products = selectedCategory === "all"
         ? allProducts
-        : allProducts.filter(product => product.category_id === selectedCategory);
+        : allProducts.filter(product =>
+            product.category_id === selectedCategory
+          );
 
       if (!products.length) {
         const empty = document.createElement("p");
@@ -97,41 +197,47 @@
         empty.textContent = allProducts.length
           ? "no hay productos en esta categoría"
           : "próximamente";
+
         catalog.append(empty);
         return;
       }
 
-      products.forEach(product => catalog.appendChild(createProduct(product)));
+      products.forEach(product => {
+        catalog.appendChild(createProduct(product));
+      });
     }
 
-    function renderCategoryMenu(categories) {
-      categoryMenu.replaceChildren();
+    function selectCategory(categoryId, button) {
+      selectedCategory = categoryId;
 
-      const allButton = document.createElement("button");
-      allButton.type = "button";
-      allButton.className = "category-filter active";
-      allButton.dataset.category = "all";
-      allButton.textContent = "todos";
-      categoryMenu.append(allButton);
+      document.querySelectorAll(".category-filter").forEach(item => {
+        item.classList.toggle("active", item === button);
+      });
+
+      closeMenus();
+      renderProducts();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    productsDropdown.addEventListener("click", event => {
+      const button = event.target.closest(".category-filter");
+      if (!button) return;
+
+      selectCategory(button.dataset.category, button);
+    });
+
+    function renderCategoryMenu(categories) {
+      dynamicCategories.replaceChildren();
 
       categories.forEach(category => {
         const button = document.createElement("button");
+
         button.type = "button";
         button.className = "category-filter";
         button.dataset.category = category.id;
         button.textContent = category.name.toLowerCase();
-        categoryMenu.append(button);
-      });
 
-      categoryMenu.addEventListener("click", event => {
-        const button = event.target.closest(".category-filter");
-        if (!button) return;
-
-        selectedCategory = button.dataset.category;
-        categoryMenu.querySelectorAll(".category-filter").forEach(item => {
-          item.classList.toggle("active", item === button);
-        });
-        renderProducts();
+        dynamicCategories.appendChild(button);
       });
     }
 
@@ -142,22 +248,37 @@
           fetch(`${API_URL}/categories`)
         ]);
 
-        if (!productsResponse.ok) throw new Error("No se pudieron cargar los productos.");
-        if (!categoriesResponse.ok) throw new Error("No se pudieron cargar las categorías.");
+        if (!productsResponse.ok) {
+          throw new Error("No se pudieron cargar los productos.");
+        }
+
+        if (!categoriesResponse.ok) {
+          throw new Error("No se pudieron cargar las categorías.");
+        }
 
         const productsData = await productsResponse.json();
         const categoriesData = await categoriesResponse.json();
 
-        allProducts = Array.isArray(productsData.products) ? productsData.products : [];
-        renderCategoryMenu(Array.isArray(categoriesData.categories) ? categoriesData.categories : []);
+        allProducts = Array.isArray(productsData.products)
+          ? productsData.products
+          : [];
+
+        const categories = Array.isArray(categoriesData.categories)
+          ? categoriesData.categories
+          : [];
+
+        renderCategoryMenu(categories);
         renderProducts();
+
       } catch (error) {
         console.error(error);
-        catalog.textContent = "no pudimos cargar la tienda. intentá nuevamente.";
+        catalog.textContent =
+          "no pudimos cargar la tienda. intentá nuevamente.";
       }
     }
 
     loadStore();
   </script>
+
 </body>
 </html>
