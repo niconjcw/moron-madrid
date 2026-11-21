@@ -408,14 +408,16 @@ a:hover {
   padding-top: 15px;
   font-size: .7rem;
   font-weight: 300;
+  position: relative;
 }
 
 .footer-clock {
-  margin-left: auto;
+  position: absolute;
+  right: 0;
+  margin-left: 0;
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
-
 /* FOOTER MOBILE */
 
 @media (max-width: 700px) {
