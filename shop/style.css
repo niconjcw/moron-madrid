@@ -281,11 +281,15 @@ button, a {
   font-size: 12px;
   cursor: pointer;
   pointer-events: auto;
-  opacity: .5;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease;
+}
 }
 
-.product-carousel-arrow:hover {
-  opacity: .5;
+.product-images:hover .product-carousel-arrow {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .product-info {
