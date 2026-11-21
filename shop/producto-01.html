@@ -449,8 +449,8 @@
       const heading = document.createElement("div");
 
       const category = document.createElement("p");
-      category.className = "product-category";
-      category.textContent = "morón madrid / colección";
+category.className = "product-category";
+category.textContent = `morón madrid / ${product.category_name || "productos"}`;
 
       const title = document.createElement("h1");
       title.textContent = product.name;
