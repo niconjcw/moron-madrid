@@ -175,16 +175,20 @@
         y <a href="https://instagram.com/nico.njcw" target="_blank">Nico</a>.
         Desde el 2015 hacemos juntos Morón Madrid.
       </p>
+
       <p>Todos nuestros productos son creados por nosotros mismos.</p>
       <p>Creemos en la producción autogestiva y lenta.</p>
+
       <p>
         Trabajamos artesanalmente en pequeñas cantidades, con proveedores chicos
         y reutilizando materiales para adherir a un modo de producción circular.
       </p>
+
       <p>
         Diseñamos optimizando el aprovecho de los recursos que utilizamos y
         procurando crear piezas sostenibles y duraderas.
       </p>
+
       <p>
         Apoyamos la economía local y el compañerismo emprendedor porque creemos
         que una nueva forma de consumo más humana, responsable y lenta es
@@ -193,172 +197,228 @@
 
     </section>
 
-<section style="display: flex; justify-content: center; align-items: center; gap: 0; width: 100%;">
+    <section style="display: flex; justify-content: center; align-items: center; gap: 0; width: 100%;">
 
-  <img
-    src="https://d22fxaf9t8d39k.cloudfront.net/descripciones/b89af1d9958b66c191bb84f61042e652ff0a6ef0f682375b354cb6b5c2f78eaf9970.png"
-    alt="Morón Madrid"
-    loading="lazy"
-    style="width: 20px; height: 20px; object-fit: contain; display: block; margin: 0;"
-  > <img
-    src="https://d22fxaf9t8d39k.cloudfront.net/descripciones/eab75baf945de250d8794c68a79ecd09595f91c2ad00588e527969e6cb8589c39970.png"
-    alt="Morón Madrid"
-    loading="lazy"
-    style="width: 20px; height: 20px; object-fit: contain; display: block; margin: 0;"
-  >
+      <img
+        src="https://d22fxaf9t8d39k.cloudfront.net/descripciones/b89af1d9958b66c191bb84f61042e652ff0a6ef0f682375b354cb6b5c2f78eaf9970.png"
+        alt="Morón Madrid"
+        loading="lazy"
+        style="width: 20px; height: 20px; object-fit: contain; display: block; margin: 0;"
+      ><img
+        src="https://d22fxaf9t8d39k.cloudfront.net/descripciones/eab75baf945de250d8794c68a79ecd09595f91c2ad00588e527969e6cb8589c39970.png"
+        alt="Morón Madrid"
+        loading="lazy"
+        style="width: 20px; height: 20px; object-fit: contain; display: block; margin: 0;"
+      >
 
-</section>
+    </section>
 
   </main>
 
-<script>
-const API_URL = "https://moron-madrid-api.moronmadrid.workers.dev";
+  <!-- FOOTER -->
 
-const productsDropdown = document.getElementById("products-dropdown");
-const infoDropdown = document.getElementById("info-dropdown");
-const productsToggle = document.getElementById("products-toggle");
-const infoToggle = document.getElementById("info-toggle");
+  <footer class="site-footer">
+    <div class="footer-columns">
 
-/* MENÚ DESKTOP */
+      <div class="footer-column">
+        <p class="footer-heading">explorar</p>
+        <a href="./">tienda</a>
+        <a href="nosotros.html">nosotros</a>
+        <a href="https://moronmadrid.com.ar/#estudio">archivo</a>
+      </div>
 
-productsToggle.addEventListener("click", () => {
-  const opening = productsDropdown.hidden;
-  productsDropdown.hidden = !opening;
-  infoDropdown.hidden = true;
-  productsToggle.setAttribute("aria-expanded", String(opening));
-  infoToggle.setAttribute("aria-expanded", "false");
-});
+      <div class="footer-column">
+        <p class="footer-heading">información</p>
+        <a href="compras-envios.html">compras / envíos</a>
+        <a href="devoluciones.html">devoluciones</a>
+        <a href="https://moronmadrid.com.ar/#contacto">contacto</a>
+      </div>
 
-infoToggle.addEventListener("click", () => {
-  const opening = infoDropdown.hidden;
-  infoDropdown.hidden = !opening;
-  productsDropdown.hidden = true;
-  infoToggle.setAttribute("aria-expanded", String(opening));
-  productsToggle.setAttribute("aria-expanded", "false");
-});
+      <div class="footer-column">
+        <p class="footer-heading">seguinos</p>
+        <a href="https://www.instagram.com/moronmadrid/" target="_blank" rel="noopener noreferrer">instagram ↗</a>
+        <a href="#newsletter" class="newsletter-link">newsletter</a>
+      </div>
 
-document.addEventListener("click", event => {
-  if (!event.target.closest(".nav-group")) {
-    productsDropdown.hidden = true;
-    infoDropdown.hidden = true;
-    productsToggle.setAttribute("aria-expanded", "false");
-    infoToggle.setAttribute("aria-expanded", "false");
-  }
-});
+      <div class="footer-column">
+        <a href="./" class="footer-heart">
+          <img src="../sticker.png" alt="morón madrid">
+        </a>
+      </div>
 
-document.addEventListener("keydown", event => {
-  if (event.key === "Escape") {
-    productsDropdown.hidden = true;
-    infoDropdown.hidden = true;
-    productsToggle.setAttribute("aria-expanded", "false");
-    infoToggle.setAttribute("aria-expanded", "false");
-    closeMobileMenu();
-  }
-});
+    </div>
 
-/* HOVER DESKTOP */
+    <div class="footer-bottom">
+      <span>© morón madrid — 2026</span>
+      <time class="footer-clock" id="footer-clock">00:00:00</time>
+    </div>
+  </footer>
 
-document.querySelectorAll(".nav-group").forEach(group => {
-  group.addEventListener("mouseenter", () => {
-    if (window.matchMedia("(min-width: 701px)").matches) {
-      const dropdown = group.querySelector(".header-dropdown");
-      dropdown.hidden = false;
+  <script>
+    const API_URL = "https://moron-madrid-api.moronmadrid.workers.dev";
+
+    const productsDropdown = document.getElementById("products-dropdown");
+    const infoDropdown = document.getElementById("info-dropdown");
+    const productsToggle = document.getElementById("products-toggle");
+    const infoToggle = document.getElementById("info-toggle");
+
+    /* RELOJ DEL FOOTER */
+
+    function updateFooterClock() {
+      const clock = document.getElementById("footer-clock");
+      if (!clock) return;
+
+      const now = new Date();
+
+      clock.textContent =
+        [now.getHours(), now.getMinutes(), now.getSeconds()]
+          .map(value => String(value).padStart(2, "0"))
+          .join(":");
     }
-  });
 
-  group.addEventListener("mouseleave", () => {
-    if (window.matchMedia("(min-width: 701px)").matches) {
-      const dropdown = group.querySelector(".header-dropdown");
-      dropdown.hidden = true;
-      group.querySelector(".nav-button").setAttribute("aria-expanded", "false");
-    }
-  });
-});
+    updateFooterClock();
+    setInterval(updateFooterClock, 1000);
 
-/* MENÚ MOBILE */
+    /* MENÚ DESKTOP */
 
-const mobilePanel = document.getElementById("mobile-panel");
-
-function openMobileMenu() {
-  mobilePanel.hidden = false;
-  requestAnimationFrame(() => mobilePanel.classList.add("is-open"));
-  document.body.style.overflow = "hidden";
-}
-
-function closeMobileMenu() {
-  mobilePanel.classList.remove("is-open");
-  document.body.style.overflow = "";
-
-  setTimeout(() => {
-    if (!mobilePanel.classList.contains("is-open")) {
-      mobilePanel.hidden = true;
-    }
-  }, 350);
-}
-
-document.getElementById("mobile-menu-toggle")
-  .addEventListener("click", openMobileMenu);
-
-document.getElementById("mobile-close")
-  .addEventListener("click", closeMobileMenu);
-
-function toggleMobileSection(buttonId, submenuId) {
-  const button = document.getElementById(buttonId);
-  const submenu = document.getElementById(submenuId);
-
-  button.addEventListener("click", () => {
-    const opening = !submenu.classList.contains("is-open");
-    submenu.classList.toggle("is-open", opening);
-    button.setAttribute("aria-expanded", String(opening));
-  });
-}
-
-toggleMobileSection("mobile-products-toggle", "mobile-categories");
-toggleMobileSection("mobile-info-toggle", "mobile-info-links");
-
-/* CATEGORÍAS */
-
-async function loadCategories() {
-  try {
-    const response = await fetch(`${API_URL}/categories`);
-    if (!response.ok) return;
-
-    const data = await response.json();
-    const categories = data.categories || [];
-
-    const desktop = document.getElementById("dynamic-categories");
-    const mobile = document.getElementById("mobile-categories");
-
-    desktop.replaceChildren();
-    mobile.replaceChildren();
-
-    const allMobile = document.createElement("a");
-    allMobile.href = "./";
-    allMobile.textContent = "ver todo";
-    mobile.appendChild(allMobile);
-
-    categories.forEach(category => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "category-filter";
-      button.textContent = category.name.toLowerCase();
-      button.addEventListener("click", () => {
-        window.location.href = `./?category=${category.id}`;
-      });
-      desktop.appendChild(button);
-
-      const mobileLink = document.createElement("a");
-      mobileLink.href = `./?category=${category.id}`;
-      mobileLink.textContent = category.name.toLowerCase();
-      mobile.appendChild(mobileLink);
+    productsToggle.addEventListener("click", () => {
+      const opening = productsDropdown.hidden;
+      productsDropdown.hidden = !opening;
+      infoDropdown.hidden = true;
+      productsToggle.setAttribute("aria-expanded", String(opening));
+      infoToggle.setAttribute("aria-expanded", "false");
     });
-  } catch (error) {
-    console.error("No se pudieron cargar las categorías", error);
-  }
-}
 
-loadCategories();
-</script>
+    infoToggle.addEventListener("click", () => {
+      const opening = infoDropdown.hidden;
+      infoDropdown.hidden = !opening;
+      productsDropdown.hidden = true;
+      infoToggle.setAttribute("aria-expanded", String(opening));
+      productsToggle.setAttribute("aria-expanded", "false");
+    });
+
+    document.addEventListener("click", event => {
+      if (!event.target.closest(".nav-group")) {
+        productsDropdown.hidden = true;
+        infoDropdown.hidden = true;
+        productsToggle.setAttribute("aria-expanded", "false");
+        infoToggle.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") {
+        productsDropdown.hidden = true;
+        infoDropdown.hidden = true;
+        productsToggle.setAttribute("aria-expanded", "false");
+        infoToggle.setAttribute("aria-expanded", "false");
+        closeMobileMenu();
+      }
+    });
+
+    /* HOVER DESKTOP */
+
+    document.querySelectorAll(".nav-group").forEach(group => {
+      group.addEventListener("mouseenter", () => {
+        if (window.matchMedia("(min-width: 701px)").matches) {
+          const dropdown = group.querySelector(".header-dropdown");
+          dropdown.hidden = false;
+        }
+      });
+
+      group.addEventListener("mouseleave", () => {
+        if (window.matchMedia("(min-width: 701px)").matches) {
+          const dropdown = group.querySelector(".header-dropdown");
+          dropdown.hidden = true;
+          group.querySelector(".nav-button").setAttribute("aria-expanded", "false");
+        }
+      });
+    });
+
+    /* MENÚ MOBILE */
+
+    const mobilePanel = document.getElementById("mobile-panel");
+
+    function openMobileMenu() {
+      mobilePanel.hidden = false;
+      requestAnimationFrame(() => mobilePanel.classList.add("is-open"));
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeMobileMenu() {
+      mobilePanel.classList.remove("is-open");
+      document.body.style.overflow = "";
+
+      setTimeout(() => {
+        if (!mobilePanel.classList.contains("is-open")) {
+          mobilePanel.hidden = true;
+        }
+      }, 350);
+    }
+
+    document.getElementById("mobile-menu-toggle")
+      .addEventListener("click", openMobileMenu);
+
+    document.getElementById("mobile-close")
+      .addEventListener("click", closeMobileMenu);
+
+    function toggleMobileSection(buttonId, submenuId) {
+      const button = document.getElementById(buttonId);
+      const submenu = document.getElementById(submenuId);
+
+      button.addEventListener("click", () => {
+        const opening = !submenu.classList.contains("is-open");
+        submenu.classList.toggle("is-open", opening);
+        button.setAttribute("aria-expanded", String(opening));
+      });
+    }
+
+    toggleMobileSection("mobile-products-toggle", "mobile-categories");
+    toggleMobileSection("mobile-info-toggle", "mobile-info-links");
+
+    /* CATEGORÍAS */
+
+    async function loadCategories() {
+      try {
+        const response = await fetch(`${API_URL}/categories`);
+        if (!response.ok) return;
+
+        const data = await response.json();
+        const categories = data.categories || [];
+
+        const desktop = document.getElementById("dynamic-categories");
+        const mobile = document.getElementById("mobile-categories");
+
+        desktop.replaceChildren();
+        mobile.replaceChildren();
+
+        const allMobile = document.createElement("a");
+        allMobile.href = "./";
+        allMobile.textContent = "ver todo";
+        mobile.appendChild(allMobile);
+
+        categories.forEach(category => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "category-filter";
+          button.textContent = category.name.toLowerCase();
+          button.addEventListener("click", () => {
+            window.location.href = `./?category=${category.id}`;
+          });
+          desktop.appendChild(button);
+
+          const mobileLink = document.createElement("a");
+          mobileLink.href = `./?category=${category.id}`;
+          mobileLink.textContent = category.name.toLowerCase();
+          mobile.appendChild(mobileLink);
+        });
+      } catch (error) {
+        console.error("No se pudieron cargar las categorías", error);
+      }
+    }
+
+    loadCategories();
+  </script>
 
 </body>
 </html>
