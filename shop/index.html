@@ -224,12 +224,16 @@ function getProductImages(product) {
 
 /* CREAR PRODUCTO */
 
+
 function createProduct(product) {
   const article = document.createElement("article");
   article.className = "product";
 
   const images = document.createElement("div");
   images.className = "product-images";
+
+  // Permite deslizar horizontalmente sin bloquear el scroll vertical.
+  images.style.touchAction = "pan-y";
 
   const imageUrls = getProductImages(product);
   let currentImage = 0;
@@ -286,6 +290,62 @@ function createProduct(product) {
       showImage(currentImage + 1);
     });
 
+    // SWIPE / DESLIZAMIENTO
+    let startX = 0;
+    let startY = 0;
+    let pointerStart = false;
+    let suppressClick = false;
+
+    images.addEventListener("pointerdown", event => {
+      if (event.target.closest("button")) return;
+
+      startX = event.clientX;
+      startY = event.clientY;
+      pointerStart = true;
+    });
+
+    images.addEventListener("pointerup", event => {
+      if (!pointerStart) return;
+
+      pointerStart = false;
+
+      const differenceX = event.clientX - startX;
+      const differenceY = event.clientY - startY;
+
+      // Solo cuenta como swipe si el movimiento es principalmente horizontal.
+      if (
+        Math.abs(differenceX) > 35 &&
+        Math.abs(differenceX) > Math.abs(differenceY) * 1.2
+      ) {
+        event.preventDefault();
+
+        showImage(
+          differenceX < 0
+            ? currentImage + 1
+            : currentImage - 1
+        );
+
+        // Evita abrir el producto después de deslizar.
+        suppressClick = true;
+
+        setTimeout(() => {
+          suppressClick = false;
+        }, 400);
+      }
+    });
+
+    images.addEventListener("pointercancel", () => {
+      pointerStart = false;
+    });
+
+    images.addEventListener("click", event => {
+      if (suppressClick) {
+        event.preventDefault();
+        event.stopPropagation();
+        suppressClick = false;
+      }
+    }, true);
+
     controls.append(previous, next);
     images.appendChild(controls);
   }
@@ -305,6 +365,7 @@ function createProduct(product) {
 
   return article;
 }
+
 
 /* RENDERIZAR PRODUCTOS */
 
