@@ -64,6 +64,13 @@
       background: #fff;
     }
 
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      flex: 0 0 auto;
+    }
+
     label {
       display: block;
       margin: 18px 0 8px;
@@ -252,9 +259,11 @@
       gap: 25px;
       border-bottom: 1px solid #ccc;
       margin-bottom: 30px;
+      overflow-x: auto;
     }
 
     .admin-tab {
+      flex: 0 0 auto;
       width: auto;
       padding: 12px 0;
       margin: 0;
@@ -263,6 +272,7 @@
       background: transparent;
       color: #888;
       font-size: 13px;
+      white-space: nowrap;
     }
 
     .admin-tab:hover {
@@ -285,9 +295,7 @@
       margin: 35px 0 25px;
     }
 
-    .newsletter-header h2 {
-      margin: 0;
-    }
+    .newsletter-header h2 { margin: 0; }
 
     .newsletter-count {
       font-size: 13px;
@@ -323,9 +331,7 @@
       border-bottom: 1px solid #ddd;
     }
 
-    .newsletter-email {
-      overflow-wrap: anywhere;
-    }
+    .newsletter-email { overflow-wrap: anywhere; }
 
     .newsletter-date {
       color: #888;
@@ -344,9 +350,143 @@
       padding: 25px 0;
     }
 
+    /* DESCUENTOS */
+
+    .discount-section {
+      border-top: 1px solid #ccc;
+      padding-top: 20px;
+      margin-top: 35px;
+    }
+
+    .discount-section h2 { margin-top: 0; }
+
+    .discount-setting {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .discount-setting input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+    }
+
+    .discount-setting label {
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .discount-percent {
+      max-width: 180px;
+    }
+
+    .discount-list-item {
+      padding: 18px 0;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .discount-list-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 15px;
+    }
+
+    .discount-code-name {
+      font-weight: 600;
+      letter-spacing: .04em;
+    }
+
+    .discount-details {
+      color: #777;
+      font-size: 12px;
+      line-height: 1.6;
+      margin-top: 7px;
+    }
+
+    .discount-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .discount-actions button {
+      width: auto;
+      min-width: 90px;
+      margin: 0;
+      padding: 9px 12px;
+    }
+
+    .discount-scope {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .discount-scope input {
+      width: 17px;
+      height: 17px;
+      margin: 0;
+    }
+
+    .discount-scope label {
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .discount-product-list {
+      max-height: 260px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 12px;
+      margin: 12px 0 20px;
+      background: #fff;
+    }
+
+    .discount-product-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .discount-product-option:last-child { border-bottom: 0; }
+
+    .discount-product-option input {
+      width: 17px;
+      height: 17px;
+      margin: 0;
+    }
+
+    .discount-product-option label {
+      margin: 0;
+      flex: 1;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .discount-empty {
+      color: #777;
+      padding: 20px 0;
+    }
+
+    .discount-form-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .discount-form-actions button {
+      flex: 1;
+    }
+
     @media (max-width: 550px) {
       body { padding: 20px; }
       header { margin-bottom: 50px; }
+
       .product { align-items: flex-start; }
 
       .variant-row {
@@ -364,12 +504,18 @@
         grid-column: 2;
       }
 
-      .newsletter-actions {
+      .newsletter-actions { flex-direction: column; }
+
+      .newsletter-header { align-items: flex-start; }
+
+      .admin-tabs { gap: 18px; }
+
+      .discount-list-top {
         flex-direction: column;
       }
 
-      .newsletter-header {
-        align-items: flex-start;
+      .discount-form-actions {
+        flex-direction: column;
       }
     }
   </style>
@@ -402,33 +548,28 @@
       <h1>Morón Madrid — Administración</h1>
 
       <nav class="admin-tabs">
-        <button type="button" class="admin-tab active" data-tab="products-panel">
+        <button type="button" class="admin-tab active" data-tab="new-product-panel">
+          NUEVO PRODUCTO
+        </button>
+        <button type="button" class="admin-tab" data-tab="products-panel">
           PRODUCTOS
+        </button>
+        <button type="button" class="admin-tab" data-tab="categories-panel">
+          CATEGORÍAS
         </button>
         <button type="button" class="admin-tab" data-tab="newsletter-panel">
           NEWSLETTER
         </button>
+        <button type="button" class="admin-tab" data-tab="discounts-panel">
+          DESCUENTOS
+        </button>
       </nav>
 
-      <!-- PANEL PRODUCTOS -->
+      <!-- PANEL NUEVO PRODUCTO -->
 
-      <section id="products-panel">
+      <section id="new-product-panel">
 
-        <section class="category-manager">
-          <h2 style="margin-top:0">Categorías</h2>
-          <p class="hint">Creá y administrá las categorías de la tienda. Cada producto puede pertenecer a una sola categoría.</p>
-          <div id="categories-list"></div>
-          <form id="category-form" class="category-add">
-            <input id="new-category-name" type="text" maxlength="80" placeholder="Nueva categoría" required>
-            <button type="submit">Agregar</button>
-          </form>
-        </section>
-
-        <h2>Productos</h2>
-        <button id="refresh" class="secondary">Actualizar lista</button>
-        <div id="products"></div>
-
-        <div class="form-section">
+        <div class="form-section" style="margin-top:0">
           <h2 id="form-title">Nuevo producto</h2>
 
           <form id="product-form">
@@ -533,6 +674,39 @@
         </div>
       </section>
 
+      <!-- PANEL PRODUCTOS -->
+
+      <section id="products-panel" hidden>
+        <h2 style="margin-top:0">Productos</h2>
+        <button id="refresh" class="secondary">Actualizar lista</button>
+        <div id="products"></div>
+      </section>
+
+      <!-- PANEL CATEGORÍAS -->
+
+      <section id="categories-panel" hidden>
+        <div class="category-manager" style="margin-top:0">
+          <h2 style="margin-top:0">Categorías</h2>
+          <p class="hint">
+            Creá y administrá las categorías de la tienda.
+            Cada producto puede pertenecer a una sola categoría.
+          </p>
+
+          <div id="categories-list"></div>
+
+          <form id="category-form" class="category-add">
+            <input
+              id="new-category-name"
+              type="text"
+              maxlength="80"
+              placeholder="Nueva categoría"
+              required
+            >
+            <button type="submit">Agregar</button>
+          </form>
+        </div>
+      </section>
+
       <!-- PANEL NEWSLETTER -->
 
       <section id="newsletter-panel" hidden>
@@ -570,6 +744,160 @@
         <div id="newsletter-list"></div>
       </section>
 
+      <!-- PANEL DESCUENTOS -->
+
+      <section id="discounts-panel" hidden>
+
+        <div class="discount-section" style="margin-top:0">
+          <h2>Descuento por transferencia</h2>
+          <p class="hint">
+            Configurá el porcentaje de descuento que se aplicará a las compras por transferencia.
+          </p>
+
+          <div class="discount-setting">
+            <input type="checkbox" id="transfer-enabled">
+            <label for="transfer-enabled">Activar descuento por transferencia</label>
+          </div>
+
+          <label for="transfer-percent">Porcentaje de descuento</label>
+          <input
+            id="transfer-percent"
+            class="discount-percent"
+            type="number"
+            min="0"
+            max="100"
+            step="1"
+            value="10"
+          >
+
+          <button type="button" id="save-transfer">
+            Guardar configuración
+          </button>
+        </div>
+
+        <div class="discount-section">
+          <h2 id="discount-form-title">Crear código promocional</h2>
+          <p class="hint">
+            Creá cupones porcentuales o de importe fijo.
+          </p>
+
+          <form id="discount-form">
+
+            <label for="discount-code">Código promocional</label>
+            <input
+              id="discount-code"
+              type="text"
+              maxlength="40"
+              placeholder="EJEMPLO10"
+              required
+            >
+
+            <label for="discount-type">Tipo de descuento</label>
+            <select id="discount-type" class="category-select">
+              <option value="percentage">Porcentaje (%)</option>
+              <option value="fixed">Importe fijo ($)</option>
+            </select>
+
+            <label for="discount-value">Valor del descuento</label>
+            <input
+              id="discount-value"
+              type="number"
+              min="1"
+              step="1"
+              required
+            >
+
+            <label for="discount-minimum">Compra mínima ($)</label>
+            <input
+              id="discount-minimum"
+              type="number"
+              min="0"
+              step="1"
+              value="0"
+            >
+
+            <label for="discount-max-uses">Cantidad máxima de usos</label>
+            <input
+              id="discount-max-uses"
+              type="number"
+              min="1"
+              step="1"
+              placeholder="Sin límite"
+            >
+            <p class="hint">
+              Dejalo vacío si el cupón no tiene límite de usos.
+            </p>
+
+            <label for="discount-start">Fecha de inicio (opcional)</label>
+            <input id="discount-start" type="datetime-local">
+
+            <label for="discount-end">Fecha de vencimiento (opcional)</label>
+            <input id="discount-end" type="datetime-local">
+
+            <h2>Productos incluidos</h2>
+
+            <div class="discount-scope">
+              <input
+                type="radio"
+                id="discount-all"
+                name="discount-scope"
+                value="all"
+                checked
+              >
+              <label for="discount-all">Todos los productos</label>
+            </div>
+
+            <div class="discount-scope">
+              <input
+                type="radio"
+                id="discount-selected"
+                name="discount-scope"
+                value="selected"
+              >
+              <label for="discount-selected">Solo productos seleccionados</label>
+            </div>
+
+            <div id="discount-products" class="discount-product-list" hidden>
+              <p class="hint">Seleccioná los productos incluidos en el cupón.</p>
+              <div id="discount-products-list"></div>
+            </div>
+
+            <div class="discount-setting">
+              <input type="checkbox" id="discount-active" checked>
+              <label for="discount-active">Cupón activo</label>
+            </div>
+
+            <div class="discount-form-actions">
+              <button type="submit" id="save-discount">
+                Crear cupón
+              </button>
+
+              <button
+                type="button"
+                id="cancel-discount-edit"
+                class="secondary"
+                hidden
+              >
+                Cancelar edición
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="discount-section">
+          <h2>Códigos promocionales</h2>
+          <button
+            type="button"
+            id="refresh-discounts"
+            class="secondary"
+          >
+            Actualizar cupones
+          </button>
+
+          <div id="discount-list"></div>
+        </div>
+      </section>
+
       <button id="logout">Cerrar sesión</button>
     </section>
 
@@ -600,6 +928,10 @@ let currentGallery = [];
 let categories = [];
 let newsletterSubscribers = [];
 
+let discountCodes = [];
+let discountProducts = [];
+let editingDiscountId = null;
+
 /* SESIÓN */
 
 function token() {
@@ -615,30 +947,57 @@ function showLogin() {
 async function showDashboard() {
   loginSection.hidden = true;
   dashboard.hidden = false;
+
+  setActiveTab("new-product-panel");
+
   await loadCategories();
   await loadProducts();
 }
 
 /* PESTAÑAS */
 
+function setActiveTab(target) {
+  document.querySelectorAll(".admin-tab").forEach(tab => {
+    tab.classList.toggle("active", tab.dataset.tab === target);
+  });
+
+  const panels = [
+    "new-product-panel",
+    "products-panel",
+    "categories-panel",
+    "newsletter-panel",
+    "discounts-panel"
+  ];
+
+  panels.forEach(panelId => {
+    document.getElementById(panelId).hidden = panelId !== target;
+  });
+
+  message.textContent = "";
+}
+
 document.querySelectorAll(".admin-tab").forEach(button => {
   button.addEventListener("click", async () => {
     const target = button.dataset.tab;
 
-    document.querySelectorAll(".admin-tab").forEach(tab => {
-      tab.classList.toggle("active", tab === button);
-    });
-
-    document.getElementById("products-panel").hidden =
-      target !== "products-panel";
-
-    document.getElementById("newsletter-panel").hidden =
-      target !== "newsletter-panel";
-
-    message.textContent = "";
+    setActiveTab(target);
 
     if (target === "newsletter-panel") {
       await loadNewsletter();
+    }
+
+    if (target === "discounts-panel") {
+      await loadDiscountSettings();
+      await loadDiscountProducts();
+      await loadDiscountCodes();
+    }
+
+    if (target === "categories-panel") {
+      await loadCategories();
+    }
+
+    if (target === "products-panel") {
+      await loadProducts();
     }
   });
 });
@@ -1290,6 +1649,8 @@ function editProduct(product) {
     totalPhotos +
     " fotos adicionales guardadas. Las nuevas se agregarán a las existentes.";
 
+  setActiveTab("new-product-panel");
+
   document.getElementById("form-title").scrollIntoView({
     behavior: "smooth"
   });
@@ -1453,6 +1814,526 @@ document.getElementById("cancel-edit").addEventListener("click", resetForm);
 
 document.getElementById("refresh").addEventListener("click", loadProducts);
 
+/* CONFIGURACIÓN DE TRANSFERENCIA */
+
+async function loadDiscountSettings() {
+  try {
+    const response = await fetch(API + "/admin/discount-settings", {
+      headers: {
+        Authorization: "Bearer " + token()
+      }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "No se pudo cargar la configuración.");
+    }
+
+    const settings = data.settings || {};
+
+    document.getElementById("transfer-enabled").checked =
+      Number(settings.transfer_enabled) === 1;
+
+    document.getElementById("transfer-percent").value =
+      settings.transfer_percent ?? 10;
+
+  } catch (error) {
+    message.textContent = error.message;
+  }
+}
+
+async function saveTransferSettings() {
+  const button = document.getElementById("save-transfer");
+  const enabled = document.getElementById("transfer-enabled").checked;
+  const percent = Number(document.getElementById("transfer-percent").value);
+
+  if (!Number.isInteger(percent) || percent < 0 || percent > 100) {
+    message.textContent = "El porcentaje debe ser un número entre 0 y 100.";
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Guardando...";
+
+  try {
+    const response = await fetch(API + "/admin/discount-settings", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token()
+      },
+      body: JSON.stringify({
+        transfer_enabled: enabled,
+        transfer_percent: percent
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "No se pudo guardar la configuración.");
+    }
+
+    message.textContent = "Configuración de transferencia actualizada.";
+
+  } catch (error) {
+    message.textContent = error.message;
+  } finally {
+    button.disabled = false;
+    button.textContent = "Guardar configuración";
+  }
+}
+
+document.getElementById("save-transfer")
+  .addEventListener("click", saveTransferSettings);
+
+/* PRODUCTOS PARA CUPONES */
+
+async function loadDiscountProducts() {
+  const box = document.getElementById("discount-products-list");
+
+  box.textContent = "Cargando productos...";
+
+  try {
+    const response = await fetch(API + "/products");
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "No se pudieron cargar los productos.");
+    }
+
+    discountProducts = data.products || [];
+    renderDiscountProducts();
+
+  } catch (error) {
+    box.textContent = error.message;
+  }
+}
+
+function renderDiscountProducts(selectedIds = []) {
+  const box = document.getElementById("discount-products-list");
+  box.replaceChildren();
+
+  if (!discountProducts.length) {
+    const empty = document.createElement("p");
+    empty.className = "discount-empty";
+    empty.textContent = "No hay productos disponibles.";
+    box.append(empty);
+    return;
+  }
+
+  discountProducts.forEach(product => {
+    const row = document.createElement("div");
+    row.className = "discount-product-option";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.value = product.id;
+    checkbox.id = "discount-product-" + product.id;
+    checkbox.checked = selectedIds.includes(product.id);
+
+    const label = document.createElement("label");
+    label.htmlFor = checkbox.id;
+    label.textContent =
+      product.name + " · $" +
+      Number(product.price).toLocaleString("es-AR");
+
+    row.append(checkbox, label);
+    box.append(row);
+  });
+}
+
+document.querySelectorAll('input[name="discount-scope"]')
+  .forEach(input => {
+    input.addEventListener("change", () => {
+      const selected =
+        document.querySelector('input[name="discount-scope"]:checked').value;
+
+      document.getElementById("discount-products").hidden =
+        selected !== "selected";
+    });
+  });
+
+/* LISTAR CUPONES */
+
+async function loadDiscountCodes() {
+  const list = document.getElementById("discount-list");
+  list.textContent = "Cargando cupones...";
+
+  try {
+    const response = await fetch(API + "/admin/discount-codes", {
+      headers: {
+        Authorization: "Bearer " + token()
+      }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "No se pudieron cargar los cupones.");
+    }
+
+    discountCodes = data.codes || [];
+    renderDiscountCodes();
+
+  } catch (error) {
+    list.textContent = error.message;
+  }
+}
+
+function renderDiscountCodes() {
+  const list = document.getElementById("discount-list");
+  list.replaceChildren();
+
+  if (!discountCodes.length) {
+    const empty = document.createElement("p");
+    empty.className = "discount-empty";
+    empty.textContent = "Todavía no hay códigos promocionales.";
+    list.append(empty);
+    return;
+  }
+
+  discountCodes.forEach(discount => {
+    const item = document.createElement("div");
+    item.className = "discount-list-item";
+
+    const top = document.createElement("div");
+    top.className = "discount-list-top";
+
+    const info = document.createElement("div");
+
+    const code = document.createElement("div");
+    code.className = "discount-code-name";
+    code.textContent = discount.code;
+
+    const value = discount.discount_type === "percentage"
+      ? discount.discount_value + "%"
+      : "$" + Number(discount.discount_value).toLocaleString("es-AR");
+
+    const usage = discount.max_uses
+      ? discount.used_count + " / " + discount.max_uses + " usos"
+      : discount.used_count + " usos";
+
+    const status = Number(discount.active) === 1
+      ? "ACTIVO"
+      : "INACTIVO";
+
+    const details = document.createElement("div");
+    details.className = "discount-details";
+    details.textContent =
+      value + " de descuento · " +
+      "Compra mínima: $" +
+      Number(discount.min_subtotal || 0).toLocaleString("es-AR") +
+      " · " + usage + " · " + status;
+
+    info.append(code, details);
+    top.append(info);
+    item.append(top);
+
+    const actions = document.createElement("div");
+    actions.className = "discount-actions";
+
+    const edit = document.createElement("button");
+    edit.type = "button";
+    edit.className = "secondary";
+    edit.textContent = "Editar";
+    edit.addEventListener("click", () => editDiscount(discount));
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "secondary";
+    remove.textContent = "Eliminar";
+    remove.addEventListener("click", () => deleteDiscount(discount));
+
+    actions.append(edit, remove);
+    item.append(actions);
+    list.append(item);
+  });
+}
+
+/* REINICIAR FORMULARIO DE CUPÓN */
+
+function resetDiscountForm() {
+  document.getElementById("discount-form").reset();
+
+  editingDiscountId = null;
+
+  document.getElementById("discount-form-title").textContent =
+    "Crear código promocional";
+
+  document.getElementById("save-discount").textContent = "Crear cupón";
+  document.getElementById("cancel-discount-edit").hidden = true;
+
+  document.getElementById("discount-all").checked = true;
+  document.getElementById("discount-products").hidden = true;
+  document.getElementById("discount-active").checked = true;
+
+  renderDiscountProducts();
+}
+
+/* FECHAS */
+
+function dateToInputValue(value) {
+  if (!value) return "";
+
+  const date = new Date(value);
+
+  if (isNaN(date.getTime())) return "";
+
+  const local = new Date(
+    date.getTime() - date.getTimezoneOffset() * 60000
+  );
+
+  return local.toISOString().slice(0, 16);
+}
+
+function inputDateToISO(value) {
+  if (!value) return null;
+
+  const date = new Date(value);
+
+  if (isNaN(date.getTime())) {
+    throw new Error("Una de las fechas ingresadas no es válida.");
+  }
+
+  return date.toISOString();
+}
+
+/* EDITAR CUPÓN */
+
+function editDiscount(discount) {
+  editingDiscountId = discount.id;
+
+  document.getElementById("discount-code").value = discount.code || "";
+  document.getElementById("discount-type").value =
+    discount.discount_type || "percentage";
+
+  document.getElementById("discount-value").value =
+    discount.discount_value ?? "";
+
+  document.getElementById("discount-minimum").value =
+    discount.min_subtotal ?? 0;
+
+  document.getElementById("discount-max-uses").value =
+    discount.max_uses ?? "";
+
+  document.getElementById("discount-start").value =
+    dateToInputValue(discount.starts_at);
+
+  document.getElementById("discount-end").value =
+    dateToInputValue(discount.ends_at);
+
+  document.getElementById("discount-active").checked =
+    Number(discount.active) === 1;
+
+  const productIds = Array.isArray(discount.product_ids)
+    ? discount.product_ids
+    : Array.isArray(discount.products)
+      ? discount.products.map(product =>
+          typeof product === "string" ? product : product.id
+        )
+      : [];
+
+  const hasSelectedProducts = productIds.length > 0;
+
+  document.getElementById("discount-selected").checked =
+    hasSelectedProducts;
+
+  document.getElementById("discount-all").checked =
+    !hasSelectedProducts;
+
+  document.getElementById("discount-products").hidden =
+    !hasSelectedProducts;
+
+  renderDiscountProducts(productIds);
+
+  document.getElementById("discount-form-title").textContent =
+    "Editar código promocional";
+
+  document.getElementById("save-discount").textContent =
+    "Guardar cambios";
+
+  document.getElementById("cancel-discount-edit").hidden = false;
+
+  document.getElementById("discount-form-title").scrollIntoView({
+    behavior: "smooth"
+  });
+}
+
+/* GUARDAR CUPÓN */
+
+document.getElementById("discount-form")
+  .addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const button = document.getElementById("save-discount");
+
+    const scope =
+      document.querySelector('input[name="discount-scope"]:checked').value;
+
+    const selectedProducts = Array.from(
+      document.querySelectorAll(
+        "#discount-products-list input[type='checkbox']:checked"
+      )
+    ).map(input => input.value);
+
+    if (scope === "selected" && !selectedProducts.length) {
+      message.textContent = "Seleccioná al menos un producto para el cupón.";
+      return;
+    }
+
+    const code = document.getElementById("discount-code").value
+      .trim()
+      .toUpperCase();
+
+    const type = document.getElementById("discount-type").value;
+    const value = Number(document.getElementById("discount-value").value);
+    const minimum = Number(document.getElementById("discount-minimum").value);
+    const maxUsesInput = document.getElementById("discount-max-uses").value;
+
+    if (!code) {
+      message.textContent = "Ingresá un código promocional.";
+      return;
+    }
+
+    if (!Number.isInteger(value) || value <= 0) {
+      message.textContent = "El descuento debe ser un número entero mayor a cero.";
+      return;
+    }
+
+    if (type === "percentage" && value > 100) {
+      message.textContent = "El porcentaje no puede superar el 100%.";
+      return;
+    }
+
+    if (!Number.isInteger(minimum) || minimum < 0) {
+      message.textContent = "La compra mínima debe ser un importe válido.";
+      return;
+    }
+
+    let maxUses = null;
+
+    if (maxUsesInput !== "") {
+      maxUses = Number(maxUsesInput);
+
+      if (!Number.isInteger(maxUses) || maxUses < 1) {
+        message.textContent = "El máximo de usos debe ser un entero mayor a cero.";
+        return;
+      }
+    }
+
+    button.disabled = true;
+    button.textContent = "Guardando...";
+
+    try {
+      const startsAt = inputDateToISO(
+        document.getElementById("discount-start").value
+      );
+
+      const endsAt = inputDateToISO(
+        document.getElementById("discount-end").value
+      );
+
+      if (startsAt && endsAt && new Date(endsAt) <= new Date(startsAt)) {
+        throw new Error("La fecha de vencimiento debe ser posterior al inicio.");
+      }
+
+      const body = {
+        code,
+        discount_type: type,
+        discount_value: value,
+        min_subtotal: minimum,
+        starts_at: startsAt,
+        ends_at: endsAt,
+        max_uses: maxUses,
+        active: document.getElementById("discount-active").checked,
+        product_ids: scope === "selected" ? selectedProducts : []
+      };
+
+      const endpoint = editingDiscountId
+        ? API + "/admin/discount-codes/" + editingDiscountId
+        : API + "/admin/discount-codes";
+
+      const response = await fetch(endpoint, {
+        method: editingDiscountId ? "PUT" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token()
+        },
+        body: JSON.stringify(body)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "No se pudo guardar el cupón.");
+      }
+
+      message.textContent = editingDiscountId
+        ? "Cupón actualizado correctamente."
+        : "Cupón creado correctamente.";
+
+      resetDiscountForm();
+      await loadDiscountCodes();
+
+    } catch (error) {
+      message.textContent = error.message;
+    } finally {
+      button.disabled = false;
+      button.textContent = editingDiscountId
+        ? "Guardar cambios"
+        : "Crear cupón";
+    }
+  });
+
+/* CANCELAR EDICIÓN DE CUPÓN */
+
+document.getElementById("cancel-discount-edit")
+  .addEventListener("click", resetDiscountForm);
+
+/* ELIMINAR CUPÓN */
+
+async function deleteDiscount(discount) {
+  if (!confirm('¿Eliminar el cupón "' + discount.code + '"?')) return;
+
+  try {
+    const response = await fetch(
+      API + "/admin/discount-codes/" + discount.id,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: "Bearer " + token()
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "No se pudo eliminar el cupón.");
+    }
+
+    if (editingDiscountId === discount.id) {
+      resetDiscountForm();
+    }
+
+    message.textContent = "Cupón eliminado.";
+    await loadDiscountCodes();
+
+  } catch (error) {
+    message.textContent = error.message;
+  }
+}
+
+/* ACTUALIZAR CUPONES */
+
+document.getElementById("refresh-discounts")
+  .addEventListener("click", async () => {
+    await loadDiscountProducts();
+    await loadDiscountCodes();
+  });
+
 /* INICIAR SESIÓN */
 
 document.getElementById("login-form").addEventListener("submit", async event => {
@@ -1512,6 +2393,7 @@ document.getElementById("logout").addEventListener("click", async () => {
     });
   } finally {
     resetForm();
+    resetDiscountForm();
     showLogin();
     message.textContent = "Sesión cerrada.";
   }
