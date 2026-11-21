@@ -281,7 +281,7 @@ button, a {
   font-size: 12px;
   cursor: pointer;
   pointer-events: auto;
-  opacity: .25;
+  opacity: .5;
 }
 
 .product-carousel-arrow:hover {
