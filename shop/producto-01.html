@@ -450,8 +450,12 @@
 
       const category = document.createElement("p");
 category.className = "product-category";
-category.textContent = `/ ${product.category_name || "productos"}`;
 
+const categoryLink = document.createElement("a");
+categoryLink.href = `./?category=${product.category_id}`;
+categoryLink.textContent = `← volver a ${product.category_name}`;
+
+category.appendChild(categoryLink);
       const title = document.createElement("h1");
       title.textContent = product.name;
 
