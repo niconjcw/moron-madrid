@@ -673,7 +673,17 @@
           return;
         }
 
-        alert("¡Próximamente vas a poder comprar directamente desde acá!");
+        if (variants.length > 0 && !selectedVariant) {
+          alert("Seleccioná una opción antes de continuar.");
+          return;
+        }
+
+        if (!window.MM_CART || typeof window.MM_CART.add !== "function") {
+          alert("No se pudo cargar el carrito. Actualizá la página e intentá nuevamente.");
+          return;
+        }
+
+        window.MM_CART.add(product, selectedVariant, 1);
       });
 
       options.appendChild(buyButton);
@@ -726,8 +736,8 @@
     loadCategories();
     loadProduct();
   </script>
-  
-<script src="./cart.js"></script>
+
+  <script src="./cart.js"></script>
 
 </body>
 </html>
