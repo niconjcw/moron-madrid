@@ -131,9 +131,7 @@
       padding-top: 20px;
     }
 
-    .variants-section h2 {
-      margin-top: 0;
-    }
+    .variants-section h2 { margin-top: 0; }
 
     .stock-mode {
       display: flex;
@@ -150,18 +148,14 @@
       flex: 0 0 auto;
     }
 
-    .stock-mode span {
-      font-size: 14px;
-    }
+    .stock-mode span { font-size: 14px; }
 
     .single-stock {
       max-width: 250px;
       margin: 20px 0;
     }
 
-    .single-stock label {
-      margin-top: 0;
-    }
+    .single-stock label { margin-top: 0; }
 
     .variant-row {
       display: grid;
@@ -194,9 +188,7 @@
       font-size: 18px;
     }
 
-    #add-variant {
-      margin-top: 8px;
-    }
+    #add-variant { margin-top: 8px; }
 
     .variant-empty {
       color: #777;
@@ -204,12 +196,12 @@
       margin: 15px 0;
     }
 
-
     .category-manager {
       border-top: 1px solid #ccc;
       margin: 30px 0 35px;
       padding-top: 20px;
     }
+
     .category-row {
       display: flex;
       align-items: center;
@@ -218,16 +210,19 @@
       padding: 12px 0;
       border-bottom: 1px solid #ddd;
     }
+
     .category-actions {
       display: flex;
       gap: 8px;
     }
+
     .category-actions button {
       width: auto;
       min-width: 76px;
       margin: 0;
       padding: 9px 12px;
     }
+
     .category-add {
       display: grid;
       grid-template-columns: 1fr 130px;
@@ -235,8 +230,10 @@
       align-items: center;
       margin-top: 15px;
     }
-    .category-add input { margin: 0; }
+
+    .category-add input,
     .category-add button { margin: 0; }
+
     .category-select {
       width: 100%;
       padding: 13px;
@@ -245,13 +242,12 @@
       font: inherit;
       margin-bottom: 14px;
     }
+
     [hidden] { display: none !important; }
 
     @media (max-width: 550px) {
       body { padding: 20px; }
-
       header { margin-bottom: 50px; }
-
       .product { align-items: flex-start; }
 
       .variant-row {
@@ -261,9 +257,7 @@
         border-bottom: 1px solid #ddd;
       }
 
-      .variant-field input {
-        width: 100%;
-      }
+      .variant-field input { width: 100%; }
 
       .remove-variant {
         width: 100%;
@@ -285,7 +279,6 @@
   <main>
     <section id="login">
       <h1>Acceso privado</h1>
-
       <form id="login-form">
         <input
           id="password"
@@ -313,7 +306,6 @@
 
       <h2>Productos</h2>
       <button id="refresh" class="secondary">Actualizar lista</button>
-
       <div id="products"></div>
 
       <div class="form-section">
@@ -353,17 +345,7 @@
             Elegí la foto principal del producto. Máximo 6 MB.
           </p>
 
-          <label for="image-hover">Segunda foto para el hover</label>
-          <input
-            id="image-hover"
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
-          >
-          <p class="hint" id="hover-hint">
-            Foto alternativa que aparece al pasar el cursor.
-          </p>
-
-          <label for="gallery">Galería de fotos del producto</label>
+          <label for="gallery">Fotos adicionales</label>
           <input
             id="gallery"
             type="file"
@@ -371,12 +353,11 @@
             multiple
           >
           <p class="hint" id="gallery-hint">
-            Podés seleccionar varias fotos a la vez. Máximo 30 fotos en total.
+            Podés seleccionar varias fotos a la vez. Máximo 30 fotos en la galería.
           </p>
 
           <div class="variants-section">
             <h2>Talles y stock</h2>
-
             <p class="hint">
               Elegí si el producto tiene talles o si se vende por unidad.
             </p>
@@ -412,19 +393,13 @@
                 Este producto todavía no tiene talles cargados.
               </p>
 
-              <button
-                type="button"
-                id="add-variant"
-                class="secondary"
-              >
+              <button type="button" id="add-variant" class="secondary">
                 + Agregar talle
               </button>
             </div>
           </div>
 
-          <button type="submit" id="save-button">
-            Guardar producto
-          </button>
+          <button type="submit" id="save-button">Guardar producto</button>
 
           <button
             type="button"
@@ -443,735 +418,756 @@
     <p id="message" role="status"></p>
   </main>
 
-  <script>
-    const API = "https://moron-madrid-api.moronmadrid.workers.dev";
+<script>
+const API = "https://moron-madrid-api.moronmadrid.workers.dev";
 
-    const loginSection = document.getElementById("login");
-    const dashboard = document.getElementById("dashboard");
-    const message = document.getElementById("message");
-    const productsBox = document.getElementById("products");
-    const productForm = document.getElementById("product-form");
+const loginSection = document.getElementById("login");
+const dashboard = document.getElementById("dashboard");
+const message = document.getElementById("message");
+const productsBox = document.getElementById("products");
+const productForm = document.getElementById("product-form");
 
-    const variantsContainer = document.getElementById("variants-container");
-    const variantsEmpty = document.getElementById("variants-empty");
+const variantsContainer = document.getElementById("variants-container");
+const variantsEmpty = document.getElementById("variants-empty");
 
-    const noSizesCheckbox = document.getElementById("no-sizes");
-    const singleStock = document.getElementById("single-stock");
-    const sizesSection = document.getElementById("sizes-section");
-    const stockQuantity = document.getElementById("stock-quantity");
+const noSizesCheckbox = document.getElementById("no-sizes");
+const singleStock = document.getElementById("single-stock");
+const sizesSection = document.getElementById("sizes-section");
+const stockQuantity = document.getElementById("stock-quantity");
 
-    let editingId = null;
-    let currentImage = null;
-    let currentHover = null;
-    let currentGallery = [];
-    let categories = [];
+let editingId = null;
+let currentImage = null;
+let currentHover = null;
+let currentGallery = [];
+let categories = [];
 
-    function token() {
-      return sessionStorage.getItem("mm_admin_token");
+function token() {
+  return sessionStorage.getItem("mm_admin_token");
+}
+
+function showLogin() {
+  loginSection.hidden = false;
+  dashboard.hidden = true;
+  sessionStorage.removeItem("mm_admin_token");
+}
+
+async function showDashboard() {
+  loginSection.hidden = true;
+  dashboard.hidden = false;
+  await loadCategories();
+  await loadProducts();
+}
+
+/* STOCK */
+
+function updateStockMode() {
+  const withoutSizes = noSizesCheckbox.checked;
+
+  singleStock.hidden = !withoutSizes;
+  sizesSection.hidden = withoutSizes;
+  stockQuantity.required = withoutSizes;
+
+  variantsContainer.querySelectorAll("input").forEach(input => {
+    input.required = !withoutSizes &&
+      input.classList.contains("variant-stock");
+  });
+}
+
+noSizesCheckbox.addEventListener("change", updateStockMode);
+
+function updateVariantsEmpty() {
+  variantsEmpty.hidden = variantsContainer.children.length > 0;
+}
+
+/* VARIANTES */
+
+function addVariantRow(variant = {}) {
+  const row = document.createElement("div");
+  row.className = "variant-row";
+
+  const sizeField = document.createElement("div");
+  sizeField.className = "variant-field";
+
+  const sizeLabel = document.createElement("label");
+  sizeLabel.textContent = "Talle";
+
+  const sizeInput = document.createElement("input");
+  sizeInput.type = "text";
+  sizeInput.className = "variant-size";
+  sizeInput.placeholder = "Ej. S, M, L";
+  sizeInput.maxLength = 50;
+  sizeInput.value = variant.size || "";
+  sizeField.append(sizeLabel, sizeInput);
+
+  const skuField = document.createElement("div");
+  skuField.className = "variant-field";
+
+  const skuLabel = document.createElement("label");
+  skuLabel.textContent = "SKU (opcional)";
+
+  const skuInput = document.createElement("input");
+  skuInput.type = "text";
+  skuInput.className = "variant-sku";
+  skuInput.placeholder = "Código";
+  skuInput.maxLength = 100;
+  skuInput.value = variant.sku || "";
+  skuField.append(skuLabel, skuInput);
+
+  const stockField = document.createElement("div");
+  stockField.className = "variant-field";
+
+  const stockLabel = document.createElement("label");
+  stockLabel.textContent = "Stock";
+
+  const stockInput = document.createElement("input");
+  stockInput.type = "number";
+  stockInput.className = "variant-stock";
+  stockInput.min = "0";
+  stockInput.step = "1";
+  stockInput.required = true;
+  stockInput.value = variant.stock ?? 0;
+  stockField.append(stockLabel, stockInput);
+
+  const removeButton = document.createElement("button");
+  removeButton.type = "button";
+  removeButton.className = "remove-variant";
+  removeButton.textContent = "×";
+  removeButton.title = "Eliminar talle";
+  removeButton.setAttribute("aria-label", "Eliminar talle");
+
+  removeButton.addEventListener("click", () => {
+    row.remove();
+    updateVariantsEmpty();
+  });
+
+  row.append(sizeField, skuField, stockField, removeButton);
+  variantsContainer.append(row);
+  updateVariantsEmpty();
+}
+
+function getVariants() {
+  if (noSizesCheckbox.checked) {
+    const stockValue = stockQuantity.value;
+
+    if (
+      stockValue === "" ||
+      !Number.isSafeInteger(Number(stockValue)) ||
+      Number(stockValue) < 0
+    ) {
+      throw new Error("El stock debe ser un número entero igual o mayor a cero.");
     }
 
-    function showLogin() {
-      loginSection.hidden = false;
-      dashboard.hidden = true;
-      sessionStorage.removeItem("mm_admin_token");
+    return [{
+      size: "Único",
+      sku: "",
+      stock: Number(stockValue)
+    }];
+  }
+
+  const rows = Array.from(variantsContainer.children);
+  const variants = [];
+
+  for (const row of rows) {
+    const size = row.querySelector(".variant-size").value.trim();
+    const sku = row.querySelector(".variant-sku").value.trim();
+    const stockValue = row.querySelector(".variant-stock").value;
+
+    if (!size && !sku && !stockValue) continue;
+
+    if (!size) {
+      throw new Error("Completá el talle de cada variante.");
     }
 
-    async function showDashboard() {
-      loginSection.hidden = true;
-      dashboard.hidden = false;
-      await loadCategories();
-      await loadProducts();
+    if (
+      stockValue === "" ||
+      !Number.isSafeInteger(Number(stockValue)) ||
+      Number(stockValue) < 0
+    ) {
+      throw new Error("El stock debe ser un número entero igual o mayor a cero.");
     }
 
-    // CAMBIAR ENTRE PRODUCTO CON TALLE Y SIN TALLE
-    function updateStockMode() {
-      const withoutSizes = noSizesCheckbox.checked;
-
-      singleStock.hidden = !withoutSizes;
-      sizesSection.hidden = withoutSizes;
-
-      stockQuantity.required = withoutSizes;
-
-      variantsContainer.querySelectorAll("input").forEach(input => {
-        input.required = !withoutSizes && input.classList.contains("variant-stock");
-      });
-    }
-
-    noSizesCheckbox.addEventListener("change", updateStockMode);
-
-    function updateVariantsEmpty() {
-      variantsEmpty.hidden = variantsContainer.children.length > 0;
-    }
-
-    // AGREGAR UNA FILA DE TALLE
-    function addVariantRow(variant = {}) {
-      const row = document.createElement("div");
-      row.className = "variant-row";
-
-      const sizeField = document.createElement("div");
-      sizeField.className = "variant-field";
-
-      const sizeLabel = document.createElement("label");
-      sizeLabel.textContent = "Talle";
-
-      const sizeInput = document.createElement("input");
-      sizeInput.type = "text";
-      sizeInput.className = "variant-size";
-      sizeInput.placeholder = "Ej. S, M, L";
-      sizeInput.maxLength = 50;
-      sizeInput.value = variant.size || "";
-
-      sizeField.append(sizeLabel, sizeInput);
-
-      const skuField = document.createElement("div");
-      skuField.className = "variant-field";
-
-      const skuLabel = document.createElement("label");
-      skuLabel.textContent = "SKU (opcional)";
-
-      const skuInput = document.createElement("input");
-      skuInput.type = "text";
-      skuInput.className = "variant-sku";
-      skuInput.placeholder = "Código";
-      skuInput.maxLength = 100;
-      skuInput.value = variant.sku || "";
-
-      skuField.append(skuLabel, skuInput);
-
-      const stockField = document.createElement("div");
-      stockField.className = "variant-field";
-
-      const stockLabel = document.createElement("label");
-      stockLabel.textContent = "Stock";
-
-      const stockInput = document.createElement("input");
-      stockInput.type = "number";
-      stockInput.className = "variant-stock";
-      stockInput.min = "0";
-      stockInput.step = "1";
-      stockInput.required = true;
-      stockInput.value = variant.stock ?? 0;
-
-      stockField.append(stockLabel, stockInput);
-
-      const removeButton = document.createElement("button");
-      removeButton.type = "button";
-      removeButton.className = "remove-variant";
-      removeButton.textContent = "×";
-      removeButton.title = "Eliminar talle";
-      removeButton.setAttribute("aria-label", "Eliminar talle");
-
-      removeButton.addEventListener("click", () => {
-        row.remove();
-        updateVariantsEmpty();
-      });
-
-      row.append(sizeField, skuField, stockField, removeButton);
-
-      variantsContainer.append(row);
-      updateVariantsEmpty();
-    }
-
-    // LEER VARIANTES DEL FORMULARIO
-    function getVariants() {
-      // Producto sin talle: se guarda como una única variante interna.
-      if (noSizesCheckbox.checked) {
-        const stockValue = stockQuantity.value;
-
-        if (
-          stockValue === "" ||
-          !Number.isSafeInteger(Number(stockValue)) ||
-          Number(stockValue) < 0
-        ) {
-          throw new Error("El stock debe ser un número entero igual o mayor a cero.");
-        }
-
-        return [{
-          size: "Único",
-          sku: "",
-          stock: Number(stockValue)
-        }];
-      }
-
-      const rows = Array.from(variantsContainer.children);
-      const variants = [];
-
-      for (const row of rows) {
-        const size = row.querySelector(".variant-size").value.trim();
-        const sku = row.querySelector(".variant-sku").value.trim();
-        const stockValue = row.querySelector(".variant-stock").value;
-
-        if (!size && !sku && !stockValue) {
-          continue;
-        }
-
-        if (!size) {
-          throw new Error("Completá el talle de cada variante.");
-        }
-
-        if (
-          stockValue === "" ||
-          !Number.isSafeInteger(Number(stockValue)) ||
-          Number(stockValue) < 0
-        ) {
-          throw new Error("El stock debe ser un número entero igual o mayor a cero.");
-        }
-
-        variants.push({
-          size,
-          sku,
-          stock: Number(stockValue)
-        });
-      }
-
-      const sizes = variants.map(v => v.size.toLowerCase());
-
-      if (new Set(sizes).size !== sizes.length) {
-        throw new Error("No podés cargar dos veces el mismo talle.");
-      }
-
-      if (variants.length > 30) {
-        throw new Error("Podés agregar hasta 30 talles por producto.");
-      }
-
-      return variants;
-    }
-
-    // CATEGORÍAS
-    async function loadCategories() {
-      const response = await fetch(API + "/admin/categories", {
-        headers: { Authorization: "Bearer " + token() }
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "No se pudieron cargar las categorías.");
-
-      categories = data.categories || [];
-      renderCategories();
-      renderCategorySelect();
-    }
-
-    function renderCategorySelect(selectedId = document.getElementById("category").value) {
-      const select = document.getElementById("category");
-      select.replaceChildren();
-      const empty = document.createElement("option");
-      empty.value = "";
-      empty.textContent = "Sin categoría";
-      select.append(empty);
-
-      categories.forEach(category => {
-        const option = document.createElement("option");
-        option.value = category.id;
-        option.textContent = category.name;
-        select.append(option);
-      });
-      select.value = selectedId || "";
-    }
-
-    function renderCategories() {
-      const box = document.getElementById("categories-list");
-      box.replaceChildren();
-
-      if (!categories.length) {
-        const empty = document.createElement("p");
-        empty.className = "hint";
-        empty.textContent = "Todavía no hay categorías.";
-        box.append(empty);
-        return;
-      }
-
-      categories.forEach(category => {
-        const row = document.createElement("div");
-        row.className = "category-row";
-
-        const name = document.createElement("span");
-        name.textContent = category.name;
-
-        const actions = document.createElement("div");
-        actions.className = "category-actions";
-
-        const edit = document.createElement("button");
-        edit.type = "button";
-        edit.className = "secondary";
-        edit.textContent = "Renombrar";
-        edit.addEventListener("click", () => renameCategory(category));
-
-        const remove = document.createElement("button");
-        remove.type = "button";
-        remove.className = "secondary";
-        remove.textContent = "Eliminar";
-        remove.addEventListener("click", () => deleteCategory(category));
-
-        actions.append(edit, remove);
-        row.append(name, actions);
-        box.append(row);
-      });
-    }
-
-    async function renameCategory(category) {
-      const name = prompt("Nuevo nombre de la categoría:", category.name);
-      if (name === null) return;
-      const cleanName = name.trim();
-      if (!cleanName) {
-        message.textContent = "El nombre no puede quedar vacío.";
-        return;
-      }
-
-      const response = await fetch(API + "/admin/categories/" + category.id, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + token()
-        },
-        body: JSON.stringify({ name: cleanName })
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        message.textContent = data.error || "No se pudo renombrar la categoría.";
-        return;
-      }
-      await loadCategories();
-      message.textContent = "Categoría actualizada.";
-    }
-
-    async function deleteCategory(category) {
-      if (!confirm('¿Eliminar la categoría "' + category.name + '"?')) return;
-
-      const response = await fetch(API + "/admin/categories/" + category.id, {
-        method: "DELETE",
-        headers: { Authorization: "Bearer " + token() }
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        message.textContent = data.error || "No se pudo eliminar la categoría.";
-        return;
-      }
-      await loadCategories();
-      message.textContent = "Categoría eliminada.";
-    }
-
-    document.getElementById("category-form").addEventListener("submit", async event => {
-      event.preventDefault();
-      const input = document.getElementById("new-category-name");
-      const name = input.value.trim();
-      if (!name) return;
-
-      const response = await fetch(API + "/admin/categories", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + token()
-        },
-        body: JSON.stringify({ name })
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        message.textContent = data.error || "No se pudo crear la categoría.";
-        return;
-      }
-      input.value = "";
-      await loadCategories();
-      message.textContent = "Categoría creada.";
+    variants.push({
+      size,
+      sku,
+      stock: Number(stockValue)
     });
+  }
 
-    // CARGAR PRODUCTOS
-    async function loadProducts() {
-      message.textContent = "Cargando productos...";
-      productsBox.replaceChildren();
+  const sizes = variants.map(v => v.size.toLowerCase());
 
-      try {
-        const response = await fetch(API + "/products");
-        const data = await response.json();
+  if (new Set(sizes).size !== sizes.length) {
+    throw new Error("No podés cargar dos veces el mismo talle.");
+  }
 
-        if (!response.ok) {
-          throw new Error(data.error || "No se pudieron cargar los productos.");
-        }
+  if (variants.length > 30) {
+    throw new Error("Podés agregar hasta 30 talles por producto.");
+  }
 
-        if (!data.products || data.products.length === 0) {
-          message.textContent = "Todavía no hay productos.";
-          return;
-        }
+  return variants;
+}
 
-        data.products.forEach(product => {
-          const item = document.createElement("div");
-          item.className = "product";
+/* CATEGORÍAS */
 
-          const info = document.createElement("div");
-          const name = document.createElement("div");
-          const details = document.createElement("div");
-          const edit = document.createElement("button");
+async function loadCategories() {
+  const response = await fetch(API + "/admin/categories", {
+    headers: { Authorization: "Bearer " + token() }
+  });
 
-          name.className = "product-name";
-          name.textContent = product.name;
+  const data = await response.json();
 
-          const variants = product.variants || [];
-          const isSingleStock =
-            variants.length === 1 &&
-            variants[0].size.toLowerCase() === "único";
+  if (!response.ok) {
+    throw new Error(data.error || "No se pudieron cargar las categorías.");
+  }
 
-          let stockDescription;
+  categories = data.categories || [];
+  renderCategories();
+  renderCategorySelect();
+}
 
-          if (isSingleStock) {
-            stockDescription = variants[0].stock + " unidades";
-          } else {
-            stockDescription =
-              variants.length +
-              (variants.length === 1 ? " talle" : " talles");
-          }
+function renderCategorySelect(selectedId = document.getElementById("category").value) {
+  const select = document.getElementById("category");
+  select.replaceChildren();
 
-          details.className = "product-info";
-          details.textContent =
-            product.slug + " · " +
-            (product.category_name || "Sin categoría") + " · $" +
-            Number(product.price).toLocaleString("es-AR") +
-            " · " + stockDescription;
+  const empty = document.createElement("option");
+  empty.value = "";
+  empty.textContent = "Sin categoría";
+  select.append(empty);
 
-          edit.textContent = "Editar";
-          edit.addEventListener("click", () => editProduct(product));
+  categories.forEach(category => {
+    const option = document.createElement("option");
+    option.value = category.id;
+    option.textContent = category.name;
+    select.append(option);
+  });
 
-          info.append(name, details);
-          item.append(info, edit);
-          productsBox.append(item);
-        });
+  select.value = selectedId || "";
+}
 
-        message.textContent = data.products.length +
-          (data.products.length === 1
-            ? " producto encontrado."
-            : " productos encontrados.");
+function renderCategories() {
+  const box = document.getElementById("categories-list");
+  box.replaceChildren();
 
-      } catch (error) {
-        message.textContent = error.message || "No pudimos cargar los productos.";
-      }
+  if (!categories.length) {
+    const empty = document.createElement("p");
+    empty.className = "hint";
+    empty.textContent = "Todavía no hay categorías.";
+    box.append(empty);
+    return;
+  }
+
+  categories.forEach(category => {
+    const row = document.createElement("div");
+    row.className = "category-row";
+
+    const name = document.createElement("span");
+    name.textContent = category.name;
+
+    const actions = document.createElement("div");
+    actions.className = "category-actions";
+
+    const edit = document.createElement("button");
+    edit.type = "button";
+    edit.className = "secondary";
+    edit.textContent = "Renombrar";
+    edit.addEventListener("click", () => renameCategory(category));
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "secondary";
+    remove.textContent = "Eliminar";
+    remove.addEventListener("click", () => deleteCategory(category));
+
+    actions.append(edit, remove);
+    row.append(name, actions);
+    box.append(row);
+  });
+}
+
+async function renameCategory(category) {
+  const name = prompt("Nuevo nombre de la categoría:", category.name);
+  if (name === null) return;
+
+  const cleanName = name.trim();
+
+  if (!cleanName) {
+    message.textContent = "El nombre no puede quedar vacío.";
+    return;
+  }
+
+  const response = await fetch(API + "/admin/categories/" + category.id, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token()
+    },
+    body: JSON.stringify({ name: cleanName })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    message.textContent = data.error || "No se pudo renombrar la categoría.";
+    return;
+  }
+
+  await loadCategories();
+  message.textContent = "Categoría actualizada.";
+}
+
+async function deleteCategory(category) {
+  if (!confirm('¿Eliminar la categoría "' + category.name + '"?')) return;
+
+  const response = await fetch(API + "/admin/categories/" + category.id, {
+    method: "DELETE",
+    headers: { Authorization: "Bearer " + token() }
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    message.textContent = data.error || "No se pudo eliminar la categoría.";
+    return;
+  }
+
+  await loadCategories();
+  message.textContent = "Categoría eliminada.";
+}
+
+document.getElementById("category-form").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const input = document.getElementById("new-category-name");
+  const name = input.value.trim();
+  if (!name) return;
+
+  const response = await fetch(API + "/admin/categories", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token()
+    },
+    body: JSON.stringify({ name })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    message.textContent = data.error || "No se pudo crear la categoría.";
+    return;
+  }
+
+  input.value = "";
+  await loadCategories();
+  message.textContent = "Categoría creada.";
+});
+
+/* CARGAR PRODUCTOS */
+
+async function loadProducts() {
+  message.textContent = "Cargando productos...";
+  productsBox.replaceChildren();
+
+  try {
+    const response = await fetch(API + "/products");
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "No se pudieron cargar los productos.");
     }
 
-    // REINICIAR FORMULARIO
-    function resetForm() {
-      productForm.reset();
-
-      editingId = null;
-      currentImage = null;
-      currentHover = null;
-      currentGallery = [];
-      document.getElementById("category").value = "";
-
-      variantsContainer.replaceChildren();
-      noSizesCheckbox.checked = false;
-      stockQuantity.value = "0";
-
-      updateVariantsEmpty();
-      updateStockMode();
-
-      document.getElementById("form-title").textContent = "Nuevo producto";
-      document.getElementById("save-button").textContent = "Guardar producto";
-      document.getElementById("cancel-edit").hidden = true;
-
-      document.getElementById("image-hint").textContent =
-        "Elegí la foto principal del producto. Máximo 6 MB.";
-
-      document.getElementById("hover-hint").textContent =
-        "Foto alternativa que aparece al pasar el cursor.";
-
-      document.getElementById("gallery-hint").textContent =
-        "Podés seleccionar varias fotos a la vez. Máximo 30 fotos en total.";
+    if (!data.products || data.products.length === 0) {
+      message.textContent = "Todavía no hay productos.";
+      return;
     }
 
-    // EDITAR PRODUCTO
-    function editProduct(product) {
-      editingId = product.id;
-      currentImage = product.image;
-      currentHover = product.image_hover;
-      currentGallery = product.gallery || [];
+    data.products.forEach(product => {
+      const item = document.createElement("div");
+      item.className = "product";
 
-      document.getElementById("name").value = product.name || "";
-      document.getElementById("slug").value = product.slug || "";
-      document.getElementById("price").value = product.price;
-      document.getElementById("description").value = product.description || "";
-      document.getElementById("category").value = product.category_id || "";
+      const info = document.createElement("div");
+      const name = document.createElement("div");
+      const details = document.createElement("div");
+      const edit = document.createElement("button");
+
+      name.className = "product-name";
+      name.textContent = product.name;
 
       const variants = product.variants || [];
-
       const isSingleStock =
         variants.length === 1 &&
-        variants[0].size.toLowerCase() === "único";
+        String(variants[0].size).toLowerCase() === "único";
 
-      noSizesCheckbox.checked = isSingleStock;
-      stockQuantity.value = isSingleStock ? variants[0].stock : 0;
+      let stockDescription;
 
-      variantsContainer.replaceChildren();
-
-      if (!isSingleStock) {
-        variants.forEach(variant => addVariantRow(variant));
+      if (isSingleStock) {
+        stockDescription = variants[0].stock + " unidades";
+      } else {
+        stockDescription =
+          variants.length +
+          (variants.length === 1 ? " talle" : " talles");
       }
 
-      updateVariantsEmpty();
-      updateStockMode();
+      const galleryCount = Array.isArray(product.gallery)
+        ? product.gallery.length
+        : 0;
 
-      document.getElementById("form-title").textContent = "Editar producto";
-      document.getElementById("save-button").textContent = "Guardar cambios";
-      document.getElementById("cancel-edit").hidden = false;
+      details.className = "product-info";
+      details.textContent =
+        product.slug + " · " +
+        (product.category_name || "Sin categoría") + " · $" +
+        Number(product.price).toLocaleString("es-AR") +
+        " · " + stockDescription +
+        " · " + (1 + galleryCount + (product.image_hover ? 1 : 0)) + " fotos";
 
-      document.getElementById("image-hint").textContent =
-        currentImage
-          ? "Ya hay una foto principal. Si elegís otra, se reemplazará."
-          : "Todavía no hay foto principal.";
+      edit.textContent = "Editar";
+      edit.addEventListener("click", () => editProduct(product));
 
-      document.getElementById("hover-hint").textContent =
-        currentHover
-          ? "Ya hay una segunda foto. Si elegís otra, se reemplazará."
-          : "Todavía no hay segunda foto.";
+      info.append(name, details);
+      item.append(info, edit);
+      productsBox.append(item);
+    });
 
-      document.getElementById("gallery-hint").textContent =
-        currentGallery.length +
-        " fotos en la galería. Las nuevas se agregarán a las existentes.";
+    message.textContent = data.products.length +
+      (data.products.length === 1
+        ? " producto encontrado."
+        : " productos encontrados.");
 
-      document.getElementById("form-title").scrollIntoView({
-        behavior: "smooth"
+  } catch (error) {
+    message.textContent = error.message || "No pudimos cargar los productos.";
+  }
+}
+
+/* REINICIAR FORMULARIO */
+
+function resetForm() {
+  productForm.reset();
+
+  editingId = null;
+  currentImage = null;
+  currentHover = null;
+  currentGallery = [];
+
+  document.getElementById("category").value = "";
+
+  variantsContainer.replaceChildren();
+  noSizesCheckbox.checked = false;
+  stockQuantity.value = "0";
+
+  updateVariantsEmpty();
+  updateStockMode();
+
+  document.getElementById("form-title").textContent = "Nuevo producto";
+  document.getElementById("save-button").textContent = "Guardar producto";
+  document.getElementById("cancel-edit").hidden = true;
+
+  document.getElementById("image-hint").textContent =
+    "Elegí la foto principal del producto. Máximo 6 MB.";
+
+  document.getElementById("gallery-hint").textContent =
+    "Podés seleccionar varias fotos a la vez. Máximo 30 fotos en la galería.";
+}
+
+/* EDITAR PRODUCTO */
+
+function editProduct(product) {
+  editingId = product.id;
+  currentImage = product.image;
+  currentHover = product.image_hover || null;
+  currentGallery = Array.isArray(product.gallery)
+    ? [...product.gallery]
+    : [];
+
+  document.getElementById("name").value = product.name || "";
+  document.getElementById("slug").value = product.slug || "";
+  document.getElementById("price").value = product.price;
+  document.getElementById("description").value = product.description || "";
+  document.getElementById("category").value = product.category_id || "";
+
+  const variants = product.variants || [];
+
+  const isSingleStock =
+    variants.length === 1 &&
+    String(variants[0].size).toLowerCase() === "único";
+
+  noSizesCheckbox.checked = isSingleStock;
+  stockQuantity.value = isSingleStock ? variants[0].stock : 0;
+
+  variantsContainer.replaceChildren();
+
+  if (!isSingleStock) {
+    variants.forEach(variant => addVariantRow(variant));
+  }
+
+  updateVariantsEmpty();
+  updateStockMode();
+
+  document.getElementById("form-title").textContent = "Editar producto";
+  document.getElementById("save-button").textContent = "Guardar cambios";
+  document.getElementById("cancel-edit").hidden = false;
+
+  document.getElementById("image-hint").textContent =
+    currentImage
+      ? "Ya hay una foto principal. Si elegís otra, se reemplazará."
+      : "Todavía no hay foto principal.";
+
+  const totalPhotos =
+    currentGallery.length + (currentHover ? 1 : 0);
+
+  document.getElementById("gallery-hint").textContent =
+    totalPhotos +
+    " fotos adicionales guardadas. Las nuevas se agregarán a las existentes.";
+
+  document.getElementById("form-title").scrollIntoView({
+    behavior: "smooth"
+  });
+}
+
+/* SUBIR IMAGEN */
+
+async function uploadImage(file) {
+  if (file.size > 6 * 1024 * 1024) {
+    throw new Error("Una de las imágenes supera los 6 MB.");
+  }
+
+  const form = new FormData();
+  form.append("image", file);
+
+  const response = await fetch(API + "/admin/upload", {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + token()
+    },
+    body: form
+  });
+
+  const responseText = await response.text();
+
+  console.log("UPLOAD STATUS:", response.status);
+  console.log("UPLOAD RESPONSE:", responseText);
+
+  let data;
+
+  try {
+    data = JSON.parse(responseText);
+  } catch {
+    throw new Error(
+      "El servidor devolvió una respuesta inválida: " + responseText
+    );
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      (data.error || "No se pudo subir la imagen.") +
+      (data.githubStatus ? " | GitHub: " + data.githubStatus : "") +
+      (data.githubMessage ? " | " + data.githubMessage : "")
+    );
+  }
+
+  if (!data.url) {
+    throw new Error("La subida terminó, pero el servidor no devolvió la URL.");
+  }
+
+  return data.url;
+}
+
+/* GUARDAR PRODUCTO */
+
+productForm.addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const saveButton = document.getElementById("save-button");
+  const wasEditing = Boolean(editingId);
+
+  saveButton.disabled = true;
+  saveButton.textContent = "Guardando...";
+  message.textContent = "Preparando producto e imágenes...";
+
+  try {
+    const variants = getVariants();
+
+    const mainFile = document.getElementById("image").files[0];
+
+    const galleryFiles = Array.from(
+      document.getElementById("gallery").files
+    );
+
+    if (currentGallery.length + galleryFiles.length > 30) {
+      throw new Error("La galería admite un máximo de 30 fotos.");
+    }
+
+    let image = currentImage;
+    const imageHover = currentHover;
+
+    if (mainFile) {
+      message.textContent = "Subiendo foto principal...";
+      image = await uploadImage(mainFile);
+    }
+
+    const gallery = [...currentGallery];
+
+    for (const file of galleryFiles) {
+      message.textContent = "Subiendo fotos adicionales...";
+
+      const imageUrl = await uploadImage(file);
+
+      gallery.push({
+        image_url: imageUrl,
+        alt_text: document.getElementById("name").value
       });
     }
 
-    // SUBIR IMAGEN
-    async function uploadImage(file) {
-      if (file.size > 6 * 1024 * 1024) {
-        throw new Error("Una de las imágenes supera los 6 MB.");
-      }
+    const body = {
+      name: document.getElementById("name").value.trim(),
+      slug: document.getElementById("slug").value.trim(),
+      price: Number(document.getElementById("price").value),
+      description: document.getElementById("description").value,
+      category_id: document.getElementById("category").value || null,
+      image,
+      image_hover: imageHover,
+      gallery,
+      variants
+    };
 
-      const form = new FormData();
-      form.append("image", file);
+    message.textContent = "Guardando producto en la base de datos...";
 
-      const response = await fetch(API + "/admin/upload", {
-        method: "POST",
-        headers: {
-          Authorization: "Bearer " + token()
-        },
-        body: form
-      });
+    const endpoint = editingId
+      ? API + "/admin/products/" + editingId
+      : API + "/admin/products";
 
-      const responseText = await response.text();
+    const response = await fetch(endpoint, {
+      method: editingId ? "PUT" : "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token()
+      },
+      body: JSON.stringify(body)
+    });
 
-      console.log("UPLOAD STATUS:", response.status);
-      console.log("UPLOAD RESPONSE:", responseText);
+    const data = await response.json();
 
-      let data;
-
-      try {
-        data = JSON.parse(responseText);
-      } catch {
-        throw new Error(
-          "El servidor devolvió una respuesta inválida: " + responseText
-        );
-      }
-
-      if (!response.ok) {
-        throw new Error(
-          (data.error || "No se pudo subir la imagen.") +
-          (data.githubStatus ? " | GitHub: " + data.githubStatus : "") +
-          (data.githubMessage ? " | " + data.githubMessage : "")
-        );
-      }
-
-      if (!data.url) {
-        throw new Error("La subida terminó, pero el servidor no devolvió la URL.");
-      }
-
-      return data.url;
+    if (!response.ok) {
+      throw new Error(data.error || "No se pudo guardar el producto.");
     }
 
-    // GUARDAR PRODUCTO
-    productForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
+    message.textContent = wasEditing
+      ? "¡Producto actualizado correctamente!"
+      : "¡Producto creado correctamente!";
 
-      const saveButton = document.getElementById("save-button");
-      const wasEditing = Boolean(editingId);
+    resetForm();
+    await loadProducts();
 
-      saveButton.disabled = true;
-      saveButton.textContent = "Guardando...";
-      message.textContent = "Preparando producto e imágenes...";
+  } catch (error) {
+    message.textContent = error.message || "Ocurrió un error.";
+  } finally {
+    saveButton.disabled = false;
+    saveButton.textContent = editingId
+      ? "Guardar cambios"
+      : "Guardar producto";
+  }
+});
 
-      try {
-        const variants = getVariants();
+/* AGREGAR TALLE */
 
-        const mainFile = document.getElementById("image").files[0];
-        const hoverFile = document.getElementById("image-hover").files[0];
+document.getElementById("add-variant").addEventListener("click", () => {
+  addVariantRow();
+});
 
-        const galleryFiles = Array.from(
-          document.getElementById("gallery").files
-        );
+/* CANCELAR EDICIÓN */
 
-        if (currentGallery.length + galleryFiles.length > 30) {
-          throw new Error("La galería admite un máximo de 30 fotos.");
-        }
+document.getElementById("cancel-edit").addEventListener("click", resetForm);
 
-        let image = currentImage;
-        let imageHover = currentHover;
+/* ACTUALIZAR LISTA */
 
-        if (mainFile) {
-          message.textContent = "Subiendo foto principal...";
-          image = await uploadImage(mainFile);
-        }
+document.getElementById("refresh").addEventListener("click", loadProducts);
 
-        if (hoverFile) {
-          message.textContent = "Subiendo segunda foto...";
-          imageHover = await uploadImage(hoverFile);
-        }
+/* INICIAR SESIÓN */
 
-        const gallery = [...currentGallery];
+document.getElementById("login-form").addEventListener("submit", async event => {
+  event.preventDefault();
 
-        for (const file of galleryFiles) {
-          message.textContent = "Subiendo galería de fotos...";
+  const passwordInput = document.getElementById("password");
+  const loginButton = event.currentTarget.querySelector("button");
 
-          const imageUrl = await uploadImage(file);
+  loginButton.disabled = true;
+  loginButton.textContent = "Verificando...";
+  message.textContent = "Verificando...";
 
-          gallery.push({
-            image_url: imageUrl,
-            alt_text: document.getElementById("name").value
-          });
-        }
-
-        const body = {
-          name: document.getElementById("name").value.trim(),
-          slug: document.getElementById("slug").value.trim(),
-          price: Number(document.getElementById("price").value),
-          description: document.getElementById("description").value,
-          category_id: document.getElementById("category").value || null,
-          image,
-          image_hover: imageHover,
-          gallery,
-          variants
-        };
-
-        message.textContent = "Guardando producto en la base de datos...";
-
-        const endpoint = editingId
-          ? API + "/admin/products/" + editingId
-          : API + "/admin/products";
-
-        const response = await fetch(endpoint, {
-          method: editingId ? "PUT" : "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + token()
-          },
-          body: JSON.stringify(body)
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error || "No se pudo guardar el producto.");
-        }
-
-        message.textContent = wasEditing
-          ? "¡Producto actualizado correctamente!"
-          : "¡Producto creado correctamente!";
-
-        resetForm();
-        await loadProducts();
-
-      } catch (error) {
-        message.textContent = error.message || "Ocurrió un error.";
-      } finally {
-        saveButton.disabled = false;
-        saveButton.textContent = editingId
-          ? "Guardar cambios"
-          : "Guardar producto";
-      }
+  try {
+    const response = await fetch(API + "/admin/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        password: passwordInput.value
+      })
     });
 
-    // AGREGAR TALLE
-    document.getElementById("add-variant").addEventListener("click", () => {
-      addVariantRow();
-    });
+    const data = await response.json();
 
-    // CANCELAR EDICIÓN
-    document.getElementById("cancel-edit").addEventListener("click", resetForm);
-
-    // ACTUALIZAR LISTA
-    document.getElementById("refresh").addEventListener("click", loadProducts);
-
-    // INICIAR SESIÓN
-    document.getElementById("login-form").addEventListener("submit", async (event) => {
-      event.preventDefault();
-
-      const passwordInput = document.getElementById("password");
-      const loginButton = event.currentTarget.querySelector("button");
-
-      loginButton.disabled = true;
-      loginButton.textContent = "Verificando...";
-      message.textContent = "Verificando...";
-
-      try {
-        const response = await fetch(API + "/admin/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            password: passwordInput.value
-          })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          message.textContent = data.error || "No se pudo iniciar sesión.";
-          return;
-        }
-
-        if (!data.token) {
-          throw new Error("El servidor no devolvió una sesión válida.");
-        }
-
-        sessionStorage.setItem("mm_admin_token", data.token);
-        passwordInput.value = "";
-
-        await showDashboard();
-
-      } catch (error) {
-        message.textContent = error.message || "Error de conexión.";
-      } finally {
-        loginButton.disabled = false;
-        loginButton.textContent = "Entrar";
-      }
-    });
-
-    // CERRAR SESIÓN
-    document.getElementById("logout").addEventListener("click", async () => {
-      try {
-        await fetch(API + "/admin/logout", {
-          method: "POST",
-          headers: {
-            Authorization: "Bearer " + token()
-          }
-        });
-      } finally {
-        resetForm();
-        showLogin();
-        message.textContent = "Sesión cerrada.";
-      }
-    });
-
-    // COMPROBAR SESIÓN EXISTENTE
-    async function checkSession() {
-      if (!token()) return;
-
-      try {
-        const response = await fetch(API + "/admin/me", {
-          headers: {
-            Authorization: "Bearer " + token()
-          }
-        });
-
-        if (response.ok) {
-          await showDashboard();
-        } else {
-          showLogin();
-        }
-      } catch {
-        message.textContent = "No se pudo conectar con el servidor.";
-      }
+    if (!response.ok) {
+      message.textContent = data.error || "No se pudo iniciar sesión.";
+      return;
     }
 
-    updateStockMode();
-    checkSession();
-  </script>
+    if (!data.token) {
+      throw new Error("El servidor no devolvió una sesión válida.");
+    }
+
+    sessionStorage.setItem("mm_admin_token", data.token);
+    passwordInput.value = "";
+
+    await showDashboard();
+
+  } catch (error) {
+    message.textContent = error.message || "Error de conexión.";
+  } finally {
+    loginButton.disabled = false;
+    loginButton.textContent = "Entrar";
+  }
+});
+
+/* CERRAR SESIÓN */
+
+document.getElementById("logout").addEventListener("click", async () => {
+  try {
+    await fetch(API + "/admin/logout", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + token()
+      }
+    });
+  } finally {
+    resetForm();
+    showLogin();
+    message.textContent = "Sesión cerrada.";
+  }
+});
+
+/* COMPROBAR SESIÓN EXISTENTE */
+
+async function checkSession() {
+  if (!token()) return;
+
+  try {
+    const response = await fetch(API + "/admin/me", {
+      headers: {
+        Authorization: "Bearer " + token()
+      }
+    });
+
+    if (response.ok) {
+      await showDashboard();
+    } else {
+      showLogin();
+    }
+  } catch {
+    message.textContent = "No se pudo conectar con el servidor.";
+  }
+}
+
+updateStockMode();
+checkSession();
+</script>
 </body>
 </html>
