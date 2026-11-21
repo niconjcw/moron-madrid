@@ -14,7 +14,7 @@
     <marquee>3 cuotas sin interés / -5% por transferencia / envíos a todo el país /</marquee>
   </div>
 
-  <!-- HEADER -->
+  <!-- /* HEADER */ -->
   <header class="site-header">
 
     <div class="header-left">
@@ -62,7 +62,7 @@
 
     </div>
 
-    <!-- HEADER MOBILE -->
+    <!-- /* HEADER MOBILE */ -->
     <div class="mobile-header">
 
       <button
@@ -93,7 +93,7 @@
 
   </header>
 
-  <!-- MENÚ MOBILE -->
+  <!-- /* MENÚ MOBILE */ -->
   <nav class="mobile-panel" id="mobile-panel" hidden>
 
     <button
@@ -137,12 +137,12 @@
 
   </nav>
 
-  <!-- PRODUCTO -->
+  <!-- /* PRODUCTO */ -->
   <main class="product-page" id="product-page">
     <p id="loading-message">cargando producto...</p>
   </main>
 
-  <!-- FOOTER -->
+  <!-- /* FOOTER */ -->
   <footer class="site-footer">
     <div class="footer-columns">
 
@@ -383,6 +383,10 @@
         const track = document.createElement("div");
         track.className = "carousel-track";
 
+        /* SWIPE EN MOBILE */
+
+        track.style.touchAction = "pan-y";
+
         let currentIndex = 0;
 
         uniqueImages.forEach((url, index) => {
@@ -426,6 +430,8 @@
         controls.append(prevButton, counter, nextButton);
         gallery.appendChild(controls);
 
+        /* CONFIGURACIÓN DEL CARRUSEL */
+
         function getSlidesPerView() {
           return window.matchMedia("(max-width: 700px)").matches ? 1 : 2;
         }
@@ -465,27 +471,75 @@
             total > slidesPerView ? "flex" : "none";
         }
 
-        prevButton.addEventListener("click", () => {
+        /* NAVEGACIÓN DEL CARRUSEL */
+
+        function moveCarousel(direction) {
           const total = track.querySelectorAll(".carousel-slide").length;
           const maxIndex = Math.max(0, total - getSlidesPerView());
 
-          currentIndex = currentIndex <= 0
-            ? maxIndex
-            : currentIndex - 1;
+          if (maxIndex <= 0) return;
+
+          if (direction === "next") {
+            currentIndex = currentIndex >= maxIndex
+              ? 0
+              : currentIndex + 1;
+          } else {
+            currentIndex = currentIndex <= 0
+              ? maxIndex
+              : currentIndex - 1;
+          }
 
           updateCarousel();
+        }
+
+        prevButton.addEventListener("click", () => {
+          moveCarousel("previous");
         });
 
         nextButton.addEventListener("click", () => {
-          const total = track.querySelectorAll(".carousel-slide").length;
-          const maxIndex = Math.max(0, total - getSlidesPerView());
-
-          currentIndex = currentIndex >= maxIndex
-            ? 0
-            : currentIndex + 1;
-
-          updateCarousel();
+          moveCarousel("next");
         });
+
+        /* DETECTAR DESLIZAMIENTO */
+
+        let startX = 0;
+        let startY = 0;
+        let pointerStart = false;
+
+        track.addEventListener("pointerdown", event => {
+          if (event.target.closest("button")) return;
+
+          startX = event.clientX;
+          startY = event.clientY;
+          pointerStart = true;
+        });
+
+        track.addEventListener("pointerup", event => {
+          if (!pointerStart) return;
+
+          pointerStart = false;
+
+          const differenceX = event.clientX - startX;
+          const differenceY = event.clientY - startY;
+
+          const horizontalSwipe =
+            Math.abs(differenceX) > 40 &&
+            Math.abs(differenceX) > Math.abs(differenceY) * 1.2;
+
+          if (!horizontalSwipe) return;
+
+          if (differenceX < 0) {
+            moveCarousel("next");
+          } else {
+            moveCarousel("previous");
+          }
+        });
+
+        track.addEventListener("pointercancel", () => {
+          pointerStart = false;
+        });
+
+        /* ACTUALIZAR AL CAMBIAR TAMAÑO */
 
         window.addEventListener("resize", updateCarousel);
 
