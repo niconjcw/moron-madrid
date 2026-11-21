@@ -103,6 +103,39 @@
     <p class="catalog-message">cargando productos...</p>
   </main>
 
+  <!-- FOOTER -->
+
+  <footer class="site-footer">
+    <div class="footer-columns">
+
+      <div class="footer-column">
+        <p class="footer-heading">explorar</p>
+        <a href="./">tienda</a>
+        <a href="nosotros.html">nosotros</a>
+        <a href="https://moronmadrid.com.ar/#estudio">archivo</a>
+      </div>
+
+      <div class="footer-column">
+        <p class="footer-heading">información</p>
+        <a href="compras-envios.html">compras / envíos</a>
+        <a href="devoluciones.html">devoluciones</a>
+        <a href="https://moronmadrid.com.ar/#contacto">contacto</a>
+      </div>
+
+      <div class="footer-column">
+        <p class="footer-heading">seguinos</p>
+        <a href="https://www.instagram.com/moronmadrid/" target="_blank" rel="noopener noreferrer">instagram ↗</a>
+        <a href="#newsletter" class="newsletter-link">newsletter</a>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <span>© morón madrid — 2026</span>
+      <time class="footer-clock" id="footer-clock">00:00:00</time>
+    </div>
+  </footer>
+
 <script>
 const API_URL = "https://moron-madrid-api.moronmadrid.workers.dev";
 
@@ -390,6 +423,19 @@ document.addEventListener("click", event => {
   }
 });
 
+/* RELOJ DEL FOOTER */
+
+function updateFooterClock() {
+  const now = new Date();
+  document.getElementById("footer-clock").textContent =
+    [now.getHours(), now.getMinutes(), now.getSeconds()]
+      .map(value => String(value).padStart(2, "0"))
+      .join(":");
+}
+
+updateFooterClock();
+setInterval(updateFooterClock, 1000);
+
 /* CARGA DE LA TIENDA */
 
 async function loadStore() {
@@ -416,7 +462,6 @@ async function loadStore() {
 
     renderCategoryMenu(categories);
 
-    // Si llega una categoría que ya no existe, mostrar todos los productos.
     if (
       selectedCategory !== "all" &&
       !categories.some(category =>
