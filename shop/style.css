@@ -399,9 +399,13 @@ a:hover {
 
 /* LÍNEA INFERIOR */
 
+.site-footer {
+  position: relative;
+}
+
 .footer-bottom {
-  display: grid;
-  grid-template-columns: 1fr auto;
+  display: flex;
+  justify-content: flex-start;
   align-items: center;
   width: 100%;
   margin-top: 75px;
@@ -410,16 +414,15 @@ a:hover {
   font-weight: 300;
 }
 
-.footer-bottom > span {
-  justify-self: start;
-}
-
 .footer-clock {
-  justify-self: end;
+  position: absolute;
+  right: 30px;
+  bottom: 22px;
   margin: 0;
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
+
 @media (max-width: 700px) {
   .footer-bottom {
     display: grid;
@@ -428,8 +431,9 @@ a:hover {
   }
 
   .footer-clock {
-    justify-self: end;
-  }
+  right: 14px;
+  bottom: 20px;
+}
 }
 /* FOOTER MOBILE */
 
