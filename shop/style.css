@@ -210,6 +210,11 @@ a:hover {
   .nav-group:focus-within > .nav-button i {
     transform: rotate(180deg);
   }
+
+  .nav-group:hover > .header-dropdown[hidden],
+  .nav-group:focus-within > .header-dropdown[hidden] {
+    display: flex !important;
+  }
 }
 
 /* MOBILE HEADER */
@@ -308,13 +313,6 @@ a:hover {
   pointer-events: auto;
 }
 
-@media (hover: none) {
-  .product-carousel-arrow {
-    opacity: 1;
-    pointer-events: auto;
-  }
-}
-
 .product-info {
   display: flex;
   justify-content: space-between;
@@ -324,7 +322,6 @@ a:hover {
   text-decoration: none;
   font-size: .7rem;
 }
-
 
 /* FOOTER */
 
@@ -459,6 +456,7 @@ a:hover {
     font-size: .7rem;
   }
 }
+
 /* PÁGINA DE PRODUCTO */
 
 .product-page {
@@ -822,14 +820,20 @@ a:hover {
     font-size: .7rem;
   }
 
+  /* CONTROLES DEL CATÁLOGO MOBILE */
+  /* Siempre visibles, mismo tamaño y color que desktop */
+
   .product-carousel-controls {
-    padding: 0 4px;
+    padding: 0 8px;
   }
 
   .product-carousel-arrow {
-    width: 30px;
-    height: 38px;
-    font-size: 21px;
+    width: 34px;
+    height: 42px;
+    font-size: 12px;
+    color: #000;
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .product-page {
@@ -850,7 +854,7 @@ a:hover {
   .product-description {
     margin: 35px 0;
   }
-
+}
 
 /* DESPLEGABLES: HOVER SOLO EN DESKTOP */
 
