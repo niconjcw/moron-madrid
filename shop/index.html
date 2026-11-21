@@ -15,15 +15,12 @@
   </div>
 
   <header class="site-header">
-
     <div class="header-left">
       <a href="./">inicio</a>
-
       <div class="nav-group">
         <button class="nav-button" id="products-toggle" type="button" aria-expanded="false">
           productos <i class="fas fa-angle-down"></i>
         </button>
-
         <div class="header-dropdown" id="products-dropdown" hidden>
           <button type="button" class="category-filter active" data-category="all">ver todo</button>
           <div id="dynamic-categories"></div>
@@ -40,7 +37,6 @@
         <button class="nav-button" id="info-toggle" type="button" aria-expanded="false">
           información <i class="fas fa-angle-down"></i>
         </button>
-
         <div class="header-dropdown" id="info-dropdown" hidden>
           <a href="nosotros.html">nosotros</a>
           <a href="compras-envios.html">compras / envíos</a>
@@ -76,12 +72,10 @@
         </svg>
       </a>
     </div>
-
   </header>
 
   <nav class="mobile-panel" id="mobile-panel" hidden>
     <button class="mobile-close" id="mobile-close" aria-label="Cerrar menú">×</button>
-
     <a href="./">inicio</a>
 
     <button class="mobile-section-button" id="mobile-products-toggle" aria-expanded="false">
@@ -120,7 +114,7 @@ const mobileCategories = document.getElementById("mobile-categories");
 let allProducts = [];
 const urlParams = new URLSearchParams(window.location.search);
 let selectedCategory = urlParams.get("category") || "all";
-  
+
 function formatPrice(price) {
   return "$ " + Number(price).toLocaleString("es-AR");
 }
@@ -174,37 +168,94 @@ function toggleMobileSection(buttonId, submenuId) {
 toggleMobileSection("mobile-products-toggle", "mobile-categories");
 toggleMobileSection("mobile-info-toggle", "mobile-info-links");
 
-/* PRODUCTOS */
+/* IMÁGENES DEL PRODUCTO */
+
+function getProductImages(product) {
+  const images = [
+    product.image,
+    product.image_hover,
+    ...(Array.isArray(product.gallery)
+      ? product.gallery.map(item => {
+          if (typeof item === "string") return item;
+          return item.image_url || item.url || item.image || "";
+        })
+      : [])
+  ];
+
+  return [...new Set(images.filter(Boolean))];
+}
+
+/* CREAR PRODUCTO */
 
 function createProduct(product) {
   const article = document.createElement("article");
   article.className = "product";
 
-  const link = document.createElement("a");
-  link.className = "product-link";
-  link.href = `producto-01.html?slug=${encodeURIComponent(product.slug)}`;
-
   const images = document.createElement("div");
   images.className = "product-images";
 
-  const primary = document.createElement("img");
-  primary.className = "primary-image";
-  primary.src = product.image || "";
-  primary.alt = product.name;
-  primary.loading = "lazy";
-  images.appendChild(primary);
+  const imageUrls = getProductImages(product);
+  let currentImage = 0;
 
-  if (product.image_hover) {
-    const secondary = document.createElement("img");
-    secondary.className = "secondary-image";
-    secondary.src = product.image_hover;
-    secondary.alt = product.name + " — segunda vista";
-    secondary.loading = "lazy";
-    images.appendChild(secondary);
+  const imageElements = imageUrls.map((url, index) => {
+    const img = document.createElement("img");
+    img.src = url;
+    img.alt = product.name + " — foto " + (index + 1);
+    img.loading = "lazy";
+    img.className = index === 0 ? "product-slide active" : "product-slide";
+    images.appendChild(img);
+    return img;
+  });
+
+  const imageLink = document.createElement("a");
+  imageLink.className = "product-image-link";
+  imageLink.href = `producto-01.html?slug=${encodeURIComponent(product.slug)}`;
+  imageLink.setAttribute("aria-label", "Ver " + product.name);
+  images.appendChild(imageLink);
+
+  if (imageElements.length > 1) {
+    const controls = document.createElement("div");
+    controls.className = "product-carousel-controls";
+
+    const previous = document.createElement("button");
+    previous.type = "button";
+    previous.className = "product-carousel-arrow previous";
+    previous.innerHTML = '<i class="fas fa-angle-left"></i>';
+    previous.setAttribute("aria-label", "Foto anterior");
+
+    const next = document.createElement("button");
+    next.type = "button";
+    next.className = "product-carousel-arrow next";
+    next.innerHTML = '<i class="fas fa-angle-right"></i>';
+    next.setAttribute("aria-label", "Foto siguiente");
+
+    function showImage(index) {
+      currentImage = (index + imageElements.length) % imageElements.length;
+
+      imageElements.forEach((img, i) => {
+        img.classList.toggle("active", i === currentImage);
+      });
+    }
+
+    previous.addEventListener("click", event => {
+      event.preventDefault();
+      event.stopPropagation();
+      showImage(currentImage - 1);
+    });
+
+    next.addEventListener("click", event => {
+      event.preventDefault();
+      event.stopPropagation();
+      showImage(currentImage + 1);
+    });
+
+    controls.append(previous, next);
+    images.appendChild(controls);
   }
 
-  const info = document.createElement("div");
+  const info = document.createElement("a");
   info.className = "product-info";
+  info.href = `producto-01.html?slug=${encodeURIComponent(product.slug)}`;
 
   const name = document.createElement("span");
   name.textContent = product.name;
@@ -213,11 +264,12 @@ function createProduct(product) {
   price.textContent = formatPrice(product.price);
 
   info.append(name, price);
-  link.append(images, info);
-  article.append(link);
+  article.append(images, info);
 
   return article;
 }
+
+/* RENDERIZAR PRODUCTOS */
 
 function renderProducts() {
   catalog.replaceChildren();
@@ -256,11 +308,9 @@ function updateCategoryButtons() {
 
 function selectCategory(categoryId) {
   selectedCategory = categoryId;
-
   updateCategoryButtons();
   renderProducts();
   closeMobileMenu();
-
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -286,7 +336,6 @@ function renderCategoryMenu(categories) {
   allButton.dataset.category = "all";
   allButton.textContent = "ver todo";
   allButton.addEventListener("click", () => selectCategory("all"));
-
   mobileCategories.appendChild(allButton);
 
   categories.forEach(category => {
@@ -295,11 +344,7 @@ function renderCategoryMenu(categories) {
     button.className = "category-filter";
     button.dataset.category = category.id;
     button.textContent = category.name.toLowerCase();
-
-    button.addEventListener("click", () => {
-      selectCategory(category.id);
-    });
-
+    button.addEventListener("click", () => selectCategory(category.id));
     dynamicCategories.appendChild(button);
 
     const mobileButton = document.createElement("button");
@@ -307,11 +352,7 @@ function renderCategoryMenu(categories) {
     mobileButton.className = "mobile-category";
     mobileButton.dataset.category = category.id;
     mobileButton.textContent = category.name.toLowerCase();
-
-    mobileButton.addEventListener("click", () => {
-      selectCategory(category.id);
-    });
-
+    mobileButton.addEventListener("click", () => selectCategory(category.id));
     mobileCategories.appendChild(mobileButton);
   });
 
@@ -326,20 +367,16 @@ const infoDropdown = document.getElementById("info-dropdown");
 
 productsToggle.addEventListener("click", () => {
   const opening = productsDropdown.hidden;
-
   productsDropdown.hidden = !opening;
   infoDropdown.hidden = true;
-
   productsToggle.setAttribute("aria-expanded", String(opening));
   infoToggle.setAttribute("aria-expanded", "false");
 });
 
 infoToggle.addEventListener("click", () => {
   const opening = infoDropdown.hidden;
-
   infoDropdown.hidden = !opening;
   productsDropdown.hidden = true;
-
   infoToggle.setAttribute("aria-expanded", String(opening));
   productsToggle.setAttribute("aria-expanded", "false");
 });
@@ -348,7 +385,6 @@ document.addEventListener("click", event => {
   if (!event.target.closest(".nav-group")) {
     productsDropdown.hidden = true;
     infoDropdown.hidden = true;
-
     productsToggle.setAttribute("aria-expanded", "false");
     infoToggle.setAttribute("aria-expanded", "false");
   }
@@ -379,6 +415,18 @@ async function loadStore() {
       : [];
 
     renderCategoryMenu(categories);
+
+    // Si llega una categoría que ya no existe, mostrar todos los productos.
+    if (
+      selectedCategory !== "all" &&
+      !categories.some(category =>
+        String(category.id) === String(selectedCategory)
+      )
+    ) {
+      selectedCategory = "all";
+    }
+
+    updateCategoryButtons();
     renderProducts();
 
   } catch (error) {
