@@ -1,4 +1,4 @@
-
+```javascript
 /* =========================================
    MORÓN MADRID — CARRITO
 ========================================= */
@@ -7,8 +7,10 @@
   "use strict";
 
   const STORAGE_KEY = "mm_cart";
+  const COUPON_STORAGE_KEY = "mm_cart_coupon";
   const CART_CURRENCY = "es-AR";
   const API_URL = "https://moron-madrid-api.moronmadrid.workers.dev";
+  const CHECKOUT_URL = "/shop/checkout.html";
 
   let cart = loadCart();
   let appliedCoupon = null;
@@ -73,6 +75,15 @@
 
   function invalidateCoupon() {
     appliedCoupon = null;
+    localStorage.removeItem(COUPON_STORAGE_KEY);
+  }
+
+  function saveCouponCode(code) {
+    if (code) {
+      localStorage.setItem(COUPON_STORAGE_KEY, code);
+    } else {
+      localStorage.removeItem(COUPON_STORAGE_KEY);
+    }
   }
 
   /* =========================================
@@ -293,6 +304,7 @@
         align-items: center;
         gap: 10px;
         font-size: .75rem;
+        margin-bottom: 18px;
       }
 
       .mm-cart-coupon-remove {
@@ -326,8 +338,34 @@
       .mm-cart-note {
         font-size: .7rem;
         color: #555;
-        margin: 0;
+        margin: 0 0 16px;
         line-height: 1.5;
+      }
+
+      .mm-cart-checkout {
+        display: block;
+        width: 100%;
+        padding: 15px 18px;
+        border: 1px solid #000;
+        background: #000;
+        color: #fff;
+        font-family: inherit;
+        font-size: .8rem;
+        font-weight: 400;
+        text-align: center;
+        text-transform: lowercase;
+        cursor: pointer;
+        transition: background .2s ease, color .2s ease;
+      }
+
+      .mm-cart-checkout:hover:not(:disabled) {
+        background: transparent;
+        color: #000;
+      }
+
+      .mm-cart-checkout:disabled {
+        opacity: .4;
+        cursor: not-allowed;
       }
 
       .mm-cart-count {
@@ -441,6 +479,13 @@
         <p class="mm-cart-note">
           los costos de envío se calcularán al continuar con la compra.
         </p>
+
+        <button
+          class="mm-cart-checkout"
+          id="mm-cart-checkout"
+          type="button"
+          disabled
+        >continuar al pago</button>
       </div>
     `;
 
@@ -471,6 +516,25 @@
 
     drawer.querySelector("#mm-cart-coupon-remove")
       .addEventListener("click", removeCoupon);
+
+    drawer.querySelector("#mm-cart-checkout")
+      .addEventListener("click", goToCheckout);
+  }
+
+  /* =========================================
+     CONTINUAR AL CHECKOUT
+  ========================================= */
+
+  function goToCheckout() {
+    if (!cart.length) return;
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
+
+    if (appliedCoupon?.code) {
+      saveCouponCode(appliedCoupon.code);
+    }
+
+    window.location.href = CHECKOUT_URL;
   }
 
   /* =========================================
@@ -610,259 +674,3 @@
       }
 
       item.quantity++;
-    }
-
-    if (action === "decrease") {
-      item.quantity--;
-
-      if (item.quantity <= 0) {
-        cart = cart.filter(product => product.key !== key);
-      }
-    }
-
-    invalidateCoupon();
-    saveCart();
-    renderCart();
-  }
-
-  /* =========================================
-     APLICAR CUPÓN
-  ========================================= */
-
-  async function applyCoupon() {
-    if (couponLoading) return;
-
-    if (!cart.length) {
-      showCouponMessage("Agregá productos antes de aplicar un cupón.", "error");
-      return;
-    }
-
-    const input = document.getElementById("mm-cart-coupon-input");
-    const button = document.getElementById("mm-cart-coupon-button");
-
-    const code = input.value.trim().toUpperCase();
-
-    if (!code) {
-      showCouponMessage("Ingresá un código de descuento.", "error");
-      return;
-    }
-
-    couponLoading = true;
-    button.disabled = true;
-    button.textContent = "validando...";
-
-    showCouponMessage("", "");
-
-    try {
-      const response = await fetch(`${API_URL}/discounts/validate`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          code,
-          items: cart.map(item => ({
-            product_id: item.product_id,
-            quantity: item.quantity
-          }))
-        })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.valido) {
-        throw new Error(
-          data.message ||
-          data.error ||
-          "El código no es válido o no se puede aplicar a esta compra."
-        );
-      }
-
-      appliedCoupon = {
-        code: data.code || code,
-        discount_amount: Number(data.discount_amount) || 0,
-        total: Number(data.total) || 0
-      };
-
-      input.value = "";
-      showCouponMessage(
-        `¡Cupón ${appliedCoupon.code} aplicado correctamente!`,
-        "success"
-      );
-
-      renderCart();
-
-    } catch (error) {
-      appliedCoupon = null;
-      showCouponMessage(error.message, "error");
-
-    } finally {
-      couponLoading = false;
-      button.disabled = false;
-      button.textContent = "aplicar";
-    }
-  }
-
-  function showCouponMessage(message, type) {
-    const element = document.getElementById("mm-cart-coupon-message");
-    if (!element) return;
-
-    element.textContent = message;
-    element.className = "mm-cart-coupon-message";
-
-    if (type) element.classList.add(type);
-  }
-
-  /* =========================================
-     QUITAR CUPÓN
-  ========================================= */
-
-  function removeCoupon() {
-    appliedCoupon = null;
-
-    const input = document.getElementById("mm-cart-coupon-input");
-
-    if (input) input.value = "";
-
-    showCouponMessage("Cupón eliminado.", "");
-    renderCart();
-  }
-
-  /* =========================================
-     MOSTRAR PRODUCTOS
-  ========================================= */
-
-  function renderCart() {
-    const container = document.getElementById("mm-cart-items");
-    if (!container) return;
-
-    container.replaceChildren();
-
-    const totalCount = document.getElementById("mm-cart-total-count");
-    const subtotal = document.getElementById("mm-cart-subtotal");
-    const total = document.getElementById("mm-cart-total");
-    const discountRow = document.getElementById("mm-cart-discount-row");
-    const discountElement = document.getElementById("mm-cart-discount");
-    const couponForm = document.getElementById("mm-cart-coupon");
-    const couponApplied = document.getElementById("mm-cart-coupon-applied");
-    const couponAppliedName = document.getElementById("mm-cart-coupon-applied-name");
-
-    totalCount.textContent = getCartCount();
-    subtotal.textContent = formatPrice(getSubtotal());
-    total.textContent = formatPrice(getTotal());
-
-    discountRow.hidden = !appliedCoupon;
-    discountElement.textContent = "− " + formatPrice(getDiscount());
-
-    couponForm.hidden = Boolean(appliedCoupon);
-    couponApplied.hidden = !appliedCoupon;
-
-    if (appliedCoupon) {
-      couponAppliedName.textContent =
-        `cupón ${appliedCoupon.code} aplicado`;
-    }
-
-    if (!cart.length) {
-      const empty = document.createElement("p");
-      empty.className = "mm-cart-empty";
-      empty.textContent = "tu carrito está vacío";
-      container.appendChild(empty);
-      return;
-    }
-
-    cart.forEach(item => {
-      const article = document.createElement("article");
-      article.className = "mm-cart-item";
-
-      const image = document.createElement("img");
-      image.src = item.image || "";
-      image.alt = item.name;
-      image.loading = "lazy";
-
-      const info = document.createElement("div");
-      info.className = "mm-cart-item-info";
-
-      const name = document.createElement("span");
-      name.className = "mm-cart-item-name";
-      name.textContent = item.name;
-
-      const size = document.createElement("span");
-      size.className = "mm-cart-item-size";
-      size.textContent = item.variant_name
-        ? "talle: " + item.variant_name
-        : "";
-
-      const price = document.createElement("span");
-      price.className = "mm-cart-item-price";
-      price.textContent = formatPrice(item.price);
-
-      const actions = document.createElement("div");
-      actions.className = "mm-cart-item-actions";
-
-      const quantity = document.createElement("div");
-      quantity.className = "mm-cart-quantity";
-
-      quantity.innerHTML = `
-        <button type="button" data-cart-action="decrease" data-key="${escapeHTML(item.key)}">−</button>
-        <span>${item.quantity}</span>
-        <button type="button" data-cart-action="increase" data-key="${escapeHTML(item.key)}">+</button>
-      `;
-
-      const remove = document.createElement("button");
-      remove.type = "button";
-      remove.className = "mm-cart-remove";
-      remove.textContent = "eliminar";
-      remove.dataset.cartAction = "remove";
-      remove.dataset.key = item.key;
-
-      actions.append(quantity, remove);
-      info.append(name, size, price, actions);
-      article.append(image, info);
-
-      container.appendChild(article);
-    });
-  }
-
-  /* =========================================
-     CONECTAR ÍCONOS
-  ========================================= */
-
-  function connectCartIcons() {
-    document.querySelectorAll(".cart-icon").forEach(icon => {
-      icon.setAttribute("href", "#carrito");
-
-      icon.addEventListener("click", event => {
-        event.preventDefault();
-        openCart();
-      });
-    });
-  }
-
-  /* =========================================
-     INICIALIZACIÓN
-  ========================================= */
-
-  function init() {
-    injectStyles();
-    createCart();
-    connectCartIcons();
-    updateCartCount();
-    renderCart();
-  }
-
-  window.MM_CART = {
-    add,
-    open: openCart,
-    close: closeCart,
-    getItems: () => [...cart],
-    getSubtotal,
-    getCount: getCartCount
-  };
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
-    init();
-  }
-
-})();
