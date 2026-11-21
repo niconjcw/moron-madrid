@@ -548,7 +548,7 @@ async function loadStore() {
 loadStore();
 </script>
 
-<!-- Pop-up Corazón — Morón Madrid -->
+
 <style>
   @font-face {
     font-display: block;
@@ -683,7 +683,6 @@ loadStore();
   }
 </style>
 
-<!-- Estructura HTML -->
 <div class="custom-popup-overlay" id="heartPopup">
   <div class="custom-popup-container">
 
@@ -712,7 +711,6 @@ loadStore();
             </button>
           </div>
 
-          <!-- Campo antispam invisible -->
           <input
             type="text"
             name="website"
@@ -731,42 +729,50 @@ loadStore();
   </div>
 </div>
 
-<!-- Conexión con Cloudflare -->
 <script>
+  /* CONFIGURACIÓN NEWSLETTER */
+
   const NEWSLETTER_API =
     "https://moron-madrid-api.moronmadrid.workers.dev/newsletter";
 
+  /* CONTROL DEL POPUP */
+
   function closeHeartPopup() {
-    document.getElementById('heartPopup').style.display = 'none';
+    localStorage.setItem("popupDismissed", "true");
+    document.getElementById("heartPopup").style.display = "none";
   }
 
-  // Mostrar popup si todavía no se suscribió
-  document.addEventListener('DOMContentLoaded', function () {
-    var isSubscribed = localStorage.getItem('popupSubscribed');
+  document.addEventListener("DOMContentLoaded", function () {
+    const currentPath = window.location.pathname.replace(/\/+$/, "");
+    const isShopHome = currentPath === "/shop";
 
-    if (!isSubscribed) {
-      document.getElementById('heartPopup').style.display = 'flex';
+    const isSubscribed = localStorage.getItem("popupSubscribed");
+    const wasDismissed = localStorage.getItem("popupDismissed");
+
+    if (isShopHome && !isSubscribed && !wasDismissed) {
+      document.getElementById("heartPopup").style.display = "flex";
     }
   });
 
-  // Envío del formulario
-  document.getElementById('custom-form').addEventListener('submit', async function (e) {
+  /* ENVÍO DEL FORMULARIO */
+
+  document.getElementById("custom-form").addEventListener("submit", async function (e) {
     e.preventDefault();
 
     var form = this;
-    var submitBtn = document.getElementById('customSubmitBtn');
-    var statusMsg = document.getElementById('status-message');
-    var email = document.getElementById('EMAIL').value.trim();
+    var submitBtn = document.getElementById("customSubmitBtn");
+    var statusMsg = document.getElementById("status-message");
+    var email = document.getElementById("EMAIL").value.trim();
 
-    submitBtn.innerText = 'enviando...';
+    submitBtn.innerText = "enviando...";
     submitBtn.disabled = true;
-    statusMsg.style.display = 'none';
+    statusMsg.style.display = "none";
 
     try {
       const response = await fetch(NEWSLETTER_API, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json"
         },
         body: JSON.stringify({
           email: email
@@ -775,28 +781,33 @@ loadStore();
 
       const data = await response.json();
 
-      if (!response.ok || data.suscripcion !== 'correcta') {
-        throw new Error(data.mensaje || 'Error al suscribirse');
+      if (!response.ok || data.suscripcion !== "correcta") {
+        throw new Error(data.mensaje || "Error al suscribirse");
       }
 
-      localStorage.setItem('popupSubscribed', 'true');
+      localStorage.setItem("popupSubscribed", "true");
+      localStorage.setItem("popupDismissed", "true");
 
-      form.style.display = 'none';
-      statusMsg.innerText = 'listo!';
-      statusMsg.style.display = 'block';
+      form.style.display = "none";
+      statusMsg.innerText = "listo!";
+      statusMsg.style.display = "block";
 
-      setTimeout(closeHeartPopup, 1000);
+      setTimeout(function () {
+        document.getElementById("heartPopup").style.display = "none";
+      }, 1000);
 
     } catch (error) {
-      console.error('Error newsletter:', error);
+      console.error("Error newsletter:", error);
 
-      statusMsg.innerText = 'no funcionó, intentá de nuevo';
-      statusMsg.style.display = 'block';
+      statusMsg.innerText = "no funcionó, intentá de nuevo";
+      statusMsg.style.display = "block";
 
-      submitBtn.innerText = 'suscribite!';
+      submitBtn.innerText = "suscribite!";
       submitBtn.disabled = false;
     }
   });
+</script>
+
 </script>
 
 </body>
