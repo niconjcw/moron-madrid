@@ -349,7 +349,7 @@ button, a {
 }
 
 .product-details {
-  padding: 60px 40px;
+  padding: 5px 40px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -362,9 +362,9 @@ button, a {
 }
 
 .product-details h1 {
-  font-size: 1rem;
-  font-weight: 400;
-  margin: 0 0 12px;
+    font-size: 1rem;
+    font-weight: 400;
+    margin: 40px 0 12px;
 }
 
 .product-price {
