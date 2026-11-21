@@ -245,6 +245,105 @@
 
     [hidden] { display: none !important; }
 
+    /* PESTAÑAS ADMIN */
+
+    .admin-tabs {
+      display: flex;
+      gap: 25px;
+      border-bottom: 1px solid #ccc;
+      margin-bottom: 30px;
+    }
+
+    .admin-tab {
+      width: auto;
+      padding: 12px 0;
+      margin: 0;
+      border: none;
+      border-bottom: 2px solid transparent;
+      background: transparent;
+      color: #888;
+      font-size: 13px;
+    }
+
+    .admin-tab:hover {
+      opacity: 1;
+      color: #000;
+    }
+
+    .admin-tab.active {
+      color: #000;
+      border-bottom-color: #000;
+    }
+
+    /* NEWSLETTER */
+
+    .newsletter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      margin: 35px 0 25px;
+    }
+
+    .newsletter-header h2 {
+      margin: 0;
+    }
+
+    .newsletter-count {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .newsletter-actions {
+      display: flex;
+      gap: 10px;
+      margin: 25px 0;
+    }
+
+    .newsletter-actions button {
+      flex: 1;
+      margin: 0;
+    }
+
+    .newsletter-filter {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #ccc;
+      background: #fff;
+      font: inherit;
+      margin: 10px 0 20px;
+    }
+
+    .newsletter-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      padding: 15px 0;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .newsletter-email {
+      overflow-wrap: anywhere;
+    }
+
+    .newsletter-date {
+      color: #888;
+      font-size: 11px;
+      margin-top: 5px;
+    }
+
+    .newsletter-status {
+      color: #777;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .newsletter-empty {
+      color: #777;
+      padding: 25px 0;
+    }
+
     @media (max-width: 550px) {
       body { padding: 20px; }
       header { margin-bottom: 50px; }
@@ -263,6 +362,14 @@
         width: 100%;
         height: 40px;
         grid-column: 2;
+      }
+
+      .newsletter-actions {
+        flex-direction: column;
+      }
+
+      .newsletter-header {
+        align-items: flex-start;
       }
     }
   </style>
@@ -294,123 +401,174 @@
     <section id="dashboard" hidden>
       <h1>Morón Madrid — Administración</h1>
 
-      <section class="category-manager">
-        <h2 style="margin-top:0">Categorías</h2>
-        <p class="hint">Creá y administrá las categorías de la tienda. Cada producto puede pertenecer a una sola categoría.</p>
-        <div id="categories-list"></div>
-        <form id="category-form" class="category-add">
-          <input id="new-category-name" type="text" maxlength="80" placeholder="Nueva categoría" required>
-          <button type="submit">Agregar</button>
-        </form>
-      </section>
+      <nav class="admin-tabs">
+        <button type="button" class="admin-tab active" data-tab="products-panel">
+          PRODUCTOS
+        </button>
+        <button type="button" class="admin-tab" data-tab="newsletter-panel">
+          NEWSLETTER
+        </button>
+      </nav>
 
-      <h2>Productos</h2>
-      <button id="refresh" class="secondary">Actualizar lista</button>
-      <div id="products"></div>
+      <!-- PANEL PRODUCTOS -->
 
-      <div class="form-section">
-        <h2 id="form-title">Nuevo producto</h2>
+      <section id="products-panel">
 
-        <form id="product-form">
-          <label for="name">Nombre del producto</label>
-          <input id="name" type="text" required maxlength="200">
+        <section class="category-manager">
+          <h2 style="margin-top:0">Categorías</h2>
+          <p class="hint">Creá y administrá las categorías de la tienda. Cada producto puede pertenecer a una sola categoría.</p>
+          <div id="categories-list"></div>
+          <form id="category-form" class="category-add">
+            <input id="new-category-name" type="text" maxlength="80" placeholder="Nueva categoría" required>
+            <button type="submit">Agregar</button>
+          </form>
+        </section>
 
-          <label for="slug">Identificador / URL</label>
-          <input
-            id="slug"
-            type="text"
-            placeholder="ejemplo-cartera"
-            pattern="[a-z0-9-]+"
-            required
-          >
+        <h2>Productos</h2>
+        <button id="refresh" class="secondary">Actualizar lista</button>
+        <div id="products"></div>
 
-          <label for="price">Precio en pesos argentinos</label>
-          <input id="price" type="number" min="0" step="1" required>
+        <div class="form-section">
+          <h2 id="form-title">Nuevo producto</h2>
 
-          <label for="category">Categoría</label>
-          <select id="category" class="category-select">
-            <option value="">Sin categoría</option>
-          </select>
+          <form id="product-form">
+            <label for="name">Nombre del producto</label>
+            <input id="name" type="text" required maxlength="200">
 
-          <label for="description">Descripción</label>
-          <textarea id="description"></textarea>
+            <label for="slug">Identificador / URL</label>
+            <input
+              id="slug"
+              type="text"
+              placeholder="ejemplo-cartera"
+              pattern="[a-z0-9-]+"
+              required
+            >
 
-          <label for="image">Foto principal</label>
-          <input
-            id="image"
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
-          >
-          <p class="hint" id="image-hint">
-            Elegí la foto principal del producto. Máximo 6 MB.
-          </p>
+            <label for="price">Precio en pesos argentinos</label>
+            <input id="price" type="number" min="0" step="1" required>
 
-          <label for="gallery">Fotos adicionales</label>
-          <input
-            id="gallery"
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
-            multiple
-          >
-          <p class="hint" id="gallery-hint">
-            Podés seleccionar varias fotos a la vez. Máximo 30 fotos en la galería.
-          </p>
+            <label for="category">Categoría</label>
+            <select id="category" class="category-select">
+              <option value="">Sin categoría</option>
+            </select>
 
-          <div class="variants-section">
-            <h2>Talles y stock</h2>
-            <p class="hint">
-              Elegí si el producto tiene talles o si se vende por unidad.
+            <label for="description">Descripción</label>
+            <textarea id="description"></textarea>
+
+            <label for="image">Foto principal</label>
+            <input
+              id="image"
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+            >
+            <p class="hint" id="image-hint">
+              Elegí la foto principal del producto. Máximo 6 MB.
             </p>
 
-            <label class="stock-mode" for="no-sizes">
-              <input type="checkbox" id="no-sizes">
-              <span>Este producto no lleva talle</span>
-            </label>
+            <label for="gallery">Fotos adicionales</label>
+            <input
+              id="gallery"
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              multiple
+            >
+            <p class="hint" id="gallery-hint">
+              Podés seleccionar varias fotos a la vez. Máximo 30 fotos en la galería.
+            </p>
 
-            <div id="single-stock" class="single-stock" hidden>
-              <label for="stock-quantity">Stock disponible</label>
-              <input
-                id="stock-quantity"
-                type="number"
-                min="0"
-                step="1"
-                value="0"
-              >
+            <div class="variants-section">
+              <h2>Talles y stock</h2>
               <p class="hint">
-                Cantidad total de unidades disponibles de este producto.
+                Elegí si el producto tiene talles o si se vende por unidad.
               </p>
+
+              <label class="stock-mode" for="no-sizes">
+                <input type="checkbox" id="no-sizes">
+                <span>Este producto no lleva talle</span>
+              </label>
+
+              <div id="single-stock" class="single-stock" hidden>
+                <label for="stock-quantity">Stock disponible</label>
+                <input
+                  id="stock-quantity"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value="0"
+                >
+                <p class="hint">
+                  Cantidad total de unidades disponibles de este producto.
+                </p>
+              </div>
+
+              <div id="sizes-section">
+                <p class="hint">
+                  Agregá cada talle y definí cuántas unidades tenés disponibles.
+                  El SKU es opcional.
+                </p>
+
+                <div id="variants-container"></div>
+
+                <p id="variants-empty" class="variant-empty">
+                  Este producto todavía no tiene talles cargados.
+                </p>
+
+                <button type="button" id="add-variant" class="secondary">
+                  + Agregar talle
+                </button>
+              </div>
             </div>
 
-            <div id="sizes-section">
-              <p class="hint">
-                Agregá cada talle y definí cuántas unidades tenés disponibles.
-                El SKU es opcional.
-              </p>
+            <button type="submit" id="save-button">Guardar producto</button>
 
-              <div id="variants-container"></div>
+            <button
+              type="button"
+              id="cancel-edit"
+              class="secondary"
+              hidden
+            >
+              Cancelar edición
+            </button>
+          </form>
+        </div>
+      </section>
 
-              <p id="variants-empty" class="variant-empty">
-                Este producto todavía no tiene talles cargados.
-              </p>
+      <!-- PANEL NEWSLETTER -->
 
-              <button type="button" id="add-variant" class="secondary">
-                + Agregar talle
-              </button>
-            </div>
+      <section id="newsletter-panel" hidden>
+        <div class="newsletter-header">
+          <h2>Suscriptores</h2>
+          <div class="newsletter-count" id="newsletter-count">
+            Cargando...
           </div>
+        </div>
 
-          <button type="submit" id="save-button">Guardar producto</button>
+        <p class="hint">
+          Lista de emails registrados en la base de datos de Morón Madrid.
+        </p>
 
-          <button
-            type="button"
-            id="cancel-edit"
-            class="secondary"
-            hidden
-          >
-            Cancelar edición
+        <select id="newsletter-filter" class="newsletter-filter">
+          <option value="active">Suscriptores activos</option>
+          <option value="inactive">Suscriptores inactivos</option>
+          <option value="all">Todos los registros</option>
+        </select>
+
+        <div class="newsletter-actions">
+          <button type="button" id="copy-emails">
+            Copiar emails
           </button>
-        </form>
-      </div>
+
+          <button type="button" id="export-emails" class="secondary">
+            Descargar CSV
+          </button>
+        </div>
+
+        <button type="button" id="refresh-newsletter" class="secondary">
+          Actualizar lista
+        </button>
+
+        <div id="newsletter-list"></div>
+      </section>
 
       <button id="logout">Cerrar sesión</button>
     </section>
@@ -440,6 +598,9 @@ let currentImage = null;
 let currentHover = null;
 let currentGallery = [];
 let categories = [];
+let newsletterSubscribers = [];
+
+/* SESIÓN */
 
 function token() {
   return sessionStorage.getItem("mm_admin_token");
@@ -457,6 +618,218 @@ async function showDashboard() {
   await loadCategories();
   await loadProducts();
 }
+
+/* PESTAÑAS */
+
+document.querySelectorAll(".admin-tab").forEach(button => {
+  button.addEventListener("click", async () => {
+    const target = button.dataset.tab;
+
+    document.querySelectorAll(".admin-tab").forEach(tab => {
+      tab.classList.toggle("active", tab === button);
+    });
+
+    document.getElementById("products-panel").hidden =
+      target !== "products-panel";
+
+    document.getElementById("newsletter-panel").hidden =
+      target !== "newsletter-panel";
+
+    message.textContent = "";
+
+    if (target === "newsletter-panel") {
+      await loadNewsletter();
+    }
+  });
+});
+
+/* NEWSLETTER */
+
+async function loadNewsletter() {
+  const list = document.getElementById("newsletter-list");
+  const count = document.getElementById("newsletter-count");
+  const filter = document.getElementById("newsletter-filter").value;
+
+  list.textContent = "Cargando suscriptores...";
+  count.textContent = "Cargando...";
+
+  try {
+    const response = await fetch(
+      API + "/admin/newsletter?status=" + encodeURIComponent(filter) +
+      "&limit=1000&offset=0",
+      {
+        headers: {
+          Authorization: "Bearer " + token()
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "No se pudo cargar el newsletter.");
+    }
+
+    newsletterSubscribers = data.subscribers || [];
+
+    count.textContent =
+      (data.total ?? newsletterSubscribers.length) +
+      ((data.total ?? newsletterSubscribers.length) === 1
+        ? " registro"
+        : " registros");
+
+    renderNewsletter();
+
+  } catch (error) {
+    list.textContent = error.message;
+    count.textContent = "Error";
+  }
+}
+
+function renderNewsletter() {
+  const list = document.getElementById("newsletter-list");
+  list.replaceChildren();
+
+  if (!newsletterSubscribers.length) {
+    const empty = document.createElement("p");
+    empty.className = "newsletter-empty";
+    empty.textContent = "No hay suscriptores para mostrar.";
+    list.append(empty);
+    return;
+  }
+
+  newsletterSubscribers.forEach(subscriber => {
+    const row = document.createElement("div");
+    row.className = "newsletter-row";
+
+    const info = document.createElement("div");
+
+    const email = document.createElement("div");
+    email.className = "newsletter-email";
+    email.textContent = subscriber.email;
+
+    const date = document.createElement("div");
+    date.className = "newsletter-date";
+
+    if (subscriber.subscribed_at) {
+      const parsedDate = new Date(subscriber.subscribed_at);
+      date.textContent = isNaN(parsedDate.getTime())
+        ? subscriber.subscribed_at
+        : parsedDate.toLocaleString("es-AR");
+    }
+
+    const status = document.createElement("span");
+    status.className = "newsletter-status";
+    status.textContent = Number(subscriber.active) === 1
+      ? "ACTIVO"
+      : "INACTIVO";
+
+    info.append(email, date);
+    row.append(info, status);
+    list.append(row);
+  });
+}
+
+document.getElementById("newsletter-filter")
+  .addEventListener("change", loadNewsletter);
+
+document.getElementById("refresh-newsletter")
+  .addEventListener("click", loadNewsletter);
+
+/* COPIAR EMAILS */
+
+document.getElementById("copy-emails")
+  .addEventListener("click", async () => {
+    const button = document.getElementById("copy-emails");
+
+    const emails = newsletterSubscribers
+      .filter(subscriber => Number(subscriber.active) === 1)
+      .map(subscriber => subscriber.email)
+      .filter(Boolean);
+
+    if (!emails.length) {
+      message.textContent = "No hay emails activos para copiar.";
+      return;
+    }
+
+    const text = emails.join("\n");
+
+    try {
+      await navigator.clipboard.writeText(text);
+      button.textContent = "¡Copiados!";
+      message.textContent = emails.length + " emails copiados.";
+
+      setTimeout(() => {
+        button.textContent = "Copiar emails";
+      }, 2000);
+
+    } catch (error) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.append(textarea);
+      textarea.select();
+
+      const copied = document.execCommand("copy");
+      textarea.remove();
+
+      if (copied) {
+        button.textContent = "¡Copiados!";
+        message.textContent = emails.length + " emails copiados.";
+
+        setTimeout(() => {
+          button.textContent = "Copiar emails";
+        }, 2000);
+      } else {
+        message.textContent = "No se pudo copiar la lista.";
+      }
+    }
+  });
+
+/* DESCARGAR CSV */
+
+document.getElementById("export-emails")
+  .addEventListener("click", async () => {
+    const button = document.getElementById("export-emails");
+
+    button.disabled = true;
+    button.textContent = "Preparando...";
+
+    try {
+      const response = await fetch(API + "/admin/newsletter/export", {
+        headers: {
+          Authorization: "Bearer " + token()
+        }
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "No se pudo descargar el CSV.");
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "moron-madrid-newsletter.csv";
+
+      document.body.append(link);
+      link.click();
+      link.remove();
+
+      URL.revokeObjectURL(url);
+
+      message.textContent = "Lista descargada correctamente.";
+
+    } catch (error) {
+      message.textContent = error.message;
+    } finally {
+      button.disabled = false;
+      button.textContent = "Descargar CSV";
+    }
+  });
 
 /* STOCK */
 
