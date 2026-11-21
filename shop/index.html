@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -9,7 +10,7 @@
 </head>
 <body>
 
-  <div class="announcement-bar">
+  <div class="announcement-bar" style="background-color: #dcd63b;">
     <marquee>3 cuotas sin interés / -5% por transferencia / envíos a todo el país /</marquee>
   </div>
 
@@ -24,7 +25,7 @@
         </button>
 
         <div class="header-dropdown" id="products-dropdown" hidden>
-          <button class="category-filter active" data-category="all">ver todo</button>
+          <button type="button" class="category-filter active" data-category="all">ver todo</button>
           <div id="dynamic-categories"></div>
         </div>
       </div>
@@ -88,7 +89,7 @@
     </button>
 
     <div class="mobile-submenu" id="mobile-categories">
-      <button type="button" class="mobile-category" data-category="all">ver todo</button>
+      <button type="button" class="mobile-category active" data-category="all">ver todo</button>
     </div>
 
     <button class="mobile-section-button" id="mobile-info-toggle" aria-expanded="false">
@@ -114,6 +115,7 @@ const API_URL = "https://moron-madrid-api.moronmadrid.workers.dev";
 const catalog = document.getElementById("catalog");
 const productsDropdown = document.getElementById("products-dropdown");
 const dynamicCategories = document.getElementById("dynamic-categories");
+const mobileCategories = document.getElementById("mobile-categories");
 
 let allProducts = [];
 let selectedCategory = "all";
@@ -240,26 +242,50 @@ function renderProducts() {
   });
 }
 
+/* SELECCIONAR CATEGORÍA */
+
+function updateCategoryButtons() {
+  document.querySelectorAll("[data-category]").forEach(button => {
+    button.classList.toggle(
+      "active",
+      String(button.dataset.category) === String(selectedCategory)
+    );
+  });
+}
+
 function selectCategory(categoryId) {
   selectedCategory = categoryId;
+
+  updateCategoryButtons();
   renderProducts();
   closeMobileMenu();
+
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
+
+/* BOTÓN VER TODO DESKTOP */
+
+const desktopAllButton = document.querySelector(
+  '#products-dropdown [data-category="all"]'
+);
+
+desktopAllButton.addEventListener("click", () => {
+  selectCategory("all");
+});
 
 /* CATEGORÍAS */
 
 function renderCategoryMenu(categories) {
   dynamicCategories.replaceChildren();
-
-  const mobileCategories = document.getElementById("mobile-categories");
   mobileCategories.replaceChildren();
 
   const allButton = document.createElement("button");
   allButton.type = "button";
-  allButton.className = "category-filter";
+  allButton.className = "mobile-category";
+  allButton.dataset.category = "all";
   allButton.textContent = "ver todo";
   allButton.addEventListener("click", () => selectCategory("all"));
+
   mobileCategories.appendChild(allButton);
 
   categories.forEach(category => {
@@ -268,16 +294,27 @@ function renderCategoryMenu(categories) {
     button.className = "category-filter";
     button.dataset.category = category.id;
     button.textContent = category.name.toLowerCase();
-    button.addEventListener("click", () => selectCategory(category.id));
+
+    button.addEventListener("click", () => {
+      selectCategory(category.id);
+    });
+
     dynamicCategories.appendChild(button);
 
     const mobileButton = document.createElement("button");
     mobileButton.type = "button";
     mobileButton.className = "mobile-category";
+    mobileButton.dataset.category = category.id;
     mobileButton.textContent = category.name.toLowerCase();
-    mobileButton.addEventListener("click", () => selectCategory(category.id));
+
+    mobileButton.addEventListener("click", () => {
+      selectCategory(category.id);
+    });
+
     mobileCategories.appendChild(mobileButton);
   });
+
+  updateCategoryButtons();
 }
 
 /* DESPLEGABLES DESKTOP */
@@ -288,16 +325,20 @@ const infoDropdown = document.getElementById("info-dropdown");
 
 productsToggle.addEventListener("click", () => {
   const opening = productsDropdown.hidden;
+
   productsDropdown.hidden = !opening;
   infoDropdown.hidden = true;
+
   productsToggle.setAttribute("aria-expanded", String(opening));
   infoToggle.setAttribute("aria-expanded", "false");
 });
 
 infoToggle.addEventListener("click", () => {
   const opening = infoDropdown.hidden;
+
   infoDropdown.hidden = !opening;
   productsDropdown.hidden = true;
+
   infoToggle.setAttribute("aria-expanded", String(opening));
   productsToggle.setAttribute("aria-expanded", "false");
 });
@@ -306,6 +347,7 @@ document.addEventListener("click", event => {
   if (!event.target.closest(".nav-group")) {
     productsDropdown.hidden = true;
     infoDropdown.hidden = true;
+
     productsToggle.setAttribute("aria-expanded", "false");
     infoToggle.setAttribute("aria-expanded", "false");
   }
