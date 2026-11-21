@@ -342,17 +342,14 @@ a:hover {
 .footer-columns {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 30px;
+  gap: 0;
 }
 
 .footer-column {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-    flex-wrap: wrap-reverse;
-    align-content: stretch;
-    justify-content: flex-start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
 }
 
 .footer-heading {
@@ -374,22 +371,15 @@ a:hover {
   text-decoration: none;
 }
 
-.footer-bottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 75px;
-  padding-top: 15px;
-  font-size: .85rem;
-  font-weight: 300;
+/* ÚLTIMA COLUMNA */
+
+.footer-column:last-child {
+  align-items: flex-end;
 }
 
-.footer-clock {
-  font-variant-numeric: tabular-nums;
-}
+/* LOGO */
 
 .footer-heart {
-  justify-self: end;
   display: block;
   width: 90px;
   transition: opacity .2s ease;
@@ -410,6 +400,22 @@ a:hover {
   transform: rotate(360deg) scale(1.05);
 }
 
+/* LÍNEA INFERIOR */
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 75px;
+  padding-top: 15px;
+  font-size: .7rem;
+  font-weight: 300;
+}
+
+.footer-clock {
+  font-variant-numeric: tabular-nums;
+}
+
 /* FOOTER MOBILE */
 
 @media (max-width: 700px) {
@@ -420,11 +426,15 @@ a:hover {
   .footer-columns {
     grid-template-columns: repeat(2, 1fr);
     row-gap: 35px;
-    column-gap: 20px;
+    column-gap: 0;
   }
 
   .footer-column {
     gap: 10px;
+  }
+
+  .footer-column:last-child {
+    align-items: flex-start;
   }
 
   .footer-heading,
@@ -436,34 +446,16 @@ a:hover {
     font-weight: 700;
   }
 
+  .footer-heart {
+    width: 90px;
+  }
+
   .footer-bottom {
-    grid-template-columns: 1fr 1fr;
     margin-top: 55px;
     padding-top: 12px;
-    min-height: 105px;
     font-size: .7rem;
   }
-
-  .footer-bottom > span {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  .footer-clock {
-    grid-column: 1;
-    grid-row: 2;
-    justify-self: start;
-    margin-top: 10px;
-  }
-
-  .footer-heart {
-    grid-column: 2;
-    grid-row: 1 / 3;
-    width: 90px;
-    justify-self: end;
-  }
 }
-
 /* PÁGINA DE PRODUCTO */
 
 .product-page {
