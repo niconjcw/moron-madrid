@@ -44,10 +44,10 @@
         </button>
 
         <div class="header-dropdown" id="info-dropdown" hidden>
-  <a href="nosotros.html">nosotros</a>
-  <a href="compras-envios.html">compras / envíos</a>
-  <a href="devoluciones.html">devoluciones</a>
-</div>
+          <a href="nosotros.html">nosotros</a>
+          <a href="compras-envios.html">compras / envíos</a>
+          <a href="devoluciones.html">devoluciones</a>
+        </div>
       </div>
 
       <a href="https://moronmadrid.com.ar/#contacto">contacto</a>
@@ -128,10 +128,10 @@
     </button>
 
     <div class="mobile-submenu" id="mobile-info-links">
-  <a href="nosotros.html">nosotros</a>
-  <a href="compras-envios.html">compras / envíos</a>
-  <a href="devoluciones.html">devoluciones</a>
-</div>
+      <a href="nosotros.html">nosotros</a>
+      <a href="compras-envios.html">compras / envíos</a>
+      <a href="devoluciones.html">devoluciones</a>
+    </div>
 
     <a href="https://moronmadrid.com.ar/#contacto">contacto</a>
 
@@ -141,6 +141,44 @@
   <main class="product-page" id="product-page">
     <p id="loading-message">cargando producto...</p>
   </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-columns">
+
+      <div class="footer-column">
+        <p class="footer-heading">explorar</p>
+        <a href="./">tienda</a>
+        <a href="nosotros.html">nosotros</a>
+        <a href="https://moronmadrid.com.ar/#estudio">archivo</a>
+      </div>
+
+      <div class="footer-column">
+        <p class="footer-heading">información</p>
+        <a href="compras-envios.html">compras / envíos</a>
+        <a href="devoluciones.html">devoluciones</a>
+        <a href="https://moronmadrid.com.ar/#contacto">contacto</a>
+      </div>
+
+      <div class="footer-column">
+        <p class="footer-heading">seguinos</p>
+        <a href="https://www.instagram.com/moronmadrid/" target="_blank" rel="noopener noreferrer">instagram ↗</a>
+        <a href="#newsletter" class="newsletter-link">newsletter</a>
+      </div>
+
+      <div class="footer-column">
+        <a href="./" class="footer-heart">
+          <img src="../sticker.png" alt="morón madrid">
+        </a>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <span>© morón madrid — 2026</span>
+      <time class="footer-clock" id="footer-clock">00:00:00</time>
+    </div>
+  </footer>
 
   <script>
     const API_URL = "https://moron-madrid-api.moronmadrid.workers.dev";
@@ -156,6 +194,23 @@
     function formatPrice(price) {
       return "$ " + Number(price).toLocaleString("es-AR");
     }
+
+    /* RELOJ DEL FOOTER */
+
+    function updateFooterClock() {
+      const now = new Date();
+      const clock = document.getElementById("footer-clock");
+
+      if (!clock) return;
+
+      clock.textContent =
+        [now.getHours(), now.getMinutes(), now.getSeconds()]
+          .map(value => String(value).padStart(2, "0"))
+          .join(":");
+    }
+
+    updateFooterClock();
+    setInterval(updateFooterClock, 1000);
 
     /* MENÚ DESKTOP */
 
@@ -448,10 +503,10 @@
 
       const heading = document.createElement("div");
 
-const category = document.createElement("a");
-category.className = "product-category";
-category.href = `index.html?category=${encodeURIComponent(product.category_id)}`;
-category.textContent = `← volver a ${product.category_name || ""}`;
+      const category = document.createElement("a");
+      category.className = "product-category";
+      category.href = `index.html?category=${encodeURIComponent(product.category_id)}`;
+      category.textContent = `← volver a ${product.category_name || ""}`;
 
       const title = document.createElement("h1");
       title.textContent = product.name;
