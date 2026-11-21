@@ -1,0 +1,521 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Finalizá tu compra en Morón Madrid.">
+  <title>checkout — morón madrid</title>
+
+  <style>
+    /* =========================================
+       ESTILOS GENERALES
+    ========================================= */
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #f5f5f5;
+      color: #000;
+      font-family: Roboto, Arial, sans-serif;
+      font-size: .85rem;
+      font-weight: 300;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .checkout-header {
+      padding: 25px 5%;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .checkout-logo {
+      display: inline-block;
+      font-size: 1rem;
+      font-weight: 400;
+      text-decoration: none;
+      text-transform: lowercase;
+    }
+
+    .checkout-container {
+      width: min(1050px, 90%);
+      margin: 55px auto;
+    }
+
+    .checkout-title {
+      margin: 0 0 35px;
+      font-size: 1.1rem;
+      font-weight: 400;
+      text-transform: lowercase;
+    }
+
+    .checkout-layout {
+      display: grid;
+      grid-template-columns: 1.3fr .7fr;
+      gap: 65px;
+      align-items: start;
+    }
+
+    .checkout-section {
+      margin-bottom: 35px;
+    }
+
+    .checkout-section h2 {
+      margin: 0 0 20px;
+      font-size: .9rem;
+      font-weight: 400;
+      text-transform: lowercase;
+    }
+
+    .checkout-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .checkout-field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .checkout-field.full {
+      grid-column: 1 / -1;
+    }
+
+    .checkout-field label {
+      font-size: .75rem;
+    }
+
+    .checkout-field input,
+    .checkout-field select,
+    .checkout-field textarea {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #ccc;
+      border-radius: 0;
+      background: transparent;
+      color: #000;
+      outline: none;
+      font-size: .8rem;
+    }
+
+    .checkout-field input:focus,
+    .checkout-field select:focus,
+    .checkout-field textarea:focus {
+      border-color: #000;
+    }
+
+    .checkout-field textarea {
+      min-height: 75px;
+      resize: vertical;
+    }
+
+    .checkout-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .checkout-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 15px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+    }
+
+    .checkout-option:has(input:checked) {
+      border-color: #000;
+    }
+
+    .checkout-option input {
+      margin-top: 2px;
+      accent-color: #000;
+    }
+
+    .checkout-option span {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .checkout-option strong {
+      font-weight: 400;
+    }
+
+    .checkout-option small {
+      color: #666;
+      font-size: .7rem;
+      line-height: 1.4;
+    }
+
+    .checkout-option.disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    /* =========================================
+       RESUMEN
+    ========================================= */
+
+    .checkout-summary {
+      padding: 24px;
+      border: 1px solid #ddd;
+    }
+
+    .checkout-summary h2 {
+      margin: 0 0 22px;
+      font-size: .9rem;
+      font-weight: 400;
+      text-transform: lowercase;
+    }
+
+    .checkout-products {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 22px;
+    }
+
+    .checkout-product {
+      display: grid;
+      grid-template-columns: 58px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      font-size: .75rem;
+    }
+
+    .checkout-product img {
+      width: 58px;
+      aspect-ratio: 3 / 4;
+      object-fit: cover;
+      background: #eee;
+    }
+
+    .checkout-product-name {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .checkout-product-name strong {
+      font-weight: 400;
+    }
+
+    .checkout-summary-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      margin-top: 13px;
+      font-size: .8rem;
+    }
+
+    .checkout-summary-row.discount {
+      color: #287a3d;
+    }
+
+    .checkout-total {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      padding-top: 17px;
+      border-top: 1px solid #ddd;
+      font-size: .95rem;
+    }
+
+    .checkout-total strong {
+      font-weight: 500;
+    }
+
+    .checkout-transfer-note {
+      margin-top: 15px;
+      color: #555;
+      font-size: .7rem;
+      line-height: 1.5;
+    }
+
+    /* =========================================
+       BOTÓN Y MENSAJES
+    ========================================= */
+
+    .checkout-submit {
+      width: 100%;
+      margin-top: 22px;
+      padding: 15px;
+      border: 1px solid #000;
+      background: #000;
+      color: #fff;
+      font-size: .8rem;
+      cursor: pointer;
+      text-transform: lowercase;
+      transition: .2s ease;
+    }
+
+    .checkout-submit:hover:not(:disabled) {
+      background: transparent;
+      color: #000;
+    }
+
+    .checkout-submit:disabled {
+      opacity: .5;
+      cursor: wait;
+    }
+
+    .checkout-message {
+      margin-top: 15px;
+      font-size: .75rem;
+      line-height: 1.5;
+    }
+
+    .checkout-back {
+      display: inline-block;
+      margin-top: 25px;
+      font-size: .75rem;
+      text-decoration: underline;
+    }
+
+    .checkout-footer {
+      padding: 25px 5%;
+      border-top: 1px solid #ddd;
+      color: #666;
+      font-size: .7rem;
+      text-align: center;
+    }
+
+    /* =========================================
+       RESPONSIVE
+    ========================================= */
+
+    @media (max-width: 750px) {
+      .checkout-container {
+        width: 90%;
+        margin: 35px auto;
+      }
+
+      .checkout-layout {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+
+      .checkout-fields {
+        grid-template-columns: 1fr;
+      }
+
+      .checkout-field.full {
+        grid-column: auto;
+      }
+
+      .checkout-summary {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="checkout-header">
+    <a class="checkout-logo" href="/shop/">morón madrid</a>
+  </header>
+
+  <main class="checkout-container">
+
+    <h1 class="checkout-title">finalizar compra</h1>
+
+    <form id="checkout-form">
+
+      <div class="checkout-layout">
+
+        <div>
+
+          <!-- DATOS PERSONALES -->
+
+          <section class="checkout-section">
+            <h2>datos personales</h2>
+
+            <div class="checkout-fields">
+
+              <div class="checkout-field full">
+                <label for="customer_name">nombre y apellido *</label>
+                <input id="customer_name" name="customer_name" required maxlength="120" autocomplete="name">
+              </div>
+
+              <div class="checkout-field">
+                <label for="email">email *</label>
+                <input id="email" name="email" type="email" required maxlength="160" autocomplete="email">
+              </div>
+
+              <div class="checkout-field">
+                <label for="phone">teléfono</label>
+                <input id="phone" name="phone" type="tel" maxlength="40" autocomplete="tel">
+              </div>
+
+              <div class="checkout-field full">
+                <label for="customer_dni">DNI</label>
+                <input id="customer_dni" name="customer_dni" maxlength="20" inputmode="numeric">
+              </div>
+
+            </div>
+          </section>
+
+          <!-- ENVÍO -->
+
+          <section class="checkout-section">
+            <h2>envío</h2>
+
+            <div class="checkout-options">
+
+              <label class="checkout-option disabled">
+                <input type="radio" name="shipping_method" value="correo_argentino" disabled>
+                <span>
+                  <strong>correo argentino</strong>
+                  <small>disponibilidad y cotización próximamente.</small>
+                </span>
+              </label>
+
+              <label class="checkout-option">
+                <input type="radio" name="shipping_method" value="coordinar" checked>
+                <span>
+                  <strong>envío a coordinar</strong>
+                  <small>coordinaremos el envío después de confirmar la compra. El costo se abona por separado.</small>
+                </span>
+              </label>
+
+            </div>
+
+            <div class="checkout-fields" style="margin-top:18px">
+
+              <div class="checkout-field full">
+                <label for="shipping_address">dirección de entrega *</label>
+                <input id="shipping_address" name="shipping_address" required maxlength="250" autocomplete="street-address">
+              </div>
+
+              <div class="checkout-field">
+                <label for="postal_code">código postal *</label>
+                <input id="postal_code" name="postal_code" required maxlength="15" autocomplete="postal-code">
+              </div>
+
+              <div class="checkout-field">
+                <label for="shipping_note">localidad / provincia</label>
+                <input id="shipping_note" name="shipping_note" maxlength="150" placeholder="localidad, provincia">
+              </div>
+
+            </div>
+          </section>
+
+          <!-- MEDIOS DE PAGO -->
+
+          <section class="checkout-section">
+            <h2>medio de pago</h2>
+
+            <div class="checkout-options">
+
+              <label class="checkout-option">
+                <input type="radio" name="payment_method" value="mercadopago" checked>
+                <span>
+                  <strong>mercado pago</strong>
+                  <small>pagá con los medios disponibles en Mercado Pago.</small>
+                </span>
+              </label>
+
+              <label class="checkout-option">
+                <input type="radio" name="payment_method" value="uala">
+                <span>
+                  <strong>ualá bis</strong>
+                  <small>pagá en cuotas según las opciones habilitadas.</small>
+                </span>
+              </label>
+
+              <label class="checkout-option">
+                <input type="radio" name="payment_method" value="transferencia">
+                <span>
+                  <strong>transferencia bancaria</strong>
+                  <small>obtené un 10% de descuento adicional sobre el importe después del cupón.</small>
+                </span>
+              </label>
+
+              <label class="checkout-option">
+                <input type="radio" name="payment_method" value="acordar">
+                <span>
+                  <strong>acordar pago</strong>
+                  <small>coordinaremos el pago personalmente.</small>
+                </span>
+              </label>
+
+            </div>
+          </section>
+
+        </div>
+
+        <!-- RESUMEN DEL PEDIDO -->
+
+        <aside class="checkout-summary">
+
+          <h2>resumen de compra</h2>
+
+          <div class="checkout-products" id="checkout-products">
+            <p>cargando productos...</p>
+          </div>
+
+          <div class="checkout-summary-row">
+            <span>subtotal</span>
+            <strong id="checkout-subtotal">$ 0</strong>
+          </div>
+
+          <div class="checkout-summary-row discount" id="checkout-coupon-row" hidden>
+            <span>descuento cupón</span>
+            <strong id="checkout-coupon-discount">− $ 0</strong>
+          </div>
+
+          <div class="checkout-summary-row discount" id="checkout-transfer-row" hidden>
+            <span>descuento transferencia</span>
+            <strong id="checkout-transfer-discount">− $ 0</strong>
+          </div>
+
+          <div class="checkout-total">
+            <span>total</span>
+            <strong id="checkout-total">$ 0</strong>
+          </div>
+
+          <p class="checkout-transfer-note" id="checkout-transfer-note" hidden>
+            el descuento por transferencia se aplica después del cupón.
+          </p>
+
+          <p class="checkout-message" id="checkout-message" aria-live="polite"></p>
+
+          <button class="checkout-submit" id="checkout-submit" type="submit">
+            confirmar compra
+          </button>
+
+          <a class="checkout-back" href="/shop/">volver a la tienda</a>
+
+        </aside>
+
+      </div>
+
+    </form>
+
+  </main>
+
+  <footer class="checkout-footer">
+    morón madrid — argentina
+  </footer>
+
+  <script src="/shop/checkout.js" defer></script>
+
+</body>
+</html>
