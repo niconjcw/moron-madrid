@@ -262,7 +262,7 @@ button, a {
   inset: 0;
   z-index: 2;
   display: flex;
-  align-items: center;
+  align-items: self-end;
   justify-content: space-between;
   padding: 0 8px;
   pointer-events: none;
@@ -278,10 +278,10 @@ button, a {
   border: 0;
   background: transparent;
   color: #000;
-  font-size: 23px;
+  font-size: 12px;
   cursor: pointer;
   pointer-events: auto;
-  opacity: .85;
+  opacity: .25;
 }
 
 .product-carousel-arrow:hover {
