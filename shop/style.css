@@ -383,7 +383,20 @@ a:hover {
 .footer-clock {
   font-variant-numeric: tabular-nums;
 }
+.footer-heart {
+  position: absolute;
+  right: 0;
+  bottom: -5px;
+  display: block;
+  width: 90px;
+  transition: opacity .2s ease;
+}
 
+.footer-heart img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
 /* PÁGINA DE PRODUCTO */
 
 .product-page {
