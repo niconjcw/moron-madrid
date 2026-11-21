@@ -1200,6 +1200,37 @@ document.getElementById("add-variant").addEventListener("click",()=>addVariantRo
 
 document.getElementById("cancel-edit").addEventListener("click",resetForm);
 
+/* ELIMINAR PRODUCTO */
+
+async function deleteProduct(id, name) {
+  const confirmed = confirm(
+    `¿Eliminar el producto "${name}"?\n\nEsta acción no se puede deshacer.`
+  );
+
+  if (!confirmed) return;
+
+  try {
+    const response = await fetch(`${API}/admin/products/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "No se pudo eliminar el producto");
+    }
+
+    alert("Producto eliminado correctamente.");
+    await loadProducts();
+
+  } catch (error) {
+    console.error("Error al eliminar producto:", error);
+    alert(error.message || "Error al eliminar el producto.");
+  }
+}
 /* ACTUALIZAR LISTA */
 
 document.getElementById("refresh").addEventListener("click",loadProducts);
