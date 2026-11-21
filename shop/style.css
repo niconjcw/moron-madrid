@@ -280,11 +280,9 @@ button, a {
   color: #000;
   font-size: 12px;
   cursor: pointer;
-  pointer-events: auto;
   opacity: 0;
   pointer-events: none;
   transition: opacity .2s ease;
-}
 }
 
 .product-images:hover .product-carousel-arrow {
@@ -292,6 +290,12 @@ button, a {
   pointer-events: auto;
 }
 
+@media (hover: none) {
+  .product-carousel-arrow {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
 .product-info {
   display: flex;
   justify-content: space-between;
