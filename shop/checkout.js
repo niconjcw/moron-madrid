@@ -212,37 +212,29 @@
     }
   }
 
-  /* =========================================
-     DESACTIVAR TEMPORALMENTE UALÁ
-  ========================================= */
+  
+/* =========================================
+   HABILITAR UALÁ BIS
+========================================= */
 
-  function disableUnavailablePayments() {
-    const ualaInput = document.querySelector(
-      'input[name="payment_method"][value="uala"]'
-    );
+function disableUnavailablePayments() {
+  const ualaInput = document.querySelector(
+    'input[name="payment_method"][value="uala"]'
+  );
 
-    if (!ualaInput) return;
+  if (!ualaInput) return;
 
-    ualaInput.disabled = true;
+  ualaInput.disabled = false;
 
-    const ualaLabel = ualaInput.closest("label");
+  const ualaLabel = ualaInput.closest("label");
 
-    if (ualaLabel) {
-      ualaLabel.style.opacity = "0.45";
-      ualaLabel.style.cursor = "not-allowed";
-      ualaLabel.title = "Próximamente";
-    }
-
-    if (ualaInput.checked) {
-      const mercadoPagoInput = document.querySelector(
-        'input[name="payment_method"][value="mercadopago"]'
-      );
-
-      if (mercadoPagoInput) {
-        mercadoPagoInput.checked = true;
-      }
-    }
+  if (ualaLabel) {
+    ualaLabel.style.opacity = "1";
+    ualaLabel.style.cursor = "pointer";
+    ualaLabel.title = "";
   }
+}
+
 
   /* =========================================
      DATOS DEL PEDIDO
