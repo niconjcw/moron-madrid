@@ -8,8 +8,11 @@
 
   const STORAGE_KEY = "mm_cart";
   const CART_CURRENCY = "es-AR";
+  const API_URL = "https://moron-madrid-api.moronmadrid.workers.dev";
 
   let cart = loadCart();
+  let appliedCoupon = null;
+  let couponLoading = false;
 
   /* =========================================
      UTILIDADES
@@ -56,6 +59,20 @@
       (total, item) => total + item.price * item.quantity,
       0
     );
+  }
+
+  function getDiscount() {
+    return appliedCoupon
+      ? Number(appliedCoupon.discount_amount) || 0
+      : 0;
+  }
+
+  function getTotal() {
+    return Math.max(0, getSubtotal() - getDiscount());
+  }
+
+  function invalidateCoupon() {
+    appliedCoupon = null;
   }
 
   /* =========================================
@@ -209,11 +226,101 @@
         border-top: 1px solid #ddd;
       }
 
+      .mm-cart-coupon {
+        margin-bottom: 18px;
+      }
+
+      .mm-cart-coupon-label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: .75rem;
+      }
+
+      .mm-cart-coupon-row {
+        display: flex;
+        gap: 8px;
+      }
+
+      .mm-cart-coupon-input {
+        flex: 1;
+        min-width: 0;
+        padding: 11px;
+        border: 1px solid #ccc;
+        border-radius: 0;
+        background: transparent;
+        color: #000;
+        font: inherit;
+        font-size: .75rem;
+        text-transform: uppercase;
+      }
+
+      .mm-cart-coupon-input:focus {
+        outline: 1px solid #000;
+      }
+
+      .mm-cart-coupon-button {
+        padding: 10px 14px;
+        border: 1px solid #000;
+        background: #000;
+        color: #fff;
+        font: inherit;
+        font-size: .75rem;
+        cursor: pointer;
+      }
+
+      .mm-cart-coupon-button:disabled {
+        opacity: .5;
+        cursor: wait;
+      }
+
+      .mm-cart-coupon-message {
+        margin: 8px 0 0;
+        font-size: .7rem;
+        line-height: 1.4;
+      }
+
+      .mm-cart-coupon-message.success {
+        color: #287a3d;
+      }
+
+      .mm-cart-coupon-message.error {
+        color: #b3261e;
+      }
+
+      .mm-cart-coupon-applied {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        font-size: .75rem;
+      }
+
+      .mm-cart-coupon-remove {
+        border: 0;
+        background: none;
+        text-decoration: underline;
+        cursor: pointer;
+        font: inherit;
+      }
+
+      .mm-cart-summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: .8rem;
+      }
+
+      .mm-cart-summary-row.discount {
+        color: #287a3d;
+      }
+
       .mm-cart-subtotal {
         display: flex;
         justify-content: space-between;
         margin-bottom: 18px;
-        font-size: .85rem;
+        font-size: .9rem;
+        border-top: 1px solid #ddd;
+        padding-top: 14px;
       }
 
       .mm-cart-note {
@@ -279,12 +386,60 @@
       <div class="mm-cart-items" id="mm-cart-items"></div>
 
       <div class="mm-cart-footer">
-        <div class="mm-cart-subtotal">
+
+        <div class="mm-cart-coupon" id="mm-cart-coupon">
+          <label class="mm-cart-coupon-label" for="mm-cart-coupon-input">
+            ¿tenés un código de descuento?
+          </label>
+
+          <div class="mm-cart-coupon-row">
+            <input
+              class="mm-cart-coupon-input"
+              id="mm-cart-coupon-input"
+              type="text"
+              placeholder="código"
+              autocomplete="off"
+            >
+            <button
+              class="mm-cart-coupon-button"
+              id="mm-cart-coupon-button"
+              type="button"
+            >aplicar</button>
+          </div>
+
+          <p
+            class="mm-cart-coupon-message"
+            id="mm-cart-coupon-message"
+            aria-live="polite"
+          ></p>
+        </div>
+
+        <div class="mm-cart-coupon-applied" id="mm-cart-coupon-applied" hidden>
+          <span id="mm-cart-coupon-applied-name"></span>
+          <button
+            class="mm-cart-coupon-remove"
+            id="mm-cart-coupon-remove"
+            type="button"
+          >quitar</button>
+        </div>
+
+        <div class="mm-cart-summary-row">
           <span>subtotal</span>
           <strong id="mm-cart-subtotal">$ 0</strong>
         </div>
+
+        <div class="mm-cart-summary-row discount" id="mm-cart-discount-row" hidden>
+          <span>descuento</span>
+          <strong id="mm-cart-discount">− $ 0</strong>
+        </div>
+
+        <div class="mm-cart-subtotal">
+          <span>total</span>
+          <strong id="mm-cart-total">$ 0</strong>
+        </div>
+
         <p class="mm-cart-note">
-          los descuentos y costos de envío se calcularán al continuar con la compra.
+          los costos de envío se calcularán al continuar con la compra.
         </p>
       </div>
     `;
@@ -302,6 +457,20 @@
 
     drawer.querySelector("#mm-cart-items")
       .addEventListener("click", handleCartAction);
+
+    drawer.querySelector("#mm-cart-coupon-button")
+      .addEventListener("click", applyCoupon);
+
+    drawer.querySelector("#mm-cart-coupon-input")
+      .addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          applyCoupon();
+        }
+      });
+
+    drawer.querySelector("#mm-cart-coupon-remove")
+      .addEventListener("click", removeCoupon);
   }
 
   /* =========================================
@@ -408,6 +577,7 @@
       });
     }
 
+    invalidateCoupon();
     saveCart();
     renderCart();
     openCart();
@@ -450,7 +620,111 @@
       }
     }
 
+    invalidateCoupon();
     saveCart();
+    renderCart();
+  }
+
+  /* =========================================
+     APLICAR CUPÓN
+  ========================================= */
+
+  async function applyCoupon() {
+    if (couponLoading) return;
+
+    if (!cart.length) {
+      showCouponMessage("Agregá productos antes de aplicar un cupón.", "error");
+      return;
+    }
+
+    const input = document.getElementById("mm-cart-coupon-input");
+    const button = document.getElementById("mm-cart-coupon-button");
+
+    const code = input.value.trim().toUpperCase();
+
+    if (!code) {
+      showCouponMessage("Ingresá un código de descuento.", "error");
+      return;
+    }
+
+    couponLoading = true;
+    button.disabled = true;
+    button.textContent = "validando...";
+
+    showCouponMessage("", "");
+
+    try {
+      const response = await fetch(`${API_URL}/discounts/validate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          code,
+          items: cart.map(item => ({
+            product_id: item.product_id,
+            quantity: item.quantity
+          }))
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.valido) {
+        throw new Error(
+          data.message ||
+          data.error ||
+          "El código no es válido o no se puede aplicar a esta compra."
+        );
+      }
+
+      appliedCoupon = {
+        code: data.code || code,
+        discount_amount: Number(data.discount_amount) || 0,
+        total: Number(data.total) || 0
+      };
+
+      input.value = "";
+      showCouponMessage(
+        `¡Cupón ${appliedCoupon.code} aplicado correctamente!`,
+        "success"
+      );
+
+      renderCart();
+
+    } catch (error) {
+      appliedCoupon = null;
+      showCouponMessage(error.message, "error");
+
+    } finally {
+      couponLoading = false;
+      button.disabled = false;
+      button.textContent = "aplicar";
+    }
+  }
+
+  function showCouponMessage(message, type) {
+    const element = document.getElementById("mm-cart-coupon-message");
+    if (!element) return;
+
+    element.textContent = message;
+    element.className = "mm-cart-coupon-message";
+
+    if (type) element.classList.add(type);
+  }
+
+  /* =========================================
+     QUITAR CUPÓN
+  ========================================= */
+
+  function removeCoupon() {
+    appliedCoupon = null;
+
+    const input = document.getElementById("mm-cart-coupon-input");
+
+    if (input) input.value = "";
+
+    showCouponMessage("Cupón eliminado.", "");
     renderCart();
   }
 
@@ -466,9 +740,27 @@
 
     const totalCount = document.getElementById("mm-cart-total-count");
     const subtotal = document.getElementById("mm-cart-subtotal");
+    const total = document.getElementById("mm-cart-total");
+    const discountRow = document.getElementById("mm-cart-discount-row");
+    const discountElement = document.getElementById("mm-cart-discount");
+    const couponForm = document.getElementById("mm-cart-coupon");
+    const couponApplied = document.getElementById("mm-cart-coupon-applied");
+    const couponAppliedName = document.getElementById("mm-cart-coupon-applied-name");
 
     totalCount.textContent = getCartCount();
     subtotal.textContent = formatPrice(getSubtotal());
+    total.textContent = formatPrice(getTotal());
+
+    discountRow.hidden = !appliedCoupon;
+    discountElement.textContent = "− " + formatPrice(getDiscount());
+
+    couponForm.hidden = Boolean(appliedCoupon);
+    couponApplied.hidden = !appliedCoupon;
+
+    if (appliedCoupon) {
+      couponAppliedName.textContent =
+        `cupón ${appliedCoupon.code} aplicado`;
+    }
 
     if (!cart.length) {
       const empty = document.createElement("p");
