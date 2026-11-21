@@ -406,6 +406,7 @@ a:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
   margin-top: 75px;
   padding-top: 15px;
   font-size: .7rem;
@@ -413,6 +414,8 @@ a:hover {
 }
 
 .footer-clock {
+  margin-left: auto;
+  text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
