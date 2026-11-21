@@ -332,120 +332,127 @@ function disableUnavailablePayments() {
     }
   }
 
-  /* =========================================
-     GENERAR PAGO MERCADO PAGO
-  ========================================= */
+  
+/* =========================================
+   GENERAR PAGO — MERCADO PAGO / UALÁ BIS
+========================================= */
 
-  async function createPayment(orderId, method) {
-    if (method !== "mercadopago") {
-      throw new Error(
-        "Este medio de pago todavía no está disponible."
-      );
-    }
+async function createPayment(orderId, method) {
+  const endpoints = {
+    mercadopago: "/payments/mercadopago/create",
+    uala: "/payments/uala/create"
+  };
 
-    const response = await fetch(
-      `${API_URL}/payments/mercadopago/create`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          order_id: orderId
-        })
-      }
-    );
+  const endpoint = endpoints[method];
 
-    const data = await readResponse(response);
-
-    if (!response.ok) {
-      throw new Error(
-        data.message ||
-        data.error ||
-        "No se pudo iniciar el pago. El pedido quedó registrado."
-      );
-    }
-
-    const checkoutUrl = data.checkout_url;
-
-    if (!checkoutUrl) {
-      throw new Error(
-        "El pedido se creó, pero no recibimos el enlace de pago."
-      );
-    }
-
-    return checkoutUrl;
+  if (!endpoint) {
+    throw new Error("Método de pago no disponible.");
   }
 
-  /* =========================================
-     CONFIRMAR COMPRA
-  ========================================= */
+  const response = await fetch(
+    `${API_URL}${endpoint}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        order_id: orderId
+      })
+    }
+  );
 
-  async function handleSubmit(event) {
-    event.preventDefault();
+  const data = await readResponse(response);
 
-    if (submitting) return;
+  if (!response.ok) {
+    throw new Error(
+      data.message ||
+      data.error ||
+      "No se pudo iniciar el pago. El pedido quedó registrado."
+    );
+  }
 
-    const form = getElement("checkout-form");
+  const checkoutUrl = data.checkout_url;
 
-    if (!form.reportValidity()) return;
+  if (!checkoutUrl) {
+    throw new Error(
+      "El pedido se creó, pero no recibimos el enlace de pago."
+    );
+  }
 
-    if (!cart.length) {
-      showMessage("Tu carrito está vacío.", "error");
+  return checkoutUrl;
+}
+
+  
+/* =========================================
+   CONFIRMAR COMPRA
+========================================= */
+
+async function handleSubmit(event) {
+  event.preventDefault();
+
+  if (submitting) return;
+
+  const form = getElement("checkout-form");
+
+  if (!form.reportValidity()) return;
+
+  if (!cart.length) {
+    showMessage("Tu carrito está vacío.", "error");
+    return;
+  }
+
+  const button = getElement("checkout-submit");
+  const originalText = button.textContent;
+
+  submitting = true;
+  button.disabled = true;
+  button.textContent = "procesando...";
+  showMessage("");
+
+  try {
+    const orderData = getCheckoutData();
+    const method = orderData.payment_method;
+
+    const order = await createOrder(orderData);
+
+    renderServerTotal(order);
+
+    if (
+      method === "mercadopago" ||
+      method === "uala"
+    ) {
+      button.textContent =
+        method === "uala"
+          ? "conectando con ualá bis..."
+          : "conectando con mercado pago...";
+
+      const checkoutUrl = await createPayment(
+        order.order_id,
+        method
+      );
+
+      window.location.assign(checkoutUrl);
       return;
     }
 
-    const button = getElement("checkout-submit");
-    const originalText = button.textContent;
+    showMessage(
+      method === "transferencia"
+        ? `Tu pedido ${order.order_id} fue registrado. Total confirmado: ${formatPrice(order.total)}. Te enviaremos los datos para realizar la transferencia.`
+        : `Tu pedido ${order.order_id} fue registrado. Total: ${formatPrice(order.total)}. Nos comunicaremos para coordinar el pago.`,
+      "success"
+    );
 
-    submitting = true;
-    button.disabled = true;
-    button.textContent = "procesando...";
-    showMessage("");
+    button.textContent = "pedido registrado";
 
-    try {
-      const orderData = getCheckoutData();
-      const method = orderData.payment_method;
+  } catch (error) {
+    showMessage(error.message, "error");
 
-      if (method === "uala") {
-        throw new Error(
-          "Ualá Bis todavía no está habilitado. Elegí otro medio de pago."
-        );
-      }
-
-      const order = await createOrder(orderData);
-
-      renderServerTotal(order);
-
-      if (method === "mercadopago") {
-        button.textContent = "conectando con Mercado Pago...";
-
-        const checkoutUrl = await createPayment(
-          order.order_id,
-          method
-        );
-
-        window.location.assign(checkoutUrl);
-        return;
-      }
-
-      showMessage(
-        method === "transferencia"
-          ? `Tu pedido ${order.order_id} fue registrado. Total confirmado: ${formatPrice(order.total)}. Te enviaremos los datos para realizar la transferencia.`
-          : `Tu pedido ${order.order_id} fue registrado. Total: ${formatPrice(order.total)}. Nos comunicaremos para coordinar el pago.`,
-        "success"
-      );
-
-      button.textContent = "pedido registrado";
-
-    } catch (error) {
-      showMessage(error.message, "error");
-
-      button.disabled = false;
-      button.textContent = originalText;
-      submitting = false;
-    }
+    button.disabled = false;
+    button.textContent = originalText;
+    submitting = false;
   }
+}
 
   /* =========================================
      INICIALIZACIÓN
