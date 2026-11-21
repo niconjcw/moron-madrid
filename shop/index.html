@@ -125,7 +125,7 @@
       <div class="footer-column">
         <p class="footer-heading">seguinos</p>
         <a href="https://www.instagram.com/moronmadrid/" target="_blank" rel="noopener noreferrer">instagram ↗</a>
-        <a href="#newsletter" class="newsletter-link">newsletter</a>
+        <a href="#" id="openNewsletterPopup">newsletter</a>
       </div>
 
       <div class="footer-column">
@@ -806,6 +806,23 @@ loadStore();
       submitBtn.disabled = false;
     }
   });
+  /* ABRIR POPUP DESDE EL FOOTER */
+
+document.addEventListener("DOMContentLoaded", function () {
+  const newsletterLink = document.getElementById("openNewsletterPopup");
+
+  if (newsletterLink) {
+    newsletterLink.addEventListener("click", function (e) {
+      e.preventDefault();
+
+      if (localStorage.getItem("popupSubscribed")) return;
+
+      localStorage.removeItem("popupDismissed");
+
+      document.getElementById("heartPopup").style.display = "flex";
+    });
+  }
+});
 </script>
 
 </script>
