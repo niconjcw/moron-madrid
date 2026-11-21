@@ -118,8 +118,9 @@ const dynamicCategories = document.getElementById("dynamic-categories");
 const mobileCategories = document.getElementById("mobile-categories");
 
 let allProducts = [];
-let selectedCategory = "all";
-
+const urlParams = new URLSearchParams(window.location.search);
+let selectedCategory = urlParams.get("category") || "all";
+  
 function formatPrice(price) {
   return "$ " + Number(price).toLocaleString("es-AR");
 }
