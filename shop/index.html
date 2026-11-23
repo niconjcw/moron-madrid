@@ -130,14 +130,16 @@
 
       <div class="footer-column">
         <a href="./" class="footer-heart">
-      <img src="../sticker.png" alt="morón madrid">
-  </a>
+          <img src="../sticker.png" alt="morón madrid">
+        </a>
+      </div>
+
     </div>
 
-<div class="footer-bottom">
-  <span>© morón madrid — 2026</span>
-  <time class="footer-clock" id="footer-clock">00:00:00</time>
-</div>
+    <div class="footer-bottom">
+      <span>© morón madrid — 2026</span>
+      <time class="footer-clock" id="footer-clock">00:00:00</time>
+    </div>
   </footer>
 
 <script>
@@ -222,17 +224,33 @@ function getProductImages(product) {
   return [...new Set(images.filter(Boolean))];
 }
 
-/* CREAR PRODUCTO */
+/* CONTROL DE STOCK */
 
+function isProductOutOfStock(product) {
+  if (Array.isArray(product.variants) && product.variants.length > 0) {
+    return product.variants.every(variant =>
+      Number(variant.stock) <= 0
+    );
+  }
+
+  return Number(product.stock) <= 0;
+}
+
+/* CREAR PRODUCTO */
 
 function createProduct(product) {
   const article = document.createElement("article");
   article.className = "product";
 
+  const outOfStock = isProductOutOfStock(product);
+
+  if (outOfStock) {
+    article.classList.add("out-of-stock");
+  }
+
   const images = document.createElement("div");
   images.className = "product-images";
 
-  // Permite deslizar horizontalmente sin bloquear el scroll vertical.
   images.style.touchAction = "pan-y";
 
   const imageUrls = getProductImages(product);
@@ -253,6 +271,16 @@ function createProduct(product) {
   imageLink.href = `producto-01.html?slug=${encodeURIComponent(product.slug)}`;
   imageLink.setAttribute("aria-label", "Ver " + product.name);
   images.appendChild(imageLink);
+
+  /* ETIQUETA SIN STOCK */
+
+  if (outOfStock) {
+    const stockLabel = document.createElement("div");
+    stockLabel.className = "out-of-stock-label";
+    stockLabel.textContent = "SIN STOCK";
+    stockLabel.setAttribute("aria-label", "Producto sin stock");
+    images.appendChild(stockLabel);
+  }
 
   if (imageElements.length > 1) {
     const controls = document.createElement("div");
@@ -290,7 +318,8 @@ function createProduct(product) {
       showImage(currentImage + 1);
     });
 
-    // SWIPE / DESLIZAMIENTO
+    /* SWIPE / DESLIZAMIENTO */
+
     let startX = 0;
     let startY = 0;
     let pointerStart = false;
@@ -312,7 +341,6 @@ function createProduct(product) {
       const differenceX = event.clientX - startX;
       const differenceY = event.clientY - startY;
 
-      // Solo cuenta como swipe si el movimiento es principalmente horizontal.
       if (
         Math.abs(differenceX) > 35 &&
         Math.abs(differenceX) > Math.abs(differenceY) * 1.2
@@ -325,7 +353,6 @@ function createProduct(product) {
             : currentImage - 1
         );
 
-        // Evita abrir el producto después de deslizar.
         suppressClick = true;
 
         setTimeout(() => {
@@ -365,7 +392,6 @@ function createProduct(product) {
 
   return article;
 }
-
 
 /* RENDERIZAR PRODUCTOS */
 
@@ -548,13 +574,39 @@ async function loadStore() {
 loadStore();
 </script>
 
-
 <style>
   @font-face {
     font-display: block;
     font-family: Roboto;
     src: url(https://assets.brevo.com/font/Roboto/Latin/normal/normal/7529907e9eaf8ebb5220c5f9850e3811.woff2) format("woff2");
   }
+
+  /* PRODUCTOS SIN STOCK */
+
+  .product.out-of-stock .product-slide {
+    filter: blur(3px);
+    opacity: 0.65;
+  }
+
+  .out-of-stock-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 5;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-family: inherit;
+    font-size: clamp(13px, 1.5vw, 20px);
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    color: #000;
+    white-space: nowrap;
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+    pointer-events: none;
+  }
+
+  /* POPUP NEWSLETTER */
 
   .custom-popup-overlay {
     position: fixed;
@@ -806,27 +858,26 @@ loadStore();
       submitBtn.disabled = false;
     }
   });
+
   /* ABRIR POPUP DESDE EL FOOTER */
 
-document.addEventListener("DOMContentLoaded", function () {
-  const newsletterLink = document.getElementById("openNewsletterPopup");
+  document.addEventListener("DOMContentLoaded", function () {
+    const newsletterLink = document.getElementById("openNewsletterPopup");
 
-  if (newsletterLink) {
-    newsletterLink.addEventListener("click", function (e) {
-      e.preventDefault();
+    if (newsletterLink) {
+      newsletterLink.addEventListener("click", function (e) {
+        e.preventDefault();
 
-      if (localStorage.getItem("popupSubscribed")) return;
+        if (localStorage.getItem("popupSubscribed")) return;
 
-      localStorage.removeItem("popupDismissed");
+        localStorage.removeItem("popupDismissed");
 
-      document.getElementById("heartPopup").style.display = "flex";
-    });
-  }
-});
+        document.getElementById("heartPopup").style.display = "flex";
+      });
+    }
+  });
 </script>
 
-</script>
-  
 <script src="./cart.js"></script>
 
 </body>
