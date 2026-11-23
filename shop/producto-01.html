@@ -560,7 +560,7 @@
       const category = document.createElement("a");
       category.className = "product-category";
       category.href = `index.html?category=${encodeURIComponent(product.category_id)}`;
-      category.textContent = `← volver a ${product.category_name || ""}`;
+      category.textContent = `← volver /${product.category_name || ""}`;
 
       const title = document.createElement("h1");
       title.textContent = product.name;
