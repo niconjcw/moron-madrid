@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -44,7 +43,7 @@
         </div>
       </div>
 
-      <a href="https://moronmadrid.com.ar/#contacto">contacto</a>
+      <a href="#" class="open-contact-modal">contacto</a>
 
       <a href="#" class="cart-icon" title="Carrito">
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -96,8 +95,36 @@
       <a href="devoluciones.html">devoluciones</a>
     </div>
 
-    <a href="https://moronmadrid.com.ar/#contacto">contacto</a>
+    <a href="#" class="open-contact-modal">contacto</a>
   </nav>
+
+
+  <!-- MODAL DE CONTACTO -->
+
+  <div class="contact-modal-overlay" id="contactModal" aria-hidden="true">
+    <section class="contact-modal" role="dialog" aria-modal="true" aria-labelledby="contactModalTitle">
+      <button class="contact-modal-close" id="closeContactModal" type="button" aria-label="Cerrar">×</button>
+      <p class="contact-modal-kicker">morón madrid</p>
+      <h2 id="contactModalTitle">contacto</h2>
+      <p class="contact-modal-intro">¿tenés alguna consulta? escribinos.</p>
+
+      <form id="contactForm">
+        <label for="contactName">nombre</label>
+        <input id="contactName" name="name" type="text" autocomplete="name" maxlength="100" required placeholder="tu nombre">
+
+        <label for="contactEmail">email</label>
+        <input id="contactEmail" name="email" type="email" autocomplete="email" maxlength="160" required placeholder="tu@email.com">
+
+        <label for="contactMessage">mensaje</label>
+        <textarea id="contactMessage" name="message" rows="4" maxlength="3000" required placeholder="escribí tu mensaje..."></textarea>
+
+        <input class="contact-honeypot" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+        <button class="contact-submit" id="contactSubmit" type="submit">enviar mensaje ↗</button>
+        <p class="contact-form-status" id="contactFormStatus" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+  </div>
 
   <main class="catalog" id="catalog">
     <p class="catalog-message">cargando productos...</p>
@@ -119,7 +146,7 @@
         <p class="footer-heading">información</p>
         <a href="compras-envios.html">compras / envíos</a>
         <a href="devoluciones.html">devoluciones</a>
-        <a href="https://moronmadrid.com.ar/#contacto">contacto</a>
+        <a href="#" class="open-contact-modal">contacto</a>
       </div>
 
       <div class="footer-column">
@@ -574,6 +601,93 @@ async function loadStore() {
 loadStore();
 </script>
 
+
+<script>
+  /* MODAL DE CONTACTO */
+
+  const contactModal = document.getElementById("contactModal");
+  const contactForm = document.getElementById("contactForm");
+  const contactStatus = document.getElementById("contactFormStatus");
+  const contactSubmit = document.getElementById("contactSubmit");
+  const closeContactButton = document.getElementById("closeContactModal");
+
+  function openContactModal(event) {
+    if (event) event.preventDefault();
+    contactModal.classList.add("is-open");
+    contactModal.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+    document.getElementById("contactName").focus();
+  }
+
+  function closeContactModal() {
+    contactModal.classList.remove("is-open");
+    contactModal.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+
+  document.querySelectorAll(".open-contact-modal").forEach(link => {
+    link.addEventListener("click", openContactModal);
+  });
+
+  closeContactButton.addEventListener("click", closeContactModal);
+
+  contactModal.addEventListener("click", event => {
+    if (event.target === contactModal) closeContactModal();
+  });
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && contactModal.classList.contains("is-open")) {
+      closeContactModal();
+    }
+  });
+
+  contactForm.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const formData = new FormData(contactForm);
+    const name = String(formData.get("name") || "").trim();
+    const email = String(formData.get("email") || "").trim();
+    const message = String(formData.get("message") || "").trim();
+    const website = String(formData.get("website") || "").trim();
+
+    if (website) return;
+
+    contactSubmit.disabled = true;
+    contactSubmit.textContent = "enviando...";
+    contactStatus.textContent = "";
+
+    try {
+      const response = await fetch(`${API_URL}/contact`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, message, website })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.success !== true) {
+        throw new Error(data.message || "No se pudo enviar el mensaje.");
+      }
+
+      contactForm.reset();
+      contactStatus.textContent = "¡mensaje enviado! gracias por escribirnos.";
+      contactSubmit.textContent = "enviado";
+
+      setTimeout(() => {
+        closeContactModal();
+        contactSubmit.disabled = false;
+        contactSubmit.textContent = "enviar mensaje ↗";
+        contactStatus.textContent = "";
+      }, 1800);
+
+    } catch (error) {
+      console.error("Error de contacto:", error);
+      contactStatus.textContent = "no se pudo enviar. intentá nuevamente.";
+      contactSubmit.disabled = false;
+      contactSubmit.textContent = "enviar mensaje ↗";
+    }
+  });
+</script>
 <style>
   @font-face {
     font-display: block;
@@ -595,7 +709,7 @@ loadStore();
     z-index: 5;
     transform: translate(-50%, -50%) rotate(-35deg);
     font-family: inherit;
-    font-size: 1vw;
+    font-size: 2rem;
     font-weight: 400;
     letter-spacing: 0.08em;
     line-height: 1;
@@ -731,6 +845,136 @@ loadStore();
     display: none;
     text-transform: lowercase;
   }
+
+  /* MODAL DE CONTACTO */
+
+  .contact-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+  }
+
+  .contact-modal-overlay.is-open {
+    display: flex;
+  }
+
+  .contact-modal {
+    position: relative;
+    width: min(100%, 460px);
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 42px 36px 34px;
+    background: #fff;
+    color: #000;
+    font-family: Roboto, Arial, sans-serif;
+  }
+
+  .contact-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #000;
+    font: inherit;
+    font-size: 27px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .contact-modal-kicker,
+  .contact-modal-intro {
+    margin: 0 0 12px;
+    font-size: 12px;
+    font-weight: 300;
+  }
+
+  .contact-modal h2 {
+    margin: 0 0 10px;
+    font-size: 24px;
+    font-weight: 400;
+    text-transform: lowercase;
+  }
+
+  .contact-modal form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 24px;
+  }
+
+  .contact-modal label {
+    margin-top: 8px;
+    font-size: 12px;
+    text-transform: lowercase;
+  }
+
+  .contact-modal input,
+  .contact-modal textarea {
+    width: 100%;
+    padding: 10px 0;
+    border: 0;
+    border-bottom: 1px solid #999;
+    border-radius: 0;
+    outline: none;
+    background: transparent;
+    color: #000;
+    font: inherit;
+    font-size: 13px;
+    resize: vertical;
+  }
+
+  .contact-modal input:focus,
+  .contact-modal textarea:focus {
+    border-bottom-color: #000;
+  }
+
+  .contact-submit {
+    align-self: flex-start;
+    margin-top: 18px;
+    padding: 11px 18px;
+    border: 0;
+    background: #dcd63b;
+    color: #000;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    text-transform: lowercase;
+  }
+
+  .contact-submit:disabled {
+    opacity: 0.55;
+    cursor: wait;
+  }
+
+  .contact-form-status {
+    min-height: 16px;
+    margin: 8px 0 0;
+    font-size: 12px;
+  }
+
+  .contact-honeypot {
+    position: absolute !important;
+    left: -9999px !important;
+    width: 1px !important;
+    height: 1px !important;
+    opacity: 0 !important;
+  }
+
+  @media (max-width: 600px) {
+    .contact-modal {
+      padding: 38px 24px 28px;
+    }
+  }
+
 </style>
 
 <div class="custom-popup-overlay" id="heartPopup">
