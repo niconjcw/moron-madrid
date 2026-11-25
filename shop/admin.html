@@ -131,6 +131,106 @@ header{margin-bottom:50px}
 .discount-form-actions{flex-direction:column}
 .photo-list{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+/* VENTAS */
+
+.orders-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  margin:35px 0 20px;
+}
+
+.orders-header button{
+  width:auto;
+  margin:0;
+}
+
+.order-card{
+  border-top:1px solid #ccc;
+  padding:22px 0;
+}
+
+.order-top{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  align-items:flex-start;
+}
+
+.order-number{
+  font-size:18px;
+  font-weight:600;
+}
+
+.order-meta{
+  color:#777;
+  font-size:12px;
+  line-height:1.7;
+  margin-top:6px;
+}
+
+.order-total{
+  font-size:16px;
+  white-space:nowrap;
+}
+
+.order-details{
+  margin-top:18px;
+  padding:15px;
+  background:#eee;
+  line-height:1.7;
+  overflow-wrap:anywhere;
+}
+
+.order-items{
+  margin:12px 0;
+  padding-left:18px;
+  line-height:1.7;
+}
+
+.order-edit{
+  margin-top:18px;
+  padding-top:15px;
+  border-top:1px solid #ccc;
+}
+
+.order-edit label{
+  margin-top:12px;
+}
+
+.order-edit button{
+  margin-top:12px;
+}
+
+.order-empty{
+  padding:25px 0;
+  color:#777;
+}
+
+.order-status{
+  width:100%;
+  padding:12px;
+  background:#fff;
+  border:1px solid #000;
+  font:inherit;
+}
+
+@media(max-width:550px){
+  .orders-header{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .orders-header button{
+    width:100%;
+  }
+
+  .order-top{
+    flex-direction:column;
+  }
+}  
 </style>
 </head>
 
@@ -158,6 +258,7 @@ header{margin-bottom:50px}
 <button type="button" class="admin-tab" data-tab="categories-panel">CATEGORÍAS</button>
 <button type="button" class="admin-tab" data-tab="newsletter-panel">NEWSLETTER</button>
 <button type="button" class="admin-tab" data-tab="discounts-panel">PAGOS</button>
+<button type="button" class="admin-tab" data-tab="orders-panel">VENTAS</button>
 </nav>
 
 <!-- PANEL NUEVO PRODUCTO -->
@@ -369,6 +470,30 @@ Seleccioná todas las fotos juntas. La primera será la principal y las demás q
 </div>
 </section>
 
+  <!-- PANEL VENTAS -->
+
+<section id="orders-panel" hidden>
+  <div class="orders-header">
+    <h2 style="margin-top:0">Ventas</h2>
+    <button type="button" id="refresh-orders" class="secondary">Actualizar ventas</button>
+  </div>
+
+  <div class="orders-filters">
+    <select id="orders-filter" class="category-select">
+      <option value="">Todos los pedidos</option>
+      <option value="pending">Pendientes de pago</option>
+      <option value="paid">Pagados</option>
+      <option value="preparing">Preparando</option>
+      <option value="shipped">Enviados</option>
+      <option value="delivered">Entregados</option>
+      <option value="cancelled">Cancelados</option>
+    </select>
+  </div>
+
+  <div id="orders-count" class="hint"></div>
+  <div id="orders-list"></div>
+</section>
+  
 <button id="logout">Cerrar sesión</button>
 </section>
 
@@ -433,7 +558,8 @@ tab.classList.toggle("active",tab.dataset.tab===target);
 "products-panel",
 "categories-panel",
 "newsletter-panel",
-"discounts-panel"
+"discounts-panel",
+"orders-panel"
 ].forEach(id=>{
 document.getElementById(id).hidden=id!==target;
 });
@@ -454,6 +580,7 @@ await loadDiscountCodes();
 }
 if(target==="categories-panel")await loadCategories();
 if(target==="products-panel")await loadProducts();
+if(target==="orders-panel")await loadOrders();
 });
 });
 
@@ -1656,6 +1783,294 @@ await loadDiscountProducts();
 await loadDiscountCodes();
 });
 
+/* VENTAS */
+
+let orders=[];
+
+async function loadOrders(){
+const list=document.getElementById("orders-list");
+const count=document.getElementById("orders-count");
+const filter=document.getElementById("orders-filter").value;
+
+list.textContent="Cargando pedidos...";
+count.textContent="";
+
+try{
+const response=await fetch(API+"/admin/orders",{
+headers:{Authorization:"Bearer "+token()}
+});
+
+const data=await response.json();
+
+if(!response.ok){
+throw new Error(data.error||"No se pudieron cargar los pedidos.");
+}
+
+orders=data.orders||[];
+
+const filtered=filter
+?orders.filter(order=>order.order_status===filter)
+:orders;
+
+count.textContent=filtered.length+
+(filtered.length===1?" pedido":" pedidos");
+
+renderOrders(filtered);
+
+}catch(error){
+list.textContent=error.message;
+count.textContent="Error";
+}
+}
+
+function safeOrderJSON(value,fallback){
+if(!value)return fallback;
+if(typeof value==="object")return value;
+
+try{
+return JSON.parse(value);
+}catch{
+return fallback;
+}
+}
+
+function orderStatusLabel(status){
+const labels={
+pending:"Pendiente de pago",
+paid:"Pagado",
+preparing:"Preparando",
+shipped:"Enviado",
+delivered:"Entregado",
+cancelled:"Cancelado"
+};
+
+return labels[status]||status||"Sin estado";
+}
+
+function renderOrders(items){
+const list=document.getElementById("orders-list");
+list.replaceChildren();
+
+if(!items.length){
+const empty=document.createElement("p");
+empty.className="order-empty";
+empty.textContent="Todavía no hay pedidos para mostrar.";
+list.append(empty);
+return;
+}
+
+items.forEach(order=>{
+const card=document.createElement("article");
+card.className="order-card";
+
+const top=document.createElement("div");
+top.className="order-top";
+
+const info=document.createElement("div");
+
+const number=document.createElement("div");
+number.className="order-number";
+number.textContent=order.order_number!=null
+?"PEDIDO #"+order.order_number
+:"PEDIDO SIN NÚMERO";
+
+const meta=document.createElement("div");
+meta.className="order-meta";
+
+const date=order.created_at
+?new Date(order.created_at.replace(" ","T")+"Z").toLocaleString("es-AR")
+:"Fecha no disponible";
+
+meta.textContent=date+" · "+orderStatusLabel(order.order_status);
+
+const total=document.createElement("div");
+total.className="order-total";
+total.textContent="$"+Number(order.total||0).toLocaleString("es-AR");
+
+info.append(number,meta);
+top.append(info,total);
+
+const details=document.createElement("div");
+details.className="order-details";
+
+const customer=document.createElement("div");
+customer.textContent=
+(order.customer_name||"Comprador sin nombre")+
+" · "+(order.email||"Sin email");
+
+const contact=document.createElement("div");
+contact.textContent=
+"Teléfono: "+(order.phone||"No informado")+
+" · DNI: "+(order.customer_dni||"No informado");
+
+const payment=document.createElement("div");
+payment.textContent=
+"Pago: "+(order.payment_method||"No informado")+
+" · Estado: "+(order.payment_status||"pending");
+
+const shipping=document.createElement("div");
+shipping.textContent="Envío: "+(order.shipping_method||"No informado");
+
+const shippingData=safeOrderJSON(order.shipping_data,{});
+const shippingAddress=[
+shippingData.address,
+shippingData.street,
+shippingData.number,
+shippingData.city,
+shippingData.province,
+shippingData.postal_code,
+order.postal_code
+].filter(Boolean);
+
+const address=document.createElement("div");
+address.textContent="Dirección: "+
+(shippingAddress.length?shippingAddress.join(", "):(order.shipping_address||"No informada"));
+
+const itemsBox=document.createElement("ul");
+itemsBox.className="order-items";
+
+const orderItems=safeOrderJSON(order.items_json,[]);
+
+if(Array.isArray(orderItems)&&orderItems.length){
+orderItems.forEach(item=>{
+const li=document.createElement("li");
+const name=item.name||item.product_name||item.title||"Producto";
+const quantity=Number(item.quantity||1);
+const variant=item.size||item.variant||item.talle||"";
+
+li.textContent=name+
+(variant?" · "+variant:"")+
+" · Cantidad: "+quantity;
+itemsBox.append(li);
+});
+}else{
+const li=document.createElement("li");
+li.textContent="No hay detalle de artículos disponible.";
+itemsBox.append(li);
+}
+
+const discount=document.createElement("div");
+discount.textContent=
+"Subtotal: $"+Number(order.subtotal||0).toLocaleString("es-AR")+
+" · Cupón: "+(order.discount_code||"Ninguno")+
+" · Descuento: $"+Number(order.discount_amount||0).toLocaleString("es-AR")+
+" · Descuento transferencia: $"+Number(order.transfer_discount||0).toLocaleString("es-AR");
+
+details.append(
+customer,
+contact,
+payment,
+shipping,
+address,
+itemsBox,
+discount
+);
+
+/* EDICIÓN DEL PEDIDO */
+
+const edit=document.createElement("div");
+edit.className="order-edit";
+
+const statusLabel=document.createElement("label");
+statusLabel.textContent="Estado del pedido";
+
+const status=document.createElement("select");
+status.className="order-status";
+
+[
+["pending","Pendiente de pago"],
+["paid","Pagado"],
+["preparing","Preparando"],
+["shipped","Enviado"],
+["delivered","Entregado"],
+["cancelled","Cancelado"]
+].forEach(([value,label])=>{
+const option=document.createElement("option");
+option.value=value;
+option.textContent=label;
+status.append(option);
+});
+
+status.value=order.order_status||"pending";
+
+const trackingLabel=document.createElement("label");
+trackingLabel.textContent="Código de seguimiento";
+
+const tracking=document.createElement("input");
+tracking.type="text";
+tracking.maxLength=150;
+tracking.value=order.tracking_code||"";
+tracking.placeholder="Número de seguimiento";
+
+const labelLabel=document.createElement("label");
+labelLabel.textContent="URL de la etiqueta de envío";
+
+const labelURL=document.createElement("input");
+labelURL.type="url";
+labelURL.maxLength=1000;
+labelURL.value=order.shipping_label_url||"";
+labelURL.placeholder="https://...";
+
+const save=document.createElement("button");
+save.type="button";
+save.textContent="Guardar cambios";
+
+save.addEventListener("click",()=>saveOrder(order.id,{
+order_status:status.value,
+tracking_code:tracking.value.trim(),
+shipping_label_url:labelURL.value.trim()
+},save));
+
+edit.append(
+statusLabel,
+status,
+trackingLabel,
+tracking,
+labelLabel,
+labelURL,
+save
+);
+
+card.append(top,details,edit);
+list.append(card);
+});
+}
+
+async function saveOrder(id,body,button){
+button.disabled=true;
+button.textContent="Guardando...";
+
+try{
+const response=await fetch(API+"/admin/orders/"+encodeURIComponent(id),{
+method:"PUT",
+headers:{
+"Content-Type":"application/json",
+Authorization:"Bearer "+token()
+},
+body:JSON.stringify(body)
+});
+
+const data=await response.json();
+
+if(!response.ok){
+throw new Error(data.error||"No se pudo actualizar el pedido.");
+}
+
+message.textContent="Pedido actualizado correctamente.";
+await loadOrders();
+
+}catch(error){
+message.textContent=error.message;
+}finally{
+button.disabled=false;
+button.textContent="Guardar cambios";
+}
+}
+
+document.getElementById("refresh-orders").addEventListener("click",loadOrders);
+document.getElementById("orders-filter").addEventListener("change",loadOrders);
+
+  
 /* INICIAR SESIÓN */
 
 document.getElementById("login-form").addEventListener("submit",async event=>{
