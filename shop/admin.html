@@ -157,7 +157,7 @@ header{margin-bottom:50px}
 <button type="button" class="admin-tab" data-tab="products-panel">PRODUCTOS</button>
 <button type="button" class="admin-tab" data-tab="categories-panel">CATEGORÍAS</button>
 <button type="button" class="admin-tab" data-tab="newsletter-panel">NEWSLETTER</button>
-<button type="button" class="admin-tab" data-tab="discounts-panel">DESCUENTOS</button>
+<button type="button" class="admin-tab" data-tab="discounts-panel">PAGOS</button>
 </nav>
 
 <!-- PANEL NUEVO PRODUCTO -->
@@ -277,8 +277,25 @@ Seleccioná todas las fotos juntas. La primera será la principal y las demás q
 <input type="checkbox" id="transfer-enabled">
 <label for="transfer-enabled">Activar descuento por transferencia</label>
 </div>
+<label for="transfer-alias">Alias bancario</label>
+<input
+  id="transfer-alias"
+  type="text"
+  maxlength="120"
+  placeholder="Ej. moron.madrid"
+>
+
 <label for="transfer-percent">Porcentaje de descuento</label>
-<input id="transfer-percent" class="discount-percent" type="number" min="0" max="100" step="1" value="10">
+<input
+  id="transfer-percent"
+  class="discount-percent"
+  type="number"
+  min="0"
+  max="100"
+  step="1"
+  value="10"
+>
+
 <button type="button" id="save-transfer">Guardar configuración</button>
 </div>
 
@@ -1235,53 +1252,90 @@ async function deleteProduct(id, name) {
 
 document.getElementById("refresh").addEventListener("click",loadProducts);
 
-/* CONFIGURACIÓN DE TRANSFERENCIA */
+/* CONFIGURACIÓN DE PAGOS */
 
 async function loadDiscountSettings(){
-try{
-const response=await fetch(API+"/admin/discount-settings",{headers:{Authorization:"Bearer "+token()}});
-const data=await response.json();
-if(!response.ok)throw new Error(data.error||"No se pudo cargar la configuración.");
+  try{
+    const response=await fetch(API+"/admin/discount-settings",{
+      headers:{Authorization:"Bearer "+token()}
+    });
 
-const settings=data.settings||{};
-document.getElementById("transfer-enabled").checked=Number(settings.transfer_enabled)===1;
-document.getElementById("transfer-percent").value=settings.transfer_percent??10;
-}catch(error){
-message.textContent=error.message;
-}
+    const data=await response.json();
+
+    if(!response.ok){
+      throw new Error(data.error||"No se pudo cargar la configuración.");
+    }
+
+    const settings=data.settings||{};
+
+    document.getElementById("transfer-enabled").checked=
+      Number(settings.transfer_enabled)===1;
+
+    document.getElementById("transfer-percent").value=
+      settings.transfer_percent??10;
+
+    document.getElementById("transfer-alias").value=
+      settings.transfer_alias||"";
+
+  }catch(error){
+    message.textContent=error.message;
+  }
 }
 
 async function saveTransferSettings(){
-const button=document.getElementById("save-transfer");
-const enabled=document.getElementById("transfer-enabled").checked;
-const percent=Number(document.getElementById("transfer-percent").value);
+  const button=document.getElementById("save-transfer");
 
-if(!Number.isInteger(percent)||percent<0||percent>100){
-message.textContent="El porcentaje debe ser un número entre 0 y 100.";
-return;
+  const enabled=document.getElementById("transfer-enabled").checked;
+  const percent=Number(document.getElementById("transfer-percent").value);
+  const alias=document.getElementById("transfer-alias").value.trim();
+
+  if(!Number.isInteger(percent)||percent<0||percent>100){
+    message.textContent="El porcentaje debe ser un número entre 0 y 100.";
+    return;
+  }
+
+  if(alias.length>120){
+    message.textContent="El alias no puede superar los 120 caracteres.";
+    return;
+  }
+
+  button.disabled=true;
+  button.textContent="Guardando...";
+
+  try{
+    const response=await fetch(API+"/admin/discount-settings",{
+      method:"PUT",
+      headers:{
+        "Content-Type":"application/json",
+        Authorization:"Bearer "+token()
+      },
+      body:JSON.stringify({
+        transfer_enabled:enabled,
+        transfer_percent:percent,
+        transfer_alias:alias
+      })
+    });
+
+    const data=await response.json();
+
+    if(!response.ok){
+      throw new Error(data.error||"No se pudo guardar la configuración.");
+    }
+
+    message.textContent="Configuración de pagos actualizada.";
+
+  }catch(error){
+    message.textContent=error.message;
+  }finally{
+    button.disabled=false;
+    button.textContent="Guardar configuración";
+  }
 }
 
-button.disabled=true;
-button.textContent="Guardando...";
-
-try{
-const response=await fetch(API+"/admin/discount-settings",{
-method:"PUT",
-headers:{"Content-Type":"application/json",Authorization:"Bearer "+token()},
-body:JSON.stringify({transfer_enabled:enabled,transfer_percent:percent})
-});
-const data=await response.json();
-if(!response.ok)throw new Error(data.error||"No se pudo guardar la configuración.");
-message.textContent="Configuración de transferencia actualizada.";
-}catch(error){
-message.textContent=error.message;
-}finally{
-button.disabled=false;
-button.textContent="Guardar configuración";
-}
-}
-
-document.getElementById("save-transfer").addEventListener("click",saveTransferSettings);
+document.getElementById("save-transfer").addEventListener(
+  "click",
+  saveTransferSettings
+);
 
 /* PRODUCTOS PARA CUPONES */
 
