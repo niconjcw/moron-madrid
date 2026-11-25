@@ -1835,16 +1835,16 @@ return fallback;
 }
 
 function orderStatusLabel(status){
-const labels={
-pending:"Pendiente de pago",
-paid:"Pagado",
-preparing:"Preparando",
-shipped:"Enviado",
-delivered:"Entregado",
-cancelled:"Cancelado"
-};
+  const labels={
+    pending:"Pendiente de preparación",
+    paid:"Pagado",
+    preparing:"Preparando",
+    shipped:"Enviado",
+    delivered:"Entregado",
+    cancelled:"Cancelado"
+  };
 
-return labels[status]||status||"Sin estado";
+  return labels[status]||status||"Sin estado";
 }
 
 function renderOrders(items){
@@ -1906,8 +1906,8 @@ contact.textContent=
 const payment=document.createElement("div");
 payment.textContent=
 "Pago: "+(order.payment_method||"No informado")+
-" · Estado: "+(order.payment_status||"pending");
-
+" · Estado del pago: "+(order.payment_status||"pending");
+  
 const shipping=document.createElement("div");
 shipping.textContent="Envío: "+(order.shipping_method||"No informado");
 
@@ -1978,7 +1978,7 @@ const status=document.createElement("select");
 status.className="order-status";
 
 [
-["pending","Pendiente de pago"],
+["pending","Pendiente de preparación"],
 ["paid","Pagado"],
 ["preparing","Preparando"],
 ["shipped","Enviado"],
