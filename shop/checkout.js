@@ -112,6 +112,21 @@
   }
 
   /* =========================================
+     NÚMERO VISIBLE DEL PEDIDO
+  ========================================= */
+
+  function getVisibleOrderNumber(order) {
+    if (
+      order.order_number !== undefined &&
+      order.order_number !== null
+    ) {
+      return "#" + Number(order.order_number);
+    }
+
+    return "#" + String(order.order_id || "");
+  }
+
+  /* =========================================
      CONFIGURACIÓN PÚBLICA DE PAGOS
   ========================================= */
 
@@ -597,47 +612,50 @@
   }
 
   /* =========================================
-   EMAIL CON DATOS DEL PEDIDO — GMAIL
-========================================= */
+     EMAIL CON DATOS DEL PEDIDO — GMAIL
+  ========================================= */
 
-function buildTransferEmail(order) {
-  const orderId = String(order.order_id);
-  const total = formatPrice(order.total);
+  function buildTransferEmail(order) {
+    const visibleNumber = getVisibleOrderNumber(order);
+    const total = formatPrice(order.total);
 
-  const subject =
-    `Comprobante de transferencia — Pedido ${orderId}`;
+    const subject =
+      `Comprobante de transferencia — Pedido ${visibleNumber}`;
 
-  const body = [
-    "Hola Morón Madrid,",
-    "",
-    "Adjunto el comprobante de transferencia de mi compra.",
-    "",
-    `Número de pedido: ${orderId}`,
-    `Importe transferido: ${total}`,
-    "",
-    "Nombre: " +
-      String(getElement("customer_name").value || "").trim(),
-    "",
-    "Muchas gracias."
-  ].join("\n");
+    const body = [
+      "Hola Morón Madrid,",
+      "",
+      "Adjunto el comprobante de transferencia de mi compra.",
+      "",
+      `Número de pedido: ${visibleNumber}`,
+      `Importe transferido: ${total}`,
+      "",
+      "Nombre: " +
+        String(getElement("customer_name").value || "").trim(),
+      "",
+      "Muchas gracias."
+    ].join("\n");
 
-  return (
-    "https://mail.google.com/mail/?view=cm&fs=1" +
-    `&to=${encodeURIComponent(TRANSFER_EMAIL)}` +
-    `&su=${encodeURIComponent(subject)}` +
-    `&body=${encodeURIComponent(body)}`
-  );
-}
+    return (
+      "https://mail.google.com/mail/?view=cm&fs=1" +
+      `&to=${encodeURIComponent(TRANSFER_EMAIL)}` +
+      `&su=${encodeURIComponent(subject)}` +
+      `&body=${encodeURIComponent(body)}`
+    );
+  }
+
   /* =========================================
      MOSTRAR PEDIDO REGISTRADO
   ========================================= */
 
   function showTransferSuccess(order) {
+    const visibleNumber = getVisibleOrderNumber(order);
+
     getElement("transfer-modal-details").hidden = true;
     getElement("transfer-modal-success").hidden = false;
 
     getElement("transfer-success-order-id").textContent =
-      order.order_id;
+      "pedido " + visibleNumber;
 
     getElement("transfer-success-total").textContent =
       formatPrice(order.total);
@@ -653,7 +671,7 @@ function buildTransferEmail(order) {
     button.textContent = "pedido registrado";
 
     showMessage(
-      `Tu pedido ${order.order_id} fue registrado correctamente.`,
+      `Tu pedido ${visibleNumber} fue registrado correctamente.`,
       "success"
     );
   }
@@ -822,8 +840,10 @@ function buildTransferEmail(order) {
         return;
       }
 
+      const visibleNumber = getVisibleOrderNumber(order);
+
       showMessage(
-        `Tu pedido ${order.order_id} fue registrado. ` +
+        `Tu pedido ${visibleNumber} fue registrado. ` +
         `Total: ${formatPrice(order.total)}. ` +
         "Nos comunicaremos para coordinar el pago.",
         "success"
