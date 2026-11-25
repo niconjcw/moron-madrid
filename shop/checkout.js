@@ -1,4 +1,3 @@
-
 /* =========================================
    MORÓN MADRID — CHECKOUT
 ========================================= */
@@ -19,6 +18,7 @@
   let coupon = null;
   let subtotal = 0;
   let submitting = false;
+  let paymentSettings = null;
 
   /* =========================================
      UTILIDADES
@@ -58,6 +58,65 @@
     } catch {
       return {};
     }
+  }
+
+  function getCouponDiscount() {
+    return coupon
+      ? Math.max(0, Number(coupon.discount_amount) || 0)
+      : 0;
+  }
+
+  function getTransferDiscount() {
+    if (
+      !paymentSettings ||
+      Number(paymentSettings.transfer_enabled) !== 1
+    ) {
+      return 0;
+    }
+
+    const remaining = Math.max(
+      0,
+      subtotal - getCouponDiscount()
+    );
+
+    return Math.floor(
+      remaining * Number(paymentSettings.transfer_percent) / 100
+    );
+  }
+
+  function getSelectedPaymentMethod() {
+    return document.querySelector(
+      'input[name="payment_method"]:checked'
+    )?.value;
+  }
+
+  /* =========================================
+     CONFIGURACIÓN PÚBLICA DE PAGOS
+  ========================================= */
+
+  async function loadPaymentSettings() {
+    const response = await fetch(
+      `${API_URL}/payment-settings`,
+      {
+        method: "GET",
+        cache: "no-store"
+      }
+    );
+
+    const data = await readResponse(response);
+
+    if (
+      !response.ok ||
+      !data.settings
+    ) {
+      throw new Error("No se pudo cargar la configuración de pagos.");
+    }
+
+    paymentSettings = {
+      transfer_enabled: Number(data.settings.transfer_enabled),
+      transfer_percent: Number(data.settings.transfer_percent),
+      transfer_alias: String(data.settings.transfer_alias || "").trim()
+    };
   }
 
   /* =========================================
@@ -110,26 +169,74 @@
     getElement("checkout-subtotal").textContent =
       formatPrice(subtotal);
 
-    getElement("checkout-total").textContent =
-      formatPrice(subtotal);
+    renderSummary();
   }
 
   function renderCoupon() {
-    const row = getElement("checkout-coupon-row");
-    const amount = getElement("checkout-coupon-discount");
+    renderSummary();
+  }
 
-    if (!row || !amount) return;
+  function renderSummary() {
+    const couponRow = getElement("checkout-coupon-row");
+    const couponAmount = getElement("checkout-coupon-discount");
 
-    if (!coupon) {
-      row.hidden = true;
-      return;
+    const transferRow = getElement("checkout-transfer-row");
+    const transferAmount = getElement("checkout-transfer-discount");
+
+    const totalElement = getElement("checkout-total");
+
+    const method = getSelectedPaymentMethod();
+    const isTransfer = method === "transferencia";
+
+    const couponDiscount = getCouponDiscount();
+    const transferDiscount = isTransfer
+      ? getTransferDiscount()
+      : 0;
+
+    if (couponRow && couponAmount) {
+      couponRow.hidden = couponDiscount <= 0;
+
+      couponAmount.textContent =
+        "− " + formatPrice(couponDiscount);
     }
 
-    row.hidden = false;
-    amount.textContent = "− " + formatPrice(coupon.discount_amount);
+    if (transferRow && transferAmount) {
+      transferRow.hidden =
+        !isTransfer ||
+        !paymentSettings ||
+        Number(paymentSettings.transfer_enabled) !== 1;
 
-    getElement("checkout-total").textContent =
-      formatPrice(Math.max(0, subtotal - coupon.discount_amount));
+      transferAmount.textContent =
+        "− " + formatPrice(transferDiscount);
+    }
+
+    if (totalElement) {
+      totalElement.textContent = formatPrice(
+        Math.max(
+          0,
+          subtotal - couponDiscount - transferDiscount
+        )
+      );
+    }
+
+    const transferNote = getElement("checkout-transfer-note");
+
+    if (transferNote) {
+      transferNote.hidden = !isTransfer;
+
+      if (isTransfer && paymentSettings) {
+        const percent = paymentSettings.transfer_percent;
+        const alias = paymentSettings.transfer_alias;
+
+        transferNote.textContent =
+          `Obtenés un ${percent}% de descuento adicional después de aplicar el cupón.` +
+          (
+            alias
+              ? ` Alias bancario: ${alias}.`
+              : " Los datos bancarios se informarán al confirmar el pedido."
+          );
+      }
+    }
   }
 
   /* =========================================
@@ -139,7 +246,11 @@
   async function validateCoupon() {
     const code = localStorage.getItem(COUPON_KEY);
 
-    if (!code) return;
+    if (!code) {
+      coupon = null;
+      renderSummary();
+      return;
+    }
 
     try {
       const response = await fetch(`${API_URL}/discounts/validate`, {
@@ -160,12 +271,14 @@
 
       if (!response.ok || !data.valido) {
         localStorage.removeItem(COUPON_KEY);
+        coupon = null;
 
         showMessage(
           "El cupón ya no está disponible y no se aplicará a esta compra.",
           "error"
         );
 
+        renderSummary();
         return;
       }
 
@@ -177,10 +290,14 @@
       renderCoupon();
 
     } catch (error) {
+      coupon = null;
+
       showMessage(
         "No se pudo verificar el cupón. Podés continuar sin él.",
         "error"
       );
+
+      renderSummary();
     }
   }
 
@@ -189,52 +306,64 @@
   ========================================= */
 
   function updatePaymentDisplay() {
-    const method = document.querySelector(
-      'input[name="payment_method"]:checked'
-    )?.value;
+    renderSummary();
+  }
 
-    const transferRow = getElement("checkout-transfer-row");
-    const transferNote = getElement("checkout-transfer-note");
+  /* =========================================
+     HABILITAR / DESHABILITAR TRANSFERENCIA
+  ========================================= */
 
-    const isTransfer = method === "transferencia";
+  function configureTransferPayment() {
+    const transferInput = document.querySelector(
+      'input[name="payment_method"][value="transferencia"]'
+    );
 
-    if (transferRow) {
-      transferRow.hidden = true;
+    if (!transferInput) return;
+
+    const transferLabel = transferInput.closest("label");
+
+    const available =
+      paymentSettings &&
+      Number(paymentSettings.transfer_enabled) === 1;
+
+    transferInput.disabled = !available;
+
+    if (transferLabel) {
+      transferLabel.hidden = !available;
     }
 
-    if (transferNote) {
-      transferNote.hidden = !isTransfer;
+    if (!available && transferInput.checked) {
+      const alternative = document.querySelector(
+        'input[name="payment_method"]:not([value="transferencia"]):not(:disabled)'
+      );
 
-      if (isTransfer) {
-        transferNote.textContent =
-          "El 10% adicional por transferencia se calculará en el servidor después de aplicar el cupón.";
+      if (alternative) {
+        alternative.checked = true;
       }
     }
   }
 
-  
-/* =========================================
-   HABILITAR UALÁ BIS
-========================================= */
+  /* =========================================
+     HABILITAR UALÁ BIS
+  ========================================= */
 
-function disableUnavailablePayments() {
-  const ualaInput = document.querySelector(
-    'input[name="payment_method"][value="uala"]'
-  );
+  function disableUnavailablePayments() {
+    const ualaInput = document.querySelector(
+      'input[name="payment_method"][value="uala"]'
+    );
 
-  if (!ualaInput) return;
+    if (!ualaInput) return;
 
-  ualaInput.disabled = false;
+    ualaInput.disabled = false;
 
-  const ualaLabel = ualaInput.closest("label");
+    const ualaLabel = ualaInput.closest("label");
 
-  if (ualaLabel) {
-    ualaLabel.style.opacity = "1";
-    ualaLabel.style.cursor = "pointer";
-    ualaLabel.title = "";
+    if (ualaLabel) {
+      ualaLabel.style.opacity = "1";
+      ualaLabel.style.cursor = "pointer";
+      ualaLabel.title = "";
+    }
   }
-}
-
 
   /* =========================================
      DATOS DEL PEDIDO
@@ -330,129 +459,155 @@ function disableUnavailablePayments() {
     if (totalElement) {
       totalElement.textContent = formatPrice(order.total);
     }
-  }
 
-  
-/* =========================================
-   GENERAR PAGO — MERCADO PAGO / UALÁ BIS
-========================================= */
+    if (order.transfer_discount !== undefined) {
+      const transferRow = getElement("checkout-transfer-row");
+      const transferAmount = getElement("checkout-transfer-discount");
 
-async function createPayment(orderId, method) {
-  const endpoints = {
-    mercadopago: "/payments/mercadopago/create",
-    uala: "/payments/uala/create"
-  };
+      if (transferRow && transferAmount) {
+        const isTransfer = order.payment_method === "transferencia";
 
-  const endpoint = endpoints[method];
+        transferRow.hidden =
+          !isTransfer ||
+          Number(order.transfer_discount) <= 0;
 
-  if (!endpoint) {
-    throw new Error("Método de pago no disponible.");
-  }
-
-  const response = await fetch(
-    `${API_URL}${endpoint}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        order_id: orderId
-      })
+        transferAmount.textContent =
+          "− " + formatPrice(order.transfer_discount);
+      }
     }
-  );
+  }
 
-  const data = await readResponse(response);
+  /* =========================================
+     GENERAR PAGO — MERCADO PAGO / UALÁ BIS
+  ========================================= */
 
-  if (!response.ok) {
-    throw new Error(
-      data.message ||
-      data.error ||
-      "No se pudo iniciar el pago. El pedido quedó registrado."
+  async function createPayment(orderId, method) {
+    const endpoints = {
+      mercadopago: "/payments/mercadopago/create",
+      uala: "/payments/uala/create"
+    };
+
+    const endpoint = endpoints[method];
+
+    if (!endpoint) {
+      throw new Error("Método de pago no disponible.");
+    }
+
+    const response = await fetch(
+      `${API_URL}${endpoint}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          order_id: orderId
+        })
+      }
     );
-  }
 
-  const checkoutUrl = data.checkout_url;
+    const data = await readResponse(response);
 
-  if (!checkoutUrl) {
-    throw new Error(
-      "El pedido se creó, pero no recibimos el enlace de pago."
-    );
-  }
-
-  return checkoutUrl;
-}
-
-  
-/* =========================================
-   CONFIRMAR COMPRA
-========================================= */
-
-async function handleSubmit(event) {
-  event.preventDefault();
-
-  if (submitting) return;
-
-  const form = getElement("checkout-form");
-
-  if (!form.reportValidity()) return;
-
-  if (!cart.length) {
-    showMessage("Tu carrito está vacío.", "error");
-    return;
-  }
-
-  const button = getElement("checkout-submit");
-  const originalText = button.textContent;
-
-  submitting = true;
-  button.disabled = true;
-  button.textContent = "procesando...";
-  showMessage("");
-
-  try {
-    const orderData = getCheckoutData();
-    const method = orderData.payment_method;
-
-    const order = await createOrder(orderData);
-
-    renderServerTotal(order);
-
-    if (
-      method === "mercadopago" ||
-      method === "uala"
-    ) {
-      button.textContent =
-        method === "uala"
-          ? "conectando con ualá bis..."
-          : "conectando con mercado pago...";
-
-      const checkoutUrl = await createPayment(
-        order.order_id,
-        method
+    if (!response.ok) {
+      throw new Error(
+        data.message ||
+        data.error ||
+        "No se pudo iniciar el pago. El pedido quedó registrado."
       );
+    }
 
-      window.location.assign(checkoutUrl);
+    const checkoutUrl = data.checkout_url;
+
+    if (!checkoutUrl) {
+      throw new Error(
+        "El pedido se creó, pero no recibimos el enlace de pago."
+      );
+    }
+
+    return checkoutUrl;
+  }
+
+  /* =========================================
+     CONFIRMAR COMPRA
+  ========================================= */
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    if (submitting) return;
+
+    const form = getElement("checkout-form");
+
+    if (!form.reportValidity()) return;
+
+    if (!cart.length) {
+      showMessage("Tu carrito está vacío.", "error");
       return;
     }
 
-    showMessage(
-      method === "transferencia"
-        ? `Tu pedido ${order.order_id} fue registrado. Total confirmado: ${formatPrice(order.total)}. Te enviaremos los datos para realizar la transferencia.`
-        : `Tu pedido ${order.order_id} fue registrado. Total: ${formatPrice(order.total)}. Nos comunicaremos para coordinar el pago.`,
-      "success"
-    );
+    const button = getElement("checkout-submit");
+    const originalText = button.textContent;
 
-    button.textContent = "pedido registrado";
+    submitting = true;
+    button.disabled = true;
+    button.textContent = "procesando...";
+    showMessage("");
 
-  } catch (error) {
-    showMessage(error.message, "error");
+    try {
+      const orderData = getCheckoutData();
+      const method = orderData.payment_method;
 
-    button.disabled = false;
-    button.textContent = originalText;
-    submitting = false;
+      if (
+        method === "transferencia" &&
+        (
+          !paymentSettings ||
+          Number(paymentSettings.transfer_enabled) !== 1
+        )
+      ) {
+        throw new Error(
+          "La transferencia bancaria no está disponible en este momento. Elegí otro método de pago."
+        );
+      }
+
+      const order = await createOrder(orderData);
+
+      renderServerTotal(order);
+
+      if (
+        method === "mercadopago" ||
+        method === "uala"
+      ) {
+        button.textContent =
+          method === "uala"
+            ? "conectando con ualá bis..."
+            : "conectando con mercado pago...";
+
+        const checkoutUrl = await createPayment(
+          order.order_id,
+          method
+        );
+
+        window.location.assign(checkoutUrl);
+        return;
+      }
+
+      showMessage(
+        method === "transferencia"
+          ? `Tu pedido ${order.order_id} fue registrado. Total confirmado: ${formatPrice(order.total)}. Te enviaremos los datos para realizar la transferencia.`
+          : `Tu pedido ${order.order_id} fue registrado. Total: ${formatPrice(order.total)}. Nos comunicaremos para coordinar el pago.`,
+        "success"
+      );
+
+      button.textContent = "pedido registrado";
+
+    } catch (error) {
+      showMessage(error.message, "error");
+
+      button.disabled = false;
+      button.textContent = originalText;
+      submitting = false;
+    }
   }
-}
 
   /* =========================================
      INICIALIZACIÓN
@@ -468,6 +623,18 @@ async function handleSubmit(event) {
 
     renderProducts();
 
+    try {
+      await loadPaymentSettings();
+    } catch (error) {
+      paymentSettings = null;
+
+      showMessage(
+        "No se pudo cargar la configuración de transferencia. Podés elegir otro método de pago.",
+        "error"
+      );
+    }
+
+    configureTransferPayment();
     await validateCoupon();
 
     disableUnavailablePayments();
