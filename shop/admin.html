@@ -1906,7 +1906,13 @@ contact.textContent=
 const payment=document.createElement("div");
 payment.textContent=
 "Pago: "+(order.payment_method||"No informado")+
-" · Estado del pago: "+(order.payment_status||"pending");
+" · Estado del pago: "+({
+  pending:"Pendiente de confirmación",
+  paid:"Pagado",
+  rejected:"Rechazado",
+  cancelled:"Cancelado",
+  refunded:"Reembolsado"
+}[order.payment_status]||order.payment_status||"Sin estado");
   
 const shipping=document.createElement("div");
 shipping.textContent="Envío: "+(order.shipping_method||"No informado");
