@@ -14,6 +14,7 @@
   const CART_KEY = "mm_cart";
   const COUPON_KEY = "mm_cart_coupon";
   const CURRENCY = "es-AR";
+  const TRANSFER_EMAIL = "hola@moronmadrid.com";
 
   let cart = [];
   let coupon = null;
@@ -89,6 +90,13 @@
     return document.querySelector(
       'input[name="payment_method"]:checked'
     )?.value;
+  }
+
+  function getEstimatedTransferTotal() {
+    return Math.max(
+      0,
+      subtotal - getCouponDiscount() - getTransferDiscount()
+    );
   }
 
   /* =========================================
@@ -192,20 +200,27 @@
       ? getTransferDiscount()
       : 0;
 
+    /* DESCUENTO POR CUPÓN */
+
     if (couponRow && couponAmount) {
       couponRow.hidden = couponDiscount <= 0;
       couponAmount.textContent = "− " + formatPrice(couponDiscount);
     }
 
+    /* DESCUENTO POR TRANSFERENCIA */
+
     if (transferRow && transferAmount) {
       transferRow.hidden =
         !isTransfer ||
         !paymentSettings ||
-        Number(paymentSettings.transfer_enabled) !== 1;
+        Number(paymentSettings.transfer_enabled) !== 1 ||
+        transferDiscount <= 0;
 
       transferAmount.textContent =
         "− " + formatPrice(transferDiscount);
     }
+
+    /* TOTAL */
 
     if (totalElement) {
       totalElement.textContent = formatPrice(
@@ -216,6 +231,8 @@
       );
     }
 
+    /* NOTA DE TRANSFERENCIA */
+
     const transferNote = getElement("checkout-transfer-note");
 
     if (transferNote) {
@@ -223,26 +240,9 @@
 
       if (isTransfer && paymentSettings) {
         const percent = paymentSettings.transfer_percent;
-        const alias = paymentSettings.transfer_alias;
-        const holder = paymentSettings.transfer_holder;
 
-        let instructions =
-          `Obtenés un ${percent}% de descuento adicional después de aplicar el cupón.`;
-
-        if (alias) {
-          instructions += ` Alias: ${alias}.`;
-        }
-
-        if (holder) {
-          instructions += ` Titular: ${holder}.`;
-        }
-
-        if (!alias || !holder) {
-          instructions +=
-            " Los datos bancarios están incompletos. Contactanos antes de realizar la transferencia.";
-        }
-
-        transferNote.textContent = instructions;
+        transferNote.textContent =
+          `obtenés un ${percent}% de descuento adicional después de aplicar el cupón.`;
       }
     }
   }
@@ -474,37 +474,206 @@
 
       if (transferRow && transferAmount) {
         const isTransfer = order.payment_method === "transferencia";
+        const discount = Number(order.transfer_discount) || 0;
 
-        transferRow.hidden =
-          !isTransfer ||
-          Number(order.transfer_discount) <= 0;
+        transferRow.hidden = !isTransfer || discount <= 0;
 
         transferAmount.textContent =
-          "− " + formatPrice(order.transfer_discount);
+          "− " + formatPrice(discount);
       }
     }
   }
 
   /* =========================================
-     GENERAR INSTRUCCIONES DE TRANSFERENCIA
+     MODAL DE TRANSFERENCIA
   ========================================= */
 
-  function getTransferInstructions(total) {
+  function openTransferModal() {
+    const modal = getElement("checkout-transfer-modal");
+
     const alias = paymentSettings?.transfer_alias || "";
     const holder = paymentSettings?.transfer_holder || "";
 
-    if (!alias || !holder) {
-      return (
-        " Los datos bancarios todavía no están completos. " +
-        "Contactanos para recibirlos antes de transferir."
-      );
+    getElement("transfer-modal-alias").textContent =
+      alias || "No configurado";
+
+    getElement("transfer-modal-holder").textContent =
+      holder || "No configurado";
+
+    getElement("transfer-modal-total").textContent =
+      formatPrice(getEstimatedTransferTotal());
+
+    getElement("transfer-modal-error").textContent = "";
+
+    const warning = getElement("transfer-modal-warning");
+    const confirmButton = getElement("confirm-transfer-order");
+
+    const bankDataComplete = Boolean(alias && holder);
+
+    warning.hidden = bankDataComplete;
+
+    if (!bankDataComplete) {
+      warning.textContent =
+        "Los datos bancarios todavía no están completos. Contactanos antes de realizar la transferencia.";
     }
 
+    confirmButton.disabled = !bankDataComplete;
+
+    getElement("transfer-modal-details").hidden = false;
+    getElement("transfer-modal-success").hidden = true;
+
+    modal.hidden = false;
+    document.body.style.overflow = "hidden";
+
+    getElement("transfer-modal-close").focus();
+  }
+
+  function closeTransferModal() {
+    const modal = getElement("checkout-transfer-modal");
+
+    if (submitting) return;
+
+    modal.hidden = true;
+    document.body.style.overflow = "";
+  }
+
+  async function copyTransferAlias() {
+    const alias = paymentSettings?.transfer_alias || "";
+
+    if (!alias) return;
+
+    const button = getElement("transfer-copy-alias");
+
+    try {
+      await navigator.clipboard.writeText(alias);
+      button.textContent = "¡alias copiado!";
+
+      setTimeout(() => {
+        button.textContent = "copiar alias";
+      }, 2000);
+
+    } catch (error) {
+      const temporaryInput = document.createElement("textarea");
+      temporaryInput.value = alias;
+      temporaryInput.style.position = "fixed";
+      temporaryInput.style.opacity = "0";
+
+      document.body.appendChild(temporaryInput);
+      temporaryInput.select();
+
+      try {
+        document.execCommand("copy");
+        button.textContent = "¡alias copiado!";
+      } catch {
+        button.textContent = "no se pudo copiar";
+      }
+
+      temporaryInput.remove();
+
+      setTimeout(() => {
+        button.textContent = "copiar alias";
+      }, 2000);
+    }
+  }
+
+  /* =========================================
+     EMAIL CON DATOS DEL PEDIDO
+  ========================================= */
+
+  function buildTransferEmail(order) {
+    const orderId = String(order.order_id);
+    const total = formatPrice(order.total);
+
+    const subject =
+      `Comprobante de transferencia — Pedido ${orderId}`;
+
+    const body = [
+      "Hola Morón Madrid,",
+      "",
+      "Adjunto el comprobante de transferencia de mi compra.",
+      "",
+      `Número de pedido: ${orderId}`,
+      `Importe transferido: ${total}`,
+      "",
+      "Nombre: " +
+        String(getElement("customer_name").value || "").trim(),
+      "",
+      "Muchas gracias."
+    ].join("\n");
+
     return (
-      ` Alias: ${alias}.` +
-      ` Titular: ${holder}.` +
-      ` Importe a transferir: ${formatPrice(total)}.`
+      `mailto:${TRANSFER_EMAIL}` +
+      `?subject=${encodeURIComponent(subject)}` +
+      `&body=${encodeURIComponent(body)}`
     );
+  }
+
+  /* =========================================
+     MOSTRAR PEDIDO REGISTRADO
+  ========================================= */
+
+  function showTransferSuccess(order) {
+    getElement("transfer-modal-details").hidden = true;
+    getElement("transfer-modal-success").hidden = false;
+
+    getElement("transfer-success-order-id").textContent =
+      order.order_id;
+
+    getElement("transfer-success-total").textContent =
+      formatPrice(order.total);
+
+    getElement("transfer-email-link").href =
+      buildTransferEmail(order);
+
+    getElement("transfer-modal-close").hidden = true;
+
+    const button = getElement("checkout-submit");
+
+    button.disabled = true;
+    button.textContent = "pedido registrado";
+
+    showMessage(
+      `Tu pedido ${order.order_id} fue registrado correctamente.`,
+      "success"
+    );
+  }
+
+  /* =========================================
+     CONFIRMAR PEDIDO POR TRANSFERENCIA
+  ========================================= */
+
+  async function confirmTransferOrder() {
+    if (submitting) return;
+
+    const button = getElement("confirm-transfer-order");
+    const originalText = button.textContent;
+
+    submitting = true;
+    button.disabled = true;
+    button.textContent = "registrando pedido...";
+
+    getElement("transfer-modal-error").textContent = "";
+
+    try {
+      const orderData = getCheckoutData();
+
+      const order = await createOrder(orderData);
+
+      renderServerTotal(order);
+      showTransferSuccess(order);
+
+    } catch (error) {
+      getElement("transfer-modal-error").textContent =
+        error.message;
+
+      button.disabled = false;
+      button.textContent = originalText;
+
+      submitting = false;
+      return;
+    }
+
+    submitting = false;
   }
 
   /* =========================================
@@ -575,6 +744,32 @@
       return;
     }
 
+    const method = getSelectedPaymentMethod();
+
+    if (
+      method === "transferencia" &&
+      (
+        !paymentSettings ||
+        Number(paymentSettings.transfer_enabled) !== 1
+      )
+    ) {
+      showMessage(
+        "La transferencia bancaria no está disponible en este momento. Elegí otro método de pago.",
+        "error"
+      );
+      return;
+    }
+
+    /* LA TRANSFERENCIA ABRE EL MODAL ANTES DE CREAR EL PEDIDO */
+
+    if (method === "transferencia") {
+      showMessage("");
+      openTransferModal();
+      return;
+    }
+
+    /* OTROS MÉTODOS DE PAGO */
+
     const button = getElement("checkout-submit");
     const originalText = button.textContent;
 
@@ -585,20 +780,6 @@
 
     try {
       const orderData = getCheckoutData();
-      const method = orderData.payment_method;
-
-      if (
-        method === "transferencia" &&
-        (
-          !paymentSettings ||
-          Number(paymentSettings.transfer_enabled) !== 1
-        )
-      ) {
-        throw new Error(
-          "La transferencia bancaria no está disponible en este momento. Elegí otro método de pago."
-        );
-      }
-
       const order = await createOrder(orderData);
 
       renderServerTotal(order);
@@ -621,21 +802,12 @@
         return;
       }
 
-      if (method === "transferencia") {
-        showMessage(
-          `Tu pedido ${order.order_id} fue registrado. ` +
-          `Total confirmado: ${formatPrice(order.total)}.` +
-          getTransferInstructions(order.total),
-          "success"
-        );
-      } else {
-        showMessage(
-          `Tu pedido ${order.order_id} fue registrado. ` +
-          `Total: ${formatPrice(order.total)}. ` +
-          "Nos comunicaremos para coordinar el pago.",
-          "success"
-        );
-      }
+      showMessage(
+        `Tu pedido ${order.order_id} fue registrado. ` +
+        `Total: ${formatPrice(order.total)}. ` +
+        "Nos comunicaremos para coordinar el pago.",
+        "success"
+      );
 
       button.textContent = "pedido registrado";
 
@@ -686,6 +858,44 @@
 
     getElement("checkout-form")
       .addEventListener("submit", handleSubmit);
+
+    getElement("confirm-transfer-order")
+      .addEventListener("click", confirmTransferOrder);
+
+    getElement("transfer-modal-close")
+      .addEventListener("click", closeTransferModal);
+
+    getElement("cancel-transfer-order")
+      .addEventListener("click", closeTransferModal);
+
+    getElement("transfer-copy-alias")
+      .addEventListener("click", copyTransferAlias);
+
+    getElement("close-transfer-success")
+      .addEventListener("click", () => {
+        getElement("checkout-transfer-modal").hidden = true;
+        document.body.style.overflow = "";
+      });
+
+    getElement("checkout-transfer-modal")
+      .addEventListener("click", event => {
+        if (
+          event.target.id === "checkout-transfer-modal" &&
+          !submitting &&
+          getElement("transfer-modal-success").hidden
+        ) {
+          closeTransferModal();
+        }
+      });
+
+    document.addEventListener("keydown", event => {
+      if (
+        event.key === "Escape" &&
+        !getElement("checkout-transfer-modal").hidden
+      ) {
+        closeTransferModal();
+      }
+    });
 
     updatePaymentDisplay();
   }
