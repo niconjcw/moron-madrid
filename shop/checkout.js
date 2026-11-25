@@ -1,3 +1,4 @@
+
 /* =========================================
    MORÓN MADRID — CHECKOUT
 ========================================= */
@@ -105,17 +106,15 @@
 
     const data = await readResponse(response);
 
-    if (
-      !response.ok ||
-      !data.settings
-    ) {
+    if (!response.ok || !data.settings) {
       throw new Error("No se pudo cargar la configuración de pagos.");
     }
 
     paymentSettings = {
       transfer_enabled: Number(data.settings.transfer_enabled),
       transfer_percent: Number(data.settings.transfer_percent),
-      transfer_alias: String(data.settings.transfer_alias || "").trim()
+      transfer_alias: String(data.settings.transfer_alias || "").trim(),
+      transfer_holder: String(data.settings.transfer_holder || "").trim()
     };
   }
 
@@ -195,9 +194,7 @@
 
     if (couponRow && couponAmount) {
       couponRow.hidden = couponDiscount <= 0;
-
-      couponAmount.textContent =
-        "− " + formatPrice(couponDiscount);
+      couponAmount.textContent = "− " + formatPrice(couponDiscount);
     }
 
     if (transferRow && transferAmount) {
@@ -227,14 +224,25 @@
       if (isTransfer && paymentSettings) {
         const percent = paymentSettings.transfer_percent;
         const alias = paymentSettings.transfer_alias;
+        const holder = paymentSettings.transfer_holder;
 
-        transferNote.textContent =
-          `Obtenés un ${percent}% de descuento adicional después de aplicar el cupón.` +
-          (
-            alias
-              ? ` Alias bancario: ${alias}.`
-              : " Los datos bancarios se informarán al confirmar el pedido."
-          );
+        let instructions =
+          `Obtenés un ${percent}% de descuento adicional después de aplicar el cupón.`;
+
+        if (alias) {
+          instructions += ` Alias: ${alias}.`;
+        }
+
+        if (holder) {
+          instructions += ` Titular: ${holder}.`;
+        }
+
+        if (!alias || !holder) {
+          instructions +=
+            " Los datos bancarios están incompletos. Contactanos antes de realizar la transferencia.";
+        }
+
+        transferNote.textContent = instructions;
       }
     }
   }
@@ -478,6 +486,28 @@
   }
 
   /* =========================================
+     GENERAR INSTRUCCIONES DE TRANSFERENCIA
+  ========================================= */
+
+  function getTransferInstructions(total) {
+    const alias = paymentSettings?.transfer_alias || "";
+    const holder = paymentSettings?.transfer_holder || "";
+
+    if (!alias || !holder) {
+      return (
+        " Los datos bancarios todavía no están completos. " +
+        "Contactanos para recibirlos antes de transferir."
+      );
+    }
+
+    return (
+      ` Alias: ${alias}.` +
+      ` Titular: ${holder}.` +
+      ` Importe a transferir: ${formatPrice(total)}.`
+    );
+  }
+
+  /* =========================================
      GENERAR PAGO — MERCADO PAGO / UALÁ BIS
   ========================================= */
 
@@ -591,12 +621,21 @@
         return;
       }
 
-      showMessage(
-        method === "transferencia"
-          ? `Tu pedido ${order.order_id} fue registrado. Total confirmado: ${formatPrice(order.total)}. Te enviaremos los datos para realizar la transferencia.`
-          : `Tu pedido ${order.order_id} fue registrado. Total: ${formatPrice(order.total)}. Nos comunicaremos para coordinar el pago.`,
-        "success"
-      );
+      if (method === "transferencia") {
+        showMessage(
+          `Tu pedido ${order.order_id} fue registrado. ` +
+          `Total confirmado: ${formatPrice(order.total)}.` +
+          getTransferInstructions(order.total),
+          "success"
+        );
+      } else {
+        showMessage(
+          `Tu pedido ${order.order_id} fue registrado. ` +
+          `Total: ${formatPrice(order.total)}. ` +
+          "Nos comunicaremos para coordinar el pago.",
+          "success"
+        );
+      }
 
       button.textContent = "pedido registrado";
 
