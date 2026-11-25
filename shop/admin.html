@@ -284,7 +284,13 @@ Seleccioná todas las fotos juntas. La primera será la principal y las demás q
   maxlength="120"
   placeholder="Ej. moron.madrid"
 >
-
+<label for="transfer-holder">Titular de la cuenta</label>
+<input
+  id="transfer-holder"
+  type="text"
+  maxlength="150"
+  placeholder="Nombre y apellido del titular"
+>
 <label for="transfer-percent">Porcentaje de descuento</label>
 <input
   id="transfer-percent"
@@ -1276,6 +1282,9 @@ async function loadDiscountSettings(){
 
     document.getElementById("transfer-alias").value=
       settings.transfer_alias||"";
+    
+    document.getElementById("transfer-holder").value=
+  settings.transfer_holder||"";
 
   }catch(error){
     message.textContent=error.message;
@@ -1288,6 +1297,7 @@ async function saveTransferSettings(){
   const enabled=document.getElementById("transfer-enabled").checked;
   const percent=Number(document.getElementById("transfer-percent").value);
   const alias=document.getElementById("transfer-alias").value.trim();
+  const holder=document.getElementById("transfer-holder").value.trim();
 
   if(!Number.isInteger(percent)||percent<0||percent>100){
     message.textContent="El porcentaje debe ser un número entre 0 y 100.";
@@ -1313,6 +1323,7 @@ async function saveTransferSettings(){
         transfer_enabled:enabled,
         transfer_percent:percent,
         transfer_alias:alias
+        transfer_holder:holder
       })
     });
 
