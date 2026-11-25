@@ -597,37 +597,37 @@
   }
 
   /* =========================================
-     EMAIL CON DATOS DEL PEDIDO
-  ========================================= */
+   EMAIL CON DATOS DEL PEDIDO — GMAIL
+========================================= */
 
-  function buildTransferEmail(order) {
-    const orderId = String(order.order_id);
-    const total = formatPrice(order.total);
+function buildTransferEmail(order) {
+  const orderId = String(order.order_id);
+  const total = formatPrice(order.total);
 
-    const subject =
-      `Comprobante de transferencia — Pedido ${orderId}`;
+  const subject =
+    `Comprobante de transferencia — Pedido ${orderId}`;
 
-    const body = [
-      "Hola Morón Madrid,",
-      "",
-      "Adjunto el comprobante de transferencia de mi compra.",
-      "",
-      `Número de pedido: ${orderId}`,
-      `Importe transferido: ${total}`,
-      "",
-      "Nombre: " +
-        String(getElement("customer_name").value || "").trim(),
-      "",
-      "Muchas gracias."
-    ].join("\n");
+  const body = [
+    "Hola Morón Madrid,",
+    "",
+    "Adjunto el comprobante de transferencia de mi compra.",
+    "",
+    `Número de pedido: ${orderId}`,
+    `Importe transferido: ${total}`,
+    "",
+    "Nombre: " +
+      String(getElement("customer_name").value || "").trim(),
+    "",
+    "Muchas gracias."
+  ].join("\n");
 
-    return (
-      `mailto:${TRANSFER_EMAIL}` +
-      `?subject=${encodeURIComponent(subject)}` +
-      `&body=${encodeURIComponent(body)}`
-    );
-  }
-
+  return (
+    "https://mail.google.com/mail/?view=cm&fs=1" +
+    `&to=${encodeURIComponent(TRANSFER_EMAIL)}` +
+    `&su=${encodeURIComponent(subject)}` +
+    `&body=${encodeURIComponent(body)}`
+  );
+}
   /* =========================================
      MOSTRAR PEDIDO REGISTRADO
   ========================================= */
