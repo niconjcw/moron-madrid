@@ -34,6 +34,18 @@
     return document.getElementById(id);
   }
 
+  function setRowVisibility(element, visible) {
+    if (!element) return;
+
+    element.hidden = !visible;
+
+    if (visible) {
+      element.style.removeProperty("display");
+    } else {
+      element.style.setProperty("display", "none", "important");
+    }
+  }
+
   function showMessage(message, type = "") {
     const element = getElement("checkout-message");
     if (!element) return;
@@ -196,6 +208,7 @@
     const isTransfer = method === "transferencia";
 
     const couponDiscount = getCouponDiscount();
+
     const transferDiscount = isTransfer
       ? getTransferDiscount()
       : 0;
@@ -203,18 +216,22 @@
     /* DESCUENTO POR CUPÓN */
 
     if (couponRow && couponAmount) {
-      couponRow.hidden = couponDiscount <= 0;
-      couponAmount.textContent = "− " + formatPrice(couponDiscount);
+      setRowVisibility(couponRow, couponDiscount > 0);
+
+      couponAmount.textContent =
+        "− " + formatPrice(couponDiscount);
     }
 
     /* DESCUENTO POR TRANSFERENCIA */
 
     if (transferRow && transferAmount) {
-      transferRow.hidden =
-        !isTransfer ||
-        !paymentSettings ||
-        Number(paymentSettings.transfer_enabled) !== 1 ||
-        transferDiscount <= 0;
+      const showTransferDiscount =
+        isTransfer &&
+        paymentSettings &&
+        Number(paymentSettings.transfer_enabled) === 1 &&
+        transferDiscount > 0;
+
+      setRowVisibility(transferRow, showTransferDiscount);
 
       transferAmount.textContent =
         "− " + formatPrice(transferDiscount);
@@ -236,7 +253,7 @@
     const transferNote = getElement("checkout-transfer-note");
 
     if (transferNote) {
-      transferNote.hidden = !isTransfer;
+      setRowVisibility(transferNote, isTransfer);
 
       if (isTransfer && paymentSettings) {
         const percent = paymentSettings.transfer_percent;
@@ -476,7 +493,10 @@
         const isTransfer = order.payment_method === "transferencia";
         const discount = Number(order.transfer_discount) || 0;
 
-        transferRow.hidden = !isTransfer || discount <= 0;
+        setRowVisibility(
+          transferRow,
+          isTransfer && discount > 0
+        );
 
         transferAmount.textContent =
           "− " + formatPrice(discount);
