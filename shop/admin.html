@@ -170,6 +170,52 @@ header{margin-bottom:50px}
   padding:22px 0;
 }
 
+.order-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1.45fr) minmax(270px,.75fr);
+  gap:clamp(22px,3vw,42px);
+  align-items:start;
+}
+
+.order-info-column,
+.order-actions-column{
+  min-width:0;
+}
+
+.order-actions-column{
+  padding:18px 20px 20px;
+  background:#fff;
+  border:1px solid #e2e2e2;
+}
+
+.order-actions-title{
+  padding-bottom:13px;
+  border-bottom:1px solid #e5e5e5;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+}
+
+.order-actions-column .order-edit{
+  margin-top:0;
+  padding-top:0;
+  border-top:0;
+}
+
+.order-actions-column .order-edit label:first-child{
+  margin-top:16px;
+}
+
+.order-actions-column .order-edit button{
+  width:100%;
+}
+
+.order-actions-column > button{
+  width:100%;
+  margin-top:18px;
+}
+
 .order-top{
   display:flex;
   justify-content:space-between;
@@ -247,6 +293,15 @@ header{margin-bottom:50px}
 
   .order-top{
     flex-direction:column;
+  }
+
+  .order-layout{
+    grid-template-columns:minmax(0,1fr);
+    gap:16px;
+  }
+
+  .order-actions-column{
+    padding:16px;
   }
 }  
 
@@ -2510,6 +2565,23 @@ itemsBox,
 discount
 );
 
+/* DISTRIBUCIÓN DEL PEDIDO: DATOS A LA IZQUIERDA / GESTIÓN A LA DERECHA */
+
+const layout=document.createElement("div");
+layout.className="order-layout";
+
+const infoColumn=document.createElement("div");
+infoColumn.className="order-info-column";
+infoColumn.append(top,details);
+
+const actionsColumn=document.createElement("div");
+actionsColumn.className="order-actions-column";
+
+const actionsTitle=document.createElement("div");
+actionsTitle.className="order-actions-title";
+actionsTitle.textContent="Gestión del pedido";
+actionsColumn.append(actionsTitle);
+
 /* PEDIDOS ARCHIVADOS: SOLO PERMITIR RESTAURAR */
 
 if(order.archived_at){
@@ -2518,7 +2590,9 @@ restore.type="button";
 restore.className="secondary";
 restore.textContent="Restaurar pedido";
 restore.addEventListener("click",()=>archiveOrder(order.id,"restore",restore));
-card.append(top,details,restore);
+actionsColumn.append(restore);
+layout.append(infoColumn,actionsColumn);
+card.append(layout);
 list.append(card);
 return;
 }
@@ -2588,6 +2662,8 @@ labelURL,
 save
 );
 
+actionsColumn.append(edit);
+
 if(["shipped","delivered","cancelled"].includes(order.order_status)){
 const archive=document.createElement("button");
 archive.type="button";
@@ -2598,7 +2674,8 @@ archive.addEventListener("click",()=>archiveOrder(order.id,"archive",archive));
 edit.append(archive);
 }
 
-card.append(top,details,edit);
+layout.append(infoColumn,actionsColumn);
+card.append(layout);
 list.append(card);
 });
 }
