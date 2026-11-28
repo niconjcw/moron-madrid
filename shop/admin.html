@@ -741,9 +741,7 @@ Seleccioná todas las fotos juntas. La primera será la principal y las demás q
       </select>
       <p class="hint">Elegí un producto ya cargado en la tienda. El enlace se genera automáticamente.</p>
 
-      <label for="portfolio-order">Orden</label>
-      <input id="portfolio-order" type="number" min="0" step="1" value="0" required>
-      <p class="hint">Los números más bajos aparecen primero en la grilla.</p>
+      <p class="hint">Las imágenes nuevas aparecen automáticamente primero en el portfolio.</p>
 
       <button type="submit" id="portfolio-save">Guardar imagen</button>
       <button type="button" id="portfolio-cancel" class="secondary" hidden>Cancelar edición</button>
@@ -1877,7 +1875,6 @@ function resetPortfolioForm(){
   document.getElementById("portfolio-save").textContent="Guardar imagen";
   document.getElementById("portfolio-cancel").hidden=true;
   document.getElementById("portfolio-preview").replaceChildren();
-  document.getElementById("portfolio-order").value=portfolioItems.length;
 }
 
 async function loadPortfolio(){
@@ -1891,7 +1888,6 @@ async function loadPortfolio(){
     if(!response.ok)throw new Error(data.error||"No se pudo cargar el portfolio.");
     portfolioItems=data.items||[];
     renderPortfolioItems();
-    if(!editingPortfolioId)document.getElementById("portfolio-order").value=portfolioItems.length;
   }catch(error){
     list.textContent=error.message;
   }
@@ -1929,7 +1925,6 @@ function renderPortfolioItems(){
     const details=document.createElement("div");
     details.className="product-info";
     details.textContent=(item.category==="coleccion"?"Colección":"Estudio")+
-      " · Orden "+Number(item.sort_order||0)+
       (item.product_name?" · Producto: "+item.product_name:"");
     info.append(name,details);
     main.append(image,info);
@@ -1961,7 +1956,6 @@ function editPortfolioItem(item){
   document.getElementById("portfolio-image").required=false;
   document.getElementById("portfolio-category").value=item.category||"coleccion";
   document.getElementById("portfolio-caption").value=item.caption||"";
-  document.getElementById("portfolio-order").value=item.sort_order??0;
   document.getElementById("portfolio-product").value=item.product_id||"";
   document.getElementById("portfolio-form-title").textContent="Portfolio · Editar imagen";
   document.getElementById("portfolio-save").textContent="Guardar cambios";
@@ -2016,8 +2010,7 @@ document.getElementById("portfolio-form").addEventListener("submit",async event=
       category:document.getElementById("portfolio-category").value,
       caption:document.getElementById("portfolio-caption").value.trim(),
       product_id:productId,
-      product_name:product?product.textContent:null,
-      sort_order:Number(document.getElementById("portfolio-order").value)
+      product_name:product?product.textContent:null
     };
 
     const response=await fetch(editingPortfolioId
