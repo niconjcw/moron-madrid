@@ -2582,6 +2582,16 @@ actionsTitle.className="order-actions-title";
 actionsTitle.textContent="Gestión del pedido";
 actionsColumn.append(actionsTitle);
 
+/* ELIMINAR PEDIDO — ACCIÓN DEFINITIVA */
+
+const removeOrder=document.createElement("button");
+removeOrder.type="button";
+removeOrder.className="secondary";
+removeOrder.textContent="Eliminar pedido";
+removeOrder.style.marginTop="10px";
+removeOrder.addEventListener("click",()=>deleteOrder(order.id,order.order_number,removeOrder));
+actionsColumn.append(removeOrder);
+
 /* PEDIDOS ARCHIVADOS: SOLO PERMITIR RESTAURAR */
 
 if(order.archived_at){
@@ -2678,6 +2688,30 @@ layout.append(infoColumn,actionsColumn);
 card.append(layout);
 list.append(card);
 });
+}
+
+async function deleteOrder(id,orderNumber,button){
+const label=orderNumber!=null?"#"+orderNumber:"este pedido";
+if(!confirm("¿Eliminar definitivamente el pedido "+label+"? Esta acción no se puede deshacer."))return;
+
+button.disabled=true;
+button.textContent="Eliminando...";
+
+try{
+const response=await fetch(API+"/admin/orders/"+encodeURIComponent(id),{
+method:"DELETE",
+headers:{Authorization:"Bearer "+token()}
+});
+const data=await response.json();
+if(!response.ok)throw new Error(data.error||"No se pudo eliminar el pedido.");
+
+message.textContent="Pedido eliminado definitivamente.";
+await loadOrders();
+}catch(error){
+message.textContent=error.message;
+button.disabled=false;
+button.textContent="Eliminar pedido";
+}
 }
 
 async function archiveOrder(id,action,button){
