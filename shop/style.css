@@ -898,3 +898,16 @@ a:hover {
     display: none !important;
   }
 }
+
+/* =========================================
+   LINK DE CATEGORÍA EN PRODUCTO
+========================================= */
+
+.product-category,
+.product-category:link,
+.product-category:visited,
+.product-category:hover,
+.product-category:active {
+  color: #000;
+  text-decoration: none;
+}
