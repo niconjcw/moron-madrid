@@ -840,12 +840,15 @@
 
 
   <script>
-    /* FILTROS DEL PORTFOLIO: INICIO = TODAS LAS IMÁGENES */
+    /* PORTFOLIO DINÁMICO + FILTROS */
     (() => {
-      const items = [...document.querySelectorAll(".portfolio-item")];
+      const grid = document.getElementById("portfolioGrid");
       const filters = [...document.querySelectorAll("[data-portfolio-filter]")];
+      let activeCategory = "todos";
+
       function setFilter(category) {
-        items.forEach(item => {
+        activeCategory = category;
+        grid.querySelectorAll(".portfolio-item").forEach(item => {
           item.hidden = category !== "todos" && item.dataset.category !== category;
         });
         filters.forEach(link => {
@@ -858,6 +861,7 @@
           window.scrollTo({ top: 0, behavior: "smooth" });
         }
       }
+
       filters.forEach(link => link.addEventListener("click", event => {
         event.preventDefault();
         setFilter(link.dataset.portfolioFilter);
@@ -865,9 +869,47 @@
         if (target === "#nosotros" || target === "#contacto") return;
         history.replaceState(null, "", target);
       }));
+
       setFilter("todos");
+
+      /* Las imágenes administradas reemplazan la grilla estática cuando hay contenido en el Admin. */
+      fetch("https://moron-madrid-api.moronmadrid.workers.dev/portfolio")
+        .then(response => {
+          if (!response.ok) throw new Error("No se pudo cargar el portfolio.");
+          return response.json();
+        })
+        .then(data => {
+          const items = Array.isArray(data.items) ? data.items : [];
+          if (!items.length) return;
+
+          const fragment = document.createDocumentFragment();
+          items.forEach((item, index) => {
+            const article = document.createElement("article");
+            article.className = "portfolio-item";
+            article.dataset.category = item.category || "coleccion";
+            article.style.setProperty("--item", String(index + 1));
+
+            const image = document.createElement("img");
+            image.src = item.image_url;
+            image.alt = item.caption || "Morón Madrid portfolio";
+            image.loading = "lazy";
+            article.append(image);
+
+            if (item.caption) {
+              const caption = document.createElement("p");
+              caption.className = "caption";
+              caption.textContent = item.caption;
+              article.append(caption);
+            }
+            fragment.append(article);
+          });
+
+          grid.replaceChildren(fragment);
+          setFilter(activeCategory);
+        })
+        .catch(error => console.warn("Portfolio dinámico:", error));
     })();
-  </script>
+
 
 </body>
 </html>
