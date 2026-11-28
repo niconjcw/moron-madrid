@@ -44,7 +44,7 @@
         </div>
 
         <a href="./" class="logo" aria-label="Morón Madrid">
-          <img src="../sticker.png" alt="morón madrid">
+          <img src="/home/images/sticker.png" alt="morón madrid">
         </a>
 
         <div class="header-right">
@@ -79,7 +79,7 @@
           </button>
 
           <a href="./" class="mobile-logo" aria-label="Morón Madrid">
-            <img src="../sticker.png" alt="morón madrid">
+            <img src="/home/images/sticker.png" alt="morón madrid">
           </a>
 
           <a href="#" class="cart-icon mobile-cart"
