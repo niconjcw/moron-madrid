@@ -1,9 +1,12 @@
 
 /* =====================================================
    MORÓN MADRID — HEADER COMPARTIDO
+   Encabezado, navegación y categorías
    ===================================================== */
 
 (() => {
+  "use strict";
+
   const API_URL = "https://moron-madrid-api.moronmadrid.workers.dev";
 
   function renderHeader() {
@@ -18,16 +21,18 @@
       : `<a href="./">ver todo</a>`;
 
     const header = `
-      <div class="announcement-bar">
+      <div class="announcement-bar" style="background-color: #dcd63b;">
         <marquee>3 cuotas sin interés / -5% por transferencia / envíos a todo el país /</marquee>
       </div>
 
       <header class="site-header">
+
         <div class="header-left">
           <a href="./">inicio</a>
 
           <div class="nav-group">
-            <button type="button" class="nav-button" id="products-toggle" aria-expanded="false">
+            <button class="nav-button" id="products-toggle"
+              type="button" aria-expanded="false">
               productos <i class="fas fa-angle-down"></i>
             </button>
 
@@ -38,13 +43,14 @@
           </div>
         </div>
 
-        <a href="./" class="logo" aria-label="Morón Madrid — Inicio">
+        <a href="./" class="logo" aria-label="Morón Madrid">
           <img src="../sticker.png" alt="morón madrid">
         </a>
 
         <div class="header-right">
           <div class="nav-group">
-            <button type="button" class="nav-button" id="info-toggle" aria-expanded="false">
+            <button class="nav-button" id="info-toggle"
+              type="button" aria-expanded="false">
               información <i class="fas fa-angle-down"></i>
             </button>
 
@@ -67,8 +73,8 @@
         </div>
 
         <div class="mobile-header">
-          <button type="button" class="mobile-menu-button" id="mobile-menu-toggle"
-            aria-label="Abrir menú" aria-expanded="false">
+          <button class="mobile-menu-button" id="mobile-menu-toggle"
+            type="button" aria-label="Abrir menú" aria-expanded="false">
             <span></span><span></span><span></span>
           </button>
 
@@ -76,7 +82,8 @@
             <img src="../sticker.png" alt="morón madrid">
           </a>
 
-          <a href="#" class="cart-icon mobile-cart" title="Carrito" aria-label="Carrito">
+          <a href="#" class="cart-icon mobile-cart"
+            title="Carrito" aria-label="Carrito">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.7a2 2 0 0 0 1.9-1.4L22 8H6"/>
               <circle cx="10" cy="20" r="1"/>
@@ -84,16 +91,17 @@
             </svg>
           </a>
         </div>
+
       </header>
 
       <nav class="mobile-panel" id="mobile-panel" hidden>
-        <button type="button" class="mobile-close" id="mobile-close"
-          aria-label="Cerrar menú">×</button>
+        <button class="mobile-close" id="mobile-close"
+          type="button" aria-label="Cerrar menú">×</button>
 
         <a href="./">inicio</a>
 
-        <button type="button" class="mobile-section-button"
-          id="mobile-products-toggle" aria-expanded="false">
+        <button class="mobile-section-button" id="mobile-products-toggle"
+          type="button" aria-expanded="false">
           productos <i class="fas fa-angle-down"></i>
         </button>
 
@@ -101,8 +109,8 @@
           ${mobileCategoryAll}
         </div>
 
-        <button type="button" class="mobile-section-button"
-          id="mobile-info-toggle" aria-expanded="false">
+        <button class="mobile-section-button" id="mobile-info-toggle"
+          type="button" aria-expanded="false">
           información <i class="fas fa-angle-down"></i>
         </button>
 
@@ -117,87 +125,140 @@
     `;
 
     const mount = document.getElementById("site-header");
-    if (mount) mount.innerHTML = header;
 
-    initializeMenu();
-    if (!isCatalogPage) loadCategoryLinks();
+    if (!mount) {
+      console.warn("No se encontró el contenedor #site-header.");
+      return;
+    }
+
+    mount.innerHTML = header;
+
+    /*
+      En el catálogo, index.html conserva el control de:
+      - menú desktop
+      - menú mobile
+      - filtros de categorías
+
+      En las páginas internas, este archivo controla el menú.
+    */
+
+    if (!isCatalogPage) {
+      initializeMenu();
+      loadCategoryLinks();
+    }
   }
 
+  /* =====================================================
+     CATEGORÍAS EN PÁGINAS INTERNAS
+     ===================================================== */
+
   async function loadCategoryLinks() {
+    const desktop = document.getElementById("dynamic-categories");
+    const mobile = document.getElementById("mobile-categories");
+
+    if (!desktop || !mobile) return;
+
     try {
       const response = await fetch(`${API_URL}/categories`);
-      if (!response.ok) throw new Error("No se pudieron cargar las categorías.");
+
+      if (!response.ok) {
+        throw new Error("No se pudieron cargar las categorías.");
+      }
 
       const data = await response.json();
-      const categories = Array.isArray(data.categories) ? data.categories : [];
 
-      const desktop = document.getElementById("dynamic-categories");
-      const mobile = document.getElementById("mobile-categories");
-
-      if (!desktop || !mobile) return;
+      const categories = Array.isArray(data.categories)
+        ? data.categories
+        : [];
 
       categories.forEach(category => {
         const href = `./?category=${encodeURIComponent(category.id)}`;
 
         const desktopLink = document.createElement("a");
         desktopLink.href = href;
-        desktopLink.textContent = category.name.toLowerCase();
+        desktopLink.textContent = String(category.name).toLowerCase();
 
         const mobileLink = document.createElement("a");
         mobileLink.href = href;
-        mobileLink.textContent = category.name.toLowerCase();
+        mobileLink.textContent = String(category.name).toLowerCase();
 
         desktop.appendChild(desktopLink);
         mobile.appendChild(mobileLink);
       });
+
     } catch (error) {
       console.error("Error al cargar categorías:", error);
     }
   }
 
+  /* =====================================================
+     MENÚ DE PÁGINAS INTERNAS
+     ===================================================== */
+
   function initializeMenu() {
     const productsToggle = document.getElementById("products-toggle");
     const infoToggle = document.getElementById("info-toggle");
+
     const productsDropdown = document.getElementById("products-dropdown");
     const infoDropdown = document.getElementById("info-dropdown");
 
     const mobilePanel = document.getElementById("mobile-panel");
     const mobileMenuButton = document.getElementById("mobile-menu-toggle");
+    const mobileCloseButton = document.getElementById("mobile-close");
 
-    if (productsToggle && infoToggle) {
-      productsToggle.addEventListener("click", () => {
-        const opening = productsDropdown.hidden;
-        productsDropdown.hidden = !opening;
-        infoDropdown.hidden = true;
+    /* DESPLEGABLES DESKTOP */
 
-        productsToggle.setAttribute("aria-expanded", String(opening));
-        infoToggle.setAttribute("aria-expanded", "false");
+    productsToggle?.addEventListener("click", () => {
+      const opening = productsDropdown.hidden;
+
+      productsDropdown.hidden = !opening;
+      infoDropdown.hidden = true;
+
+      productsToggle.setAttribute("aria-expanded", String(opening));
+      infoToggle.setAttribute("aria-expanded", "false");
+    });
+
+    infoToggle?.addEventListener("click", () => {
+      const opening = infoDropdown.hidden;
+
+      infoDropdown.hidden = !opening;
+      productsDropdown.hidden = true;
+
+      infoToggle.setAttribute("aria-expanded", String(opening));
+      productsToggle.setAttribute("aria-expanded", "false");
+    });
+
+    document.addEventListener("click", event => {
+      if (event.target.closest(".nav-group")) return;
+
+      if (productsDropdown) productsDropdown.hidden = true;
+      if (infoDropdown) infoDropdown.hidden = true;
+
+      productsToggle?.setAttribute("aria-expanded", "false");
+      infoToggle?.setAttribute("aria-expanded", "false");
+    });
+
+    /* MENÚ MOBILE */
+
+    function openMobileMenu() {
+      if (!mobilePanel) return;
+
+      mobilePanel.hidden = false;
+
+      requestAnimationFrame(() => {
+        mobilePanel.classList.add("is-open");
       });
 
-      infoToggle.addEventListener("click", () => {
-        const opening = infoDropdown.hidden;
-        infoDropdown.hidden = !opening;
-        productsDropdown.hidden = true;
-
-        infoToggle.setAttribute("aria-expanded", String(opening));
-        productsToggle.setAttribute("aria-expanded", "false");
-      });
-
-      document.addEventListener("click", event => {
-        if (!event.target.closest(".nav-group")) {
-          productsDropdown.hidden = true;
-          infoDropdown.hidden = true;
-          productsToggle.setAttribute("aria-expanded", "false");
-          infoToggle.setAttribute("aria-expanded", "false");
-        }
-      });
+      mobileMenuButton?.setAttribute("aria-expanded", "true");
+      document.body.style.overflow = "hidden";
     }
 
     function closeMobileMenu() {
-      if (!mobilePanel || !mobileMenuButton) return;
+      if (!mobilePanel) return;
 
       mobilePanel.classList.remove("is-open");
-      mobileMenuButton.setAttribute("aria-expanded", "false");
+
+      mobileMenuButton?.setAttribute("aria-expanded", "false");
       document.body.style.overflow = "";
 
       setTimeout(() => {
@@ -207,21 +268,10 @@
       }, 350);
     }
 
-    window.closeMobileMenu = closeMobileMenu;
-
-    function openMobileMenu() {
-      if (!mobilePanel || !mobileMenuButton) return;
-
-      mobilePanel.hidden = false;
-      requestAnimationFrame(() => mobilePanel.classList.add("is-open"));
-
-      mobileMenuButton.setAttribute("aria-expanded", "true");
-      document.body.style.overflow = "hidden";
-    }
-
     mobileMenuButton?.addEventListener("click", openMobileMenu);
-    document.getElementById("mobile-close")
-      ?.addEventListener("click", closeMobileMenu);
+    mobileCloseButton?.addEventListener("click", closeMobileMenu);
+
+    /* SUBMENÚS MOBILE */
 
     function toggleMobileSection(buttonId, submenuId) {
       const button = document.getElementById(buttonId);
@@ -231,13 +281,23 @@
 
       button.addEventListener("click", () => {
         const opening = !submenu.classList.contains("is-open");
+
         submenu.classList.toggle("is-open", opening);
         button.setAttribute("aria-expanded", String(opening));
       });
     }
 
-    toggleMobileSection("mobile-products-toggle", "mobile-categories");
-    toggleMobileSection("mobile-info-toggle", "mobile-info-links");
+    toggleMobileSection(
+      "mobile-products-toggle",
+      "mobile-categories"
+    );
+
+    toggleMobileSection(
+      "mobile-info-toggle",
+      "mobile-info-links"
+    );
+
+    /* CERRAR CON ESCAPE */
 
     document.addEventListener("keydown", event => {
       if (event.key !== "Escape") return;
@@ -252,9 +312,14 @@
     });
   }
 
+  /* =====================================================
+     INICIO
+     ===================================================== */
+
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", renderHeader);
   } else {
     renderHeader();
   }
+
 })();
