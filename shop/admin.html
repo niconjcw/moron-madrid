@@ -77,6 +77,24 @@ button.secondary{background:transparent;color:#000}
 .admin-tab:hover{opacity:1;color:#000}
 .admin-tab.active{color:#000;border-bottom-color:#000}
 
+/* AVISO DE NUEVAS VENTAS */
+.sales-tab-count{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:19px;
+  height:19px;
+  margin-left:7px;
+  padding:0 5px;
+  border-radius:50px;
+  background:#dcd63b;
+  color:#171717;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:0;
+  vertical-align:middle;
+}
+
 /* NEWSLETTER */
 
 .newsletter-header{display:flex;justify-content:space-between;align-items:center;gap:20px;margin:35px 0 25px}
@@ -489,10 +507,10 @@ button.secondary:hover{background:#eee}
 <button type="button" class="admin-tab active" data-tab="new-product-panel">NUEVO PRODUCTO</button>
 <button type="button" class="admin-tab" data-tab="products-panel">PRODUCTOS</button>
 <button type="button" class="admin-tab" data-tab="categories-panel">CATEGORÍAS</button>
-<button type="button" class="admin-tab" data-tab="newsletter-panel">NEWSLETTER</button>
+<button type="button" class="admin-tab" data-tab="orders-panel">VENTAS <span id="new-sales-count" class="sales-tab-count" hidden>0</span></button>
 <button type="button" class="admin-tab" data-tab="discounts-panel">PAGOS</button>
-<button type="button" class="admin-tab" data-tab="orders-panel">VENTAS</button>
 <button type="button" class="admin-tab" data-tab="portfolio-panel">PORTFOLIO</button>
+<button type="button" class="admin-tab" data-tab="newsletter-panel">NEWSLETTER</button>
 </nav>
 
 <!-- PANEL NUEVO PRODUCTO -->
@@ -826,6 +844,7 @@ dashboard.hidden=false;
 setActiveTab("new-product-panel");
 await loadCategories();
 await loadProducts();
+await loadOrders();
 }
 
 /* PESTAÑAS */
@@ -2319,6 +2338,12 @@ throw new Error(data.error||"No se pudieron cargar los pedidos.");
 }
 
 orders=data.orders||[];
+
+/* Las ventas nuevas son los pedidos que siguen pendientes. */
+const newSales=orders.filter(order=>order.order_status==="pending").length;
+const salesBadge=document.getElementById("new-sales-count");
+salesBadge.textContent=String(newSales);
+salesBadge.hidden=newSales===0;
 
 const filtered=filter
 ?orders.filter(order=>order.order_status===filter)
