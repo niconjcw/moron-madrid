@@ -231,6 +231,239 @@ header{margin-bottom:50px}
     flex-direction:column;
   }
 }  
+
+
+/* REDISEÑO ADMIN — EDITORIAL Y COMPACTO */
+
+body{
+  padding:24px clamp(20px,3.5vw,56px);
+  background:#f5f5f5;
+  color:#171717;
+  font-family:Roboto,Arial,sans-serif;
+}
+
+body > header{
+  max-width:1500px;
+  margin:0 auto 38px;
+  padding-bottom:18px;
+  border-bottom:1px solid #dedede;
+}
+
+body > header img{width:58px}
+body > header span{
+  font-size:10px;
+  letter-spacing:.16em;
+  color:#777;
+}
+
+main{
+  width:100%;
+  max-width:1500px;
+  margin:0 auto;
+}
+
+#login{
+  width:min(100%,420px);
+  margin:10vh auto 0;
+  padding:34px;
+  background:#fff;
+  border:1px solid #e5e5e5;
+}
+
+#login h1{margin:0 0 28px;font-size:22px}
+#login button{margin-top:8px}
+
+#dashboard{
+  display:grid;
+  grid-template-columns:190px minmax(0,1fr);
+  column-gap:clamp(28px,4vw,64px);
+  align-items:start;
+}
+
+#dashboard > h1{
+  grid-column:1/-1;
+  margin:0 0 28px;
+  padding-bottom:20px;
+  border-bottom:1px solid #dedede;
+  font-size:23px;
+  letter-spacing:-.035em;
+}
+
+.admin-tabs{
+  grid-column:1;
+  grid-row:2;
+  position:sticky;
+  top:24px;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:3px;
+  margin:0;
+  padding:8px 0;
+  overflow:visible;
+  border:0;
+  border-right:1px solid #dedede;
+}
+
+.admin-tab{
+  width:100%;
+  padding:12px 14px;
+  text-align:left;
+  border:0;
+  border-left:2px solid transparent;
+  background:transparent;
+  color:#888;
+  font-size:11px;
+  letter-spacing:.075em;
+  transition:background .18s,color .18s;
+}
+
+.admin-tab:hover{
+  background:#ececec;
+  color:#111;
+}
+
+.admin-tab.active{
+  color:#111;
+  border-left-color:#171717;
+  background:#eaeaea;
+}
+
+#dashboard > section[id$="-panel"]{
+  grid-column:2;
+  grid-row:2;
+  min-width:0;
+}
+
+#dashboard > section[id$="-panel"] h2{
+  margin-top:0;
+  margin-bottom:18px;
+  font-size:17px;
+}
+
+.form-section,.variants-section,.category-manager,.discount-section{
+  margin-top:24px;
+  padding:24px;
+  border:1px solid #e5e5e5;
+  background:#fff;
+}
+
+.form-section:first-child{margin-top:0}
+.variants-section,.discount-section{padding:20px;margin-top:22px}
+.form-section > h2,.discount-section > h2{margin-top:0}
+
+input,textarea,.category-select,.newsletter-filter,.order-status{
+  border:1px solid #d7d7d7;
+  border-radius:0;
+  background:#fff;
+  padding:11px 12px;
+  font-size:13px;
+}
+
+input:focus,textarea:focus,select:focus{
+  outline:1px solid #171717;
+  outline-offset:1px;
+}
+
+label{
+  margin:13px 0 7px;
+  font-size:12px;
+  color:#555;
+}
+
+textarea{min-height:115px}
+button{
+  padding:11px 15px;
+  font-size:11px;
+  letter-spacing:.045em;
+  transition:opacity .18s,background .18s;
+}
+button.secondary{
+  border:1px solid #d0d0d0;
+  background:#fff;
+}
+button.secondary:hover{background:#eee}
+
+.hint{font-size:11px;color:#888}
+#message{font-size:12px}
+
+.photo-list{
+  grid-template-columns:repeat(auto-fill,minmax(115px,1fr));
+  gap:10px;
+}
+.photo-card{border-color:#e2e2e2}
+.photo-card img{height:125px}
+
+.product,.newsletter-row,.discount-list-item,.order-card,.category-row{
+  border-color:#e5e5e5;
+}
+.product{padding:14px 0}
+.product-name{font-size:13px}
+.product-info{font-size:11px}
+.newsletter-row{padding:12px 0}
+.order-card{padding:18px 0}
+.order-details{background:#f1f1f1;font-size:12px}
+.orders-header{margin:0 0 18px}
+.newsletter-header{margin:0 0 18px}
+#logout{max-width:180px;margin-top:34px}
+
+@media(max-width:760px){
+  body{padding:18px}
+  body > header{margin-bottom:28px}
+  #dashboard{
+    grid-template-columns:minmax(0,1fr);
+    row-gap:20px;
+  }
+  #dashboard > h1{
+    grid-column:1;
+    grid-row:1;
+    margin-bottom:0;
+  }
+  .admin-tabs{
+    grid-column:1;
+    grid-row:2;
+    position:static;
+    flex-direction:row;
+    flex-wrap:nowrap;
+    gap:8px;
+    padding:0 0 10px;
+    border-right:0;
+    border-bottom:1px solid #dedede;
+    overflow-x:auto;
+  }
+  .admin-tab{
+    width:auto;
+    flex:0 0 auto;
+    padding:10px 12px;
+    border-left:0;
+    border-bottom:2px solid transparent;
+    text-align:center;
+  }
+  .admin-tab.active{
+    border-left:0;
+    border-bottom-color:#171717;
+  }
+  #dashboard > section[id$="-panel"]{
+    grid-column:1;
+    grid-row:3;
+  }
+  .form-section,.discount-section,.category-manager{
+    padding:18px;
+  }
+}
+
+@media(min-width:761px) and (max-width:1050px){
+  #dashboard{grid-template-columns:155px minmax(0,1fr);column-gap:24px}
+  .admin-tabs{gap:0}
+  .admin-tab{padding:11px 9px;font-size:10px}
+}
+
+@media(max-width:550px){
+  #login{padding:24px}
+  .form-section,.discount-section,.category-manager{padding:15px}
+  .newsletter-header{flex-direction:column;gap:8px}
+}
+
 </style>
 </head>
 
