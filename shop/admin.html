@@ -163,6 +163,7 @@ header{margin-bottom:50px}
 .discount-list-top{flex-direction:column}
 .discount-form-actions{flex-direction:column}
 .photo-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+.portfolio-admin-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 }
 
 /* VENTAS */
@@ -1981,7 +1982,8 @@ function renderPortfolioItems(){
       const toIndex=reordered.findIndex(entry=>entry.id===toId);
       if(fromIndex<0||toIndex<0)return;
       const [moved]=reordered.splice(fromIndex,1);
-      reordered.splice(toIndex,0,moved);
+      const insertIndex=fromIndex<toIndex?toIndex-1:toIndex;
+      reordered.splice(insertIndex,0,moved);
       portfolioItems=reordered;
       renderPortfolioItems();
       await savePortfolioOrder();
