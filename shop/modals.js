@@ -1,38 +1,164 @@
 
-/* =====================================================
+/* =========================================================
    MORÓN MADRID — MODALES COMPARTIDOS
    Contacto + Newsletter
-   ===================================================== */
+   ========================================================= */
 
 (() => {
   "use strict";
 
   const API_URL = "https://moron-madrid-api.moronmadrid.workers.dev";
+  const NEWSLETTER_API = `${API_URL}/newsletter`;
 
-  /* =====================================================
+  /* =========================================================
+     EVITAR INICIALIZACIÓN DUPLICADA
+     ========================================================= */
+
+  if (window.MMModalsInitialized) return;
+  window.MMModalsInitialized = true;
+
+  /* =========================================================
      ESTILOS
-     ===================================================== */
+     ========================================================= */
 
   const styles = document.createElement("style");
 
   styles.textContent = `
-    @font-face {
-      font-display: block;
-      font-family: Roboto;
-      src: url(https://assets.brevo.com/font/Roboto/Latin/normal/normal/7529907e9eaf8ebb5220c5f9850e3811.woff2) format("woff2");
+    /* NEWSLETTER */
+
+    .custom-popup-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+      background: rgba(0,0,0,.4);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      z-index: 100000;
     }
 
-    /* MODAL DE CONTACTO */
+    .custom-popup-overlay.is-open {
+      display: flex;
+    }
+
+    .custom-popup-container {
+      position: relative;
+      width: min(65vw, 650px);
+      aspect-ratio: 1 / 1;
+      background-image: url("https://i.ibb.co/4ZD4v21F/Stickerpopup.png");
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .custom-popup-content {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .custom-popup-close {
+      position: absolute;
+      top: 25%;
+      right: 10%;
+      z-index: 10;
+      border: none;
+      border-radius: 20px;
+      background: #f5f5f5;
+      color: #333;
+      font-size: 24px;
+      font-weight: bold;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    #custom-form-wrapper {
+      width: 250px;
+      margin: 0 auto;
+      text-align: center;
+      background: transparent;
+      transform: rotate(-18deg) translateY(-5px) translateX(-5px);
+    }
+
+    #custom-form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #custom-form input.input {
+      display: block;
+      width: 100%;
+      margin: 18px 0 0;
+      padding: 2px 0;
+      border: none;
+      background: transparent;
+      color: #fff;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 600;
+      text-transform: lowercase;
+      outline: none;
+      box-shadow: none;
+    }
+
+    #custom-form input::placeholder {
+      color: rgba(255,255,255,.9);
+      text-align: center;
+    }
+
+    .custom-submit-btn {
+      display: block;
+      width: auto;
+      margin: 4px auto 0;
+      padding: 4px 10px;
+      border: none;
+      background: transparent;
+      color: #fff;
+      font-family: Helvetica, sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+      text-transform: lowercase;
+      cursor: pointer;
+    }
+
+    .custom-submit-btn:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    .custom-response-msg {
+      display: none;
+      margin-top: 5px;
+      color: #fff;
+      font-family: Helvetica, sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: lowercase;
+    }
+
+    /* CONTACTO */
 
     .contact-modal-overlay {
       position: fixed;
       inset: 0;
-      z-index: 100000;
+      z-index: 100001;
       display: none;
       align-items: center;
       justify-content: center;
       padding: 20px;
-      background: rgba(0, 0, 0, .28);
+      background: rgba(0,0,0,.28);
       backdrop-filter: blur(7px);
       -webkit-backdrop-filter: blur(7px);
     }
@@ -60,7 +186,6 @@
       border: 0;
       background: transparent;
       color: #000;
-      font: inherit;
       font-size: 27px;
       line-height: 1;
       cursor: pointer;
@@ -115,8 +240,8 @@
       color: #000;
       font: inherit;
       font-size: 12px;
-      cursor: pointer;
       text-transform: lowercase;
+      cursor: pointer;
     }
 
     .contact-submit:disabled {
@@ -138,175 +263,103 @@
       opacity: 0 !important;
     }
 
-    /* POPUP NEWSLETTER */
-
-    .custom-popup-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 99999;
-      display: none;
-      justify-content: center;
-      align-items: center;
-      background: rgba(0, 0, 0, .4);
-      backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
-    }
-
-    .custom-popup-container {
-      position: relative;
-      width: 65%;
-      height: 65%;
-      background-image: url("https://i.ibb.co/4ZD4v21F/Stickerpopup.png");
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .custom-popup-close {
-      position: absolute;
-      top: 25%;
-      right: 10%;
-      background: #f5f5f5;
-      border-radius: 20px;
-      border: none;
-      font-size: 24px;
-      font-weight: bold;
-      color: #333;
-      cursor: pointer;
-      z-index: 10;
-      line-height: 1;
-    }
-
-    .custom-popup-content {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    #custom-form-wrapper {
-      background: transparent !important;
-      transform: rotate(-18deg) translateY(-5px) translateX(-5px);
-      width: 250px;
-      margin: 0 auto !important;
-      text-align: center !important;
-    }
-
-    #custom-form {
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      justify-content: center !important;
-      width: 100% !important;
-    }
-
-    #custom-form input.input {
-      background: transparent !important;
-      border: none !important;
-      border-bottom: 0 solid #fff !important;
-      color: #fff !important;
-      text-align: center !important;
-      font-size: 15px !important;
-      font-weight: 600 !important;
-      width: 100% !important;
-      padding: 2px 0 !important;
-      outline: none !important;
-      box-shadow: none !important;
-      text-transform: lowercase;
-      margin: 18px 0 auto !important;
-      display: block !important;
-    }
-
-    #custom-form input::placeholder {
-      color: rgba(255, 255, 255, .9) !important;
-      text-align: center !important;
-    }
-
-    .custom-submit-btn {
-      background: transparent !important;
-      border: 0 !important;
-      color: #fff !important;
-      font-family: Helvetica, sans-serif !important;
-      font-size: 13px !important;
-      font-weight: 700 !important;
-      padding: 4px 10px !important;
-      cursor: pointer !important;
-      margin: 4px auto 0 !important;
-      transition: all .2s ease !important;
-      text-transform: lowercase;
-      display: block !important;
-      text-align: center !important;
-      width: auto !important;
-    }
-
-    .custom-submit-btn:hover {
-      opacity: .8;
-    }
-
-    .custom-submit-btn:disabled {
-      opacity: .6;
-      cursor: wait !important;
-    }
-
-    .custom-response-msg {
-      font-family: Helvetica, sans-serif;
-      font-size: 14px;
-      color: #fff;
-      font-weight: 700;
-      margin-top: 5px;
-      display: none;
-      text-transform: lowercase;
-    }
-
     @media (max-width: 600px) {
-      .contact-modal {
-        padding: 38px 24px 28px;
-      }
-
       .custom-popup-container {
-        width: 100%;
-        height: 75%;
+        width: min(95vw, 480px);
       }
 
       #custom-form-wrapper {
         width: 210px;
       }
 
-      .custom-popup-close {
-        top: 20%;
-        right: 8%;
+      .contact-modal {
+        padding: 38px 24px 28px;
       }
     }
   `;
 
   document.head.appendChild(styles);
 
-  /* =====================================================
-     HTML DE LOS MODALES
-     ===================================================== */
+  /* =========================================================
+     INSERTAR HTML DE LOS MODALES
+     ========================================================= */
 
-  const mount = document.createElement("div");
+  const modalMarkup = `
+    <!-- NEWSLETTER -->
+    <div class="custom-popup-overlay" id="heartPopup" aria-hidden="true">
+      <div class="custom-popup-container">
 
-  mount.innerHTML = `
+        <button
+          class="custom-popup-close"
+          id="closeHeartPopup"
+          type="button"
+          aria-label="Cerrar"
+        >&times;</button>
+
+        <div class="custom-popup-content">
+          <div id="custom-form-wrapper">
+
+            <form id="custom-form">
+              <div style="padding:0;width:100%;">
+                <input
+                  class="input"
+                  type="email"
+                  id="EMAIL"
+                  name="email"
+                  autocomplete="email"
+                  placeholder="tu email"
+                  required
+                >
+              </div>
+
+              <div style="padding:0;width:100%;text-align:center;">
+                <button
+                  type="submit"
+                  class="custom-submit-btn"
+                  id="customSubmitBtn"
+                >suscribite!</button>
+              </div>
+
+              <input
+                type="text"
+                name="website"
+                value=""
+                tabindex="-1"
+                autocomplete="off"
+                style="display:none;"
+              >
+            </form>
+
+            <div
+              id="status-message"
+              class="custom-response-msg"
+              role="status"
+              aria-live="polite"
+            ></div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- CONTACTO -->
-
-    <div class="contact-modal-overlay" id="contactModal"
-      aria-hidden="true">
-
-      <section class="contact-modal"
+    <div
+      class="contact-modal-overlay"
+      id="contactModal"
+      aria-hidden="true"
+    >
+      <section
+        class="contact-modal"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="contactModalTitle">
-
-        <button class="contact-modal-close"
+        aria-labelledby="contactModalTitle"
+      >
+        <button
+          class="contact-modal-close"
           id="closeContactModal"
           type="button"
-          aria-label="Cerrar">×</button>
+          aria-label="Cerrar"
+        >×</button>
 
         <h2 id="contactModalTitle">contacto</h2>
 
@@ -320,7 +373,8 @@
             autocomplete="name"
             maxlength="100"
             required
-            placeholder="tu nombre">
+            placeholder="tu nombre"
+          >
 
           <label for="contactEmail">email</label>
           <input
@@ -330,7 +384,8 @@
             autocomplete="email"
             maxlength="160"
             required
-            placeholder="tu@email.com">
+            placeholder="tu@email.com"
+          >
 
           <label for="contactMessage">mensaje</label>
           <textarea
@@ -339,7 +394,8 @@
             rows="4"
             maxlength="3000"
             required
-            placeholder="escribí tu mensaje..."></textarea>
+            placeholder="escribí tu mensaje..."
+          ></textarea>
 
           <input
             class="contact-honeypot"
@@ -347,144 +403,77 @@
             name="website"
             tabindex="-1"
             autocomplete="off"
-            aria-hidden="true">
+            aria-hidden="true"
+          >
 
           <button
             class="contact-submit"
             id="contactSubmit"
-            type="submit">
-            enviar mensaje ↗
-          </button>
+            type="submit"
+          >enviar mensaje ↗</button>
 
           <p
             class="contact-form-status"
             id="contactFormStatus"
             role="status"
-            aria-live="polite"></p>
+            aria-live="polite"
+          ></p>
 
         </form>
       </section>
     </div>
-
-    <!-- NEWSLETTER -->
-
-    <div class="custom-popup-overlay" id="heartPopup">
-
-      <div class="custom-popup-container">
-
-        <button
-          class="custom-popup-close"
-          id="closeHeartPopup"
-          type="button"
-          aria-label="Cerrar">×</button>
-
-        <div class="custom-popup-content">
-
-          <div id="custom-form-wrapper">
-
-            <form id="custom-form">
-
-              <div style="padding:0;width:100%;">
-                <input
-                  class="input"
-                  type="email"
-                  id="EMAIL"
-                  name="email"
-                  autocomplete="email"
-                  placeholder="tu email"
-                  required>
-              </div>
-
-              <div style="padding:0;width:100%;text-align:center;">
-                <button
-                  type="submit"
-                  class="custom-submit-btn"
-                  id="customSubmitBtn">
-                  suscribite!
-                </button>
-              </div>
-
-              <input
-                type="text"
-                name="website"
-                value=""
-                tabindex="-1"
-                autocomplete="off"
-                style="display:none;">
-
-            </form>
-
-            <div
-              id="status-message"
-              class="custom-response-msg"></div>
-
-          </div>
-        </div>
-      </div>
-    </div>
   `;
 
-  document.body.appendChild(mount);
-
-  /* =====================================================
-     REFERENCIAS
-     ===================================================== */
-
-  const contactModal = document.getElementById("contactModal");
-  const newsletterModal = document.getElementById("heartPopup");
-
-  const contactForm = document.getElementById("contactForm");
-  const contactStatus = document.getElementById("contactFormStatus");
-  const contactSubmit = document.getElementById("contactSubmit");
-
-  const newsletterForm = document.getElementById("custom-form");
-  const newsletterSubmit = document.getElementById("customSubmitBtn");
-  const newsletterStatus = document.getElementById("status-message");
-
-  /* =====================================================
-     APERTURA Y CIERRE
-     ===================================================== */
-
-  function updateBodyScroll() {
-    const contactOpen = contactModal.classList.contains("is-open");
-    const newsletterOpen = newsletterModal.style.display === "flex";
-
-    document.body.style.overflow =
-      contactOpen || newsletterOpen ? "hidden" : "";
+  if (!document.getElementById("heartPopup")) {
+    document.body.insertAdjacentHTML("beforeend", modalMarkup);
   }
 
-  function openContactModal() {
-    closeNewsletterModal(false);
+  /* =========================================================
+     ELEMENTOS
+     ========================================================= */
 
-    contactModal.classList.add("is-open");
-    contactModal.setAttribute("aria-hidden", "false");
+  const heartPopup = document.getElementById("heartPopup");
+  const contactModal = document.getElementById("contactModal");
 
+  const newsletterForm = document.getElementById("custom-form");
+  const newsletterButton = document.getElementById("customSubmitBtn");
+  const newsletterStatus = document.getElementById("status-message");
+
+  const contactForm = document.getElementById("contactForm");
+  const contactButton = document.getElementById("contactSubmit");
+  const contactStatus = document.getElementById("contactFormStatus");
+
+  /* =========================================================
+     CONTROL DEL SCROLL
+     ========================================================= */
+
+  function updateBodyScroll() {
+    const modalOpen =
+      heartPopup.classList.contains("is-open") ||
+      contactModal.classList.contains("is-open");
+
+    document.body.style.overflow = modalOpen ? "hidden" : "";
+  }
+
+  /* =========================================================
+     NEWSLETTER — ABRIR Y CERRAR
+     ========================================================= */
+
+  function openHeartPopup() {
+    if (localStorage.getItem("popupSubscribed")) return;
+
+    heartPopup.classList.add("is-open");
+    heartPopup.setAttribute("aria-hidden", "false");
     updateBodyScroll();
 
     setTimeout(() => {
-      document.getElementById("contactName").focus();
-    }, 50);
+      document.getElementById("EMAIL")?.focus();
+    }, 100);
   }
 
-  function closeContactModal() {
-    contactModal.classList.remove("is-open");
-    contactModal.setAttribute("aria-hidden", "true");
-    updateBodyScroll();
-  }
-
-  function openNewsletterModal() {
-    if (localStorage.getItem("popupSubscribed")) return;
-
-    closeContactModal();
-
-    localStorage.removeItem("popupDismissed");
-    newsletterModal.style.display = "flex";
-
-    updateBodyScroll();
-  }
-
-  function closeNewsletterModal(saveDismissal = true) {
-    newsletterModal.style.display = "none";
+  function closeHeartPopup(saveDismissal = true) {
+    heartPopup.classList.remove("is-open");
+    heartPopup.setAttribute("aria-hidden", "true");
 
     if (saveDismissal) {
       localStorage.setItem("popupDismissed", "true");
@@ -493,44 +482,143 @@
     updateBodyScroll();
   }
 
-  /* Compatibilidad con el nombre utilizado anteriormente */
+  window.closeHeartPopup = closeHeartPopup;
 
-  window.closeHeartPopup = closeNewsletterModal;
+  document
+    .getElementById("closeHeartPopup")
+    .addEventListener("click", () => closeHeartPopup());
 
-  /* Apertura desde encabezado y footer */
+  heartPopup.addEventListener("click", event => {
+    if (event.target === heartPopup) closeHeartPopup();
+  });
+
+  /* =========================================================
+     NEWSLETTER — APERTURA AUTOMÁTICA SOLO EN HOME
+     ========================================================= */
+
+  const currentPath = window.location.pathname.replace(/\/+$/, "");
+
+  const isShopHome =
+    /\/shop(?:\/index\.html)?$/.test(currentPath);
+
+  if (
+    isShopHome &&
+    !localStorage.getItem("popupSubscribed") &&
+    !localStorage.getItem("popupDismissed")
+  ) {
+    setTimeout(openHeartPopup, 1200);
+  }
+
+  /* =========================================================
+     NEWSLETTER — ABRIR DESDE EL FOOTER
+     ========================================================= */
 
   document.addEventListener("click", event => {
-    const contactLink = event.target.closest(".open-contact-modal");
+    const link = event.target.closest(
+      "#openNewsletterPopup, .newsletter-link"
+    );
 
-    const newsletterLink =
-      event.target.closest(".newsletter-link") ||
-      event.target.closest("#openNewsletterPopup");
+    if (!link) return;
 
-    if (contactLink) {
-      event.preventDefault();
-      openContactModal();
-    }
+    event.preventDefault();
 
-    if (newsletterLink) {
-      event.preventDefault();
-      openNewsletterModal();
+    if (localStorage.getItem("popupSubscribed")) return;
+
+    localStorage.removeItem("popupDismissed");
+    openHeartPopup();
+  });
+
+  /* =========================================================
+     NEWSLETTER — ENVÍO
+     ========================================================= */
+
+  newsletterForm.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const formData = new FormData(newsletterForm);
+    const email = String(formData.get("email") || "").trim();
+    const website = String(formData.get("website") || "").trim();
+
+    if (website) return;
+
+    newsletterButton.disabled = true;
+    newsletterButton.textContent = "enviando...";
+    newsletterStatus.style.display = "none";
+
+    try {
+      const response = await fetch(NEWSLETTER_API, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || data.suscripcion !== "correcta") {
+        throw new Error(data.mensaje || "Error al suscribirse");
+      }
+
+      localStorage.setItem("popupSubscribed", "true");
+      localStorage.setItem("popupDismissed", "true");
+
+      newsletterForm.style.display = "none";
+      newsletterStatus.textContent = "listo!";
+      newsletterStatus.style.display = "block";
+
+      setTimeout(() => {
+        closeHeartPopup(false);
+      }, 1000);
+
+    } catch (error) {
+      console.error("Error newsletter:", error);
+
+      newsletterStatus.textContent =
+        "no funcionó, intentá de nuevo";
+
+      newsletterStatus.style.display = "block";
+      newsletterButton.textContent = "suscribite!";
+      newsletterButton.disabled = false;
     }
   });
 
-  /* Eventos compartidos */
+  /* =========================================================
+     CONTACTO — ABRIR Y CERRAR
+     ========================================================= */
 
-  document.addEventListener("mm:open-contact", openContactModal);
-  document.addEventListener("mm:open-newsletter", openNewsletterModal);
+  function openContactModal(event) {
+    if (event) event.preventDefault();
 
-  /* Botones de cierre */
+    contactModal.classList.add("is-open");
+    contactModal.setAttribute("aria-hidden", "false");
+    updateBodyScroll();
 
-  document.getElementById("closeContactModal")
+    setTimeout(() => {
+      document.getElementById("contactName")?.focus();
+    }, 100);
+  }
+
+  function closeContactModal() {
+    contactModal.classList.remove("is-open");
+    contactModal.setAttribute("aria-hidden", "true");
+    updateBodyScroll();
+  }
+
+  window.openContactModal = openContactModal;
+  window.closeContactModal = closeContactModal;
+
+  document.addEventListener("click", event => {
+    const link = event.target.closest(".open-contact-modal");
+
+    if (link) {
+      openContactModal(event);
+    }
+  });
+
+  document
+    .getElementById("closeContactModal")
     .addEventListener("click", closeContactModal);
-
-  document.getElementById("closeHeartPopup")
-    .addEventListener("click", () => closeNewsletterModal(true));
-
-  /* Cerrar al hacer clic fuera */
 
   contactModal.addEventListener("click", event => {
     if (event.target === contactModal) {
@@ -538,28 +626,9 @@
     }
   });
 
-  newsletterModal.addEventListener("click", event => {
-    if (event.target === newsletterModal) {
-      closeNewsletterModal(true);
-    }
-  });
-
-  /* Cerrar con Escape */
-
-  document.addEventListener("keydown", event => {
-    if (event.key !== "Escape") return;
-
-    closeContactModal();
-
-    if (newsletterModal.style.display === "flex") {
-      closeNewsletterModal(true);
-    }
-  });
-
-  /* =====================================================
-     FORMULARIO DE CONTACTO
-     Endpoint original: POST /contact
-     ===================================================== */
+  /* =========================================================
+     CONTACTO — ENVÍO DEL FORMULARIO
+     ========================================================= */
 
   contactForm.addEventListener("submit", async event => {
     event.preventDefault();
@@ -573,8 +642,8 @@
 
     if (website) return;
 
-    contactSubmit.disabled = true;
-    contactSubmit.textContent = "enviando...";
+    contactButton.disabled = true;
+    contactButton.textContent = "enviando...";
     contactStatus.textContent = "";
 
     try {
@@ -600,17 +669,15 @@
       }
 
       contactForm.reset();
-
       contactStatus.textContent =
         "¡mensaje enviado! gracias por escribirnos.";
 
-      contactSubmit.textContent = "enviado";
+      contactButton.textContent = "enviado";
 
       setTimeout(() => {
         closeContactModal();
-
-        contactSubmit.disabled = false;
-        contactSubmit.textContent = "enviar mensaje ↗";
+        contactButton.disabled = false;
+        contactButton.textContent = "enviar mensaje ↗";
         contactStatus.textContent = "";
       }, 1800);
 
@@ -620,87 +687,32 @@
       contactStatus.textContent =
         "no se pudo enviar. intentá nuevamente.";
 
-      contactSubmit.disabled = false;
-      contactSubmit.textContent = "enviar mensaje ↗";
+      contactButton.disabled = false;
+      contactButton.textContent = "enviar mensaje ↗";
     }
   });
 
-  /* =====================================================
-     FORMULARIO NEWSLETTER
-     Endpoint original: POST /newsletter
-     ===================================================== */
+  /* =========================================================
+     ATAJOS DE TECLADO
+     ========================================================= */
 
-  newsletterForm.addEventListener("submit", async event => {
-    event.preventDefault();
+  document.addEventListener("keydown", event => {
+    if (event.key !== "Escape") return;
 
-    const formData = new FormData(newsletterForm);
+    if (contactModal.classList.contains("is-open")) {
+      closeContactModal();
+    }
 
-    const email = String(formData.get("email") || "").trim();
-    const website = String(formData.get("website") || "").trim();
-
-    if (website) return;
-
-    newsletterSubmit.textContent = "enviando...";
-    newsletterSubmit.disabled = true;
-    newsletterStatus.style.display = "none";
-
-    try {
-      const response = await fetch(`${API_URL}/newsletter`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ email })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || data.suscripcion !== "correcta") {
-        throw new Error(
-          data.mensaje || "Error al suscribirse"
-        );
-      }
-
-      localStorage.setItem("popupSubscribed", "true");
-      localStorage.setItem("popupDismissed", "true");
-
-      newsletterForm.style.display = "none";
-
-      newsletterStatus.textContent = "listo!";
-      newsletterStatus.style.display = "block";
-
-      setTimeout(() => {
-        closeNewsletterModal(false);
-      }, 1000);
-
-    } catch (error) {
-      console.error("Error newsletter:", error);
-
-      newsletterStatus.textContent =
-        "no funcionó, intentá de nuevo";
-
-      newsletterStatus.style.display = "block";
-
-      newsletterSubmit.textContent = "suscribite!";
-      newsletterSubmit.disabled = false;
+    if (heartPopup.classList.contains("is-open")) {
+      closeHeartPopup();
     }
   });
 
-  /* =====================================================
-     POPUP AUTOMÁTICO SOLO EN EL INICIO DE LA TIENDA
-     ===================================================== */
+  /* =========================================================
+     EVENTOS PARA APERTURA DESDE OTROS SCRIPTS
+     ========================================================= */
 
-  const currentPath = window.location.pathname.replace(/\/+$/, "");
-
-  const isShopHome =
-    /\/shop$/.test(currentPath) ||
-    /\/shop\/index\.html$/.test(currentPath);
-
-  const isSubscribed = localStorage.getItem("popupSubscribed");
-  const wasDismissed = localStorage.getItem("popupDismissed");
-
-  if (isShopHome && !isSubscribed && !wasDismissed) {
-    setTimeout(openNewsletterModal, 500);
-  }
+  document.addEventListener("mm:open-contact", openContactModal);
+  document.addEventListener("mm:open-newsletter", openHeartPopup);
 
 })();
