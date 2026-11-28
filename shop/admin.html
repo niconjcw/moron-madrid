@@ -35,7 +35,7 @@ button.secondary{background:transparent;color:#000}
 .variants-section h2,.discount-section h2{margin-top:0}
 .hint{color:#777;font-size:12px;line-height:1.5;margin:-5px 0 15px}
 #message{margin:20px 0;line-height:1.5}
-#logout{margin-top:50px}
+#logout{width:100%;max-width:180px;margin-top:24px}
 .stock-mode{display:flex;align-items:center;gap:10px;margin:20px 0;cursor:pointer}
 .stock-mode input{width:18px;height:18px;margin:0}
 .stock-mode span{font-size:14px}
@@ -381,11 +381,18 @@ main{
   letter-spacing:-.035em;
 }
 
-.admin-tabs{
+.admin-sidebar{
   grid-column:1;
   grid-row:2;
   position:sticky;
   top:24px;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  min-width:0;
+}
+
+.admin-tabs{
   display:flex;
   flex-direction:column;
   align-items:stretch;
@@ -497,7 +504,7 @@ button.secondary:hover{background:#eee}
 .order-details{background:#f1f1f1;font-size:12px}
 .orders-header{margin:0 0 18px}
 .newsletter-header{margin:0 0 18px}
-#logout{max-width:180px;margin-top:34px}
+#logout{width:100%;max-width:180px;margin-top:24px}
 
 @media(max-width:760px){
   body{padding:18px}
@@ -511,9 +518,12 @@ button.secondary:hover{background:#eee}
     grid-row:1;
     margin-bottom:0;
   }
-  .admin-tabs{
+  .admin-sidebar{
     grid-column:1;
     grid-row:2;
+    position:static;
+  }
+  .admin-tabs{
     position:static;
     flex-direction:row;
     flex-wrap:nowrap;
@@ -710,6 +720,7 @@ button{font-size:10px;padding:10px 13px}
 
 <section id="dashboard" hidden>
 
+<div class="admin-sidebar">
 <nav class="admin-tabs">
 <button type="button" class="admin-tab active" data-tab="summary-panel">RESUMEN</button>
 <button type="button" class="admin-tab" data-tab="products-panel">PRODUCTOS</button>
@@ -718,6 +729,8 @@ button{font-size:10px;padding:10px 13px}
 <button type="button" class="admin-tab" data-tab="portfolio-panel">PORTFOLIO</button>
 <button type="button" class="admin-tab" data-tab="newsletter-panel">NEWSLETTER</button>
 </nav>
+<button id="logout" type="button">Cerrar sesión</button>
+</div>
 
 <!-- PANEL RESUMEN -->
 <section id="summary-panel">
@@ -1056,7 +1069,6 @@ Seleccioná todas las fotos juntas. La primera será la principal y las demás q
   <div id="orders-list"></div>
 </section>
   
-<button id="logout">Cerrar sesión</button>
 </section>
 
 <p id="message" role="status"></p>
