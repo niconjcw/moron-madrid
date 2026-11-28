@@ -87,6 +87,9 @@ button.secondary{background:transparent;color:#000}
 
 /* PESTAÑAS */
 
+.product-subtabs{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 24px;padding:0 0 12px;border-bottom:1px solid #d5d5d5}
+.product-subtab{width:auto;margin:0;padding:8px 12px;background:transparent;color:#777;border:0;border-bottom:2px solid transparent;font-size:11px;letter-spacing:.04em}
+.product-subtab.active{color:#000;border-bottom-color:#dcd63b}
 .admin-tabs{display:flex;gap:25px;border-bottom:1px solid #ccc;margin-bottom:30px;overflow-x:auto}
 .admin-tab{flex:0 0 auto;width:auto;padding:12px 0;margin:0;border:none;border-bottom:2px solid transparent;background:transparent;color:#888;font-size:13px;white-space:nowrap}
 .admin-tab:hover{opacity:1;color:#000}
@@ -711,9 +714,7 @@ button{font-size:10px;padding:10px 13px}
 
 <nav class="admin-tabs">
 <button type="button" class="admin-tab active" data-tab="summary-panel">RESUMEN</button>
-<button type="button" class="admin-tab" data-tab="new-product-panel">NUEVO PRODUCTO</button>
 <button type="button" class="admin-tab" data-tab="products-panel">PRODUCTOS</button>
-<button type="button" class="admin-tab" data-tab="categories-panel">CATEGORÍAS</button>
 <button type="button" class="admin-tab" data-tab="orders-panel">VENTAS <span id="new-sales-count" class="sales-tab-count" hidden>0</span></button>
 <button type="button" class="admin-tab" data-tab="discounts-panel">PAGOS</button>
 <button type="button" class="admin-tab" data-tab="portfolio-panel">PORTFOLIO</button>
@@ -747,7 +748,14 @@ button{font-size:10px;padding:10px 13px}
   </div>
 </section>
 
-<!-- PANEL NUEVO PRODUCTO -->
+<!-- PANEL PRODUCTOS / SUBPESTAÑAS -->
+<section id="products-panel" hidden>
+  <nav class="product-subtabs" aria-label="Secciones de productos">
+    <button type="button" class="product-subtab" data-product-subtab="new-product-panel">NUEVO PRODUCTO</button>
+    <button type="button" class="product-subtab active" data-product-subtab="products-list-panel">PRODUCTOS</button>
+    <button type="button" class="product-subtab" data-product-subtab="categories-panel">CATEGORÍAS</button>
+  </nav>
+  <!-- PANEL NUEVO PRODUCTO -->
 
 <section id="new-product-panel">
 <div class="form-section" style="margin-top:0">
@@ -811,14 +819,17 @@ Seleccioná todas las fotos juntas. La primera será la principal y las demás q
 </div>
 </section>
 
-<!-- PANEL PRODUCTOS -->
+<!-- SUBPANEL LISTA DE PRODUCTOS -->
 
-<section id="products-panel" hidden>
+<section id="products-list-panel" hidden>
 <h2 style="margin-top:0">Productos</h2>
 <button id="refresh" class="secondary">Actualizar lista</button>
 <div id="products"></div>
 </section>
 
+
+
+</section>
 
 <!-- PANEL PORTFOLIO -->
 
@@ -1110,10 +1121,8 @@ tab.classList.toggle("active",tab.dataset.tab===target);
 
 [
 "summary-panel",
-"new-product-panel",
 "products-panel",
 "portfolio-panel",
-"categories-panel",
 "newsletter-panel",
 "discounts-panel",
 "orders-panel"
@@ -1121,6 +1130,19 @@ tab.classList.toggle("active",tab.dataset.tab===target);
 document.getElementById(id).hidden=id!==target;
 });
 
+if(target==="products-panel"&&!document.querySelector(".product-subtab.active")){
+setProductSubtab("products-list-panel");
+}
+message.textContent="";
+}
+
+function setProductSubtab(target){
+["new-product-panel","products-list-panel","categories-panel"].forEach(id=>{
+document.getElementById(id).hidden=id!==target;
+});
+document.querySelectorAll(".product-subtab").forEach(button=>{
+button.classList.toggle("active",button.dataset.productSubtab===target);
+});
 message.textContent="";
 }
 
@@ -1135,10 +1157,18 @@ await loadDiscountSettings();
 await loadDiscountProducts();
 await loadDiscountCodes();
 }
-if(target==="categories-panel")await loadCategories();
-if(target==="products-panel")await loadProducts();
+if(target==="products-panel"){setProductSubtab("products-list-panel");await loadProducts();}
 if(target==="portfolio-panel"){await loadPortfolioProducts();await loadPortfolio();}
 if(target==="orders-panel")await loadOrders();
+});
+});
+
+document.querySelectorAll(".product-subtab").forEach(button=>{
+button.addEventListener("click",async()=>{
+const target=button.dataset.productSubtab;
+setProductSubtab(target);
+if(target==="products-list-panel")await loadProducts();
+if(target==="categories-panel")await loadCategories();
 });
 });
 
@@ -1195,6 +1225,7 @@ function renderAdminSummary(items){
 document.querySelectorAll("[data-go-tab]").forEach(button=>{
   button.addEventListener("click",async()=>{
     const target=button.dataset.goTab;
+    if(["new-product-panel","products-list-panel","categories-panel"].includes(target)){setActiveTab("products-panel");setProductSubtab(target);if(target==="products-list-panel")await loadProducts();if(target==="categories-panel")await loadCategories();return;}
     setActiveTab(target);
     if(target==="orders-panel")await loadOrders();
     if(target==="products-panel")await loadProducts();
@@ -1840,7 +1871,8 @@ document.getElementById("form-title").textContent="Editar producto";
 document.getElementById("save-button").textContent="Guardar cambios";
 document.getElementById("cancel-edit").hidden=false;
 
-setActiveTab("new-product-panel");
+setActiveTab("products-panel");
+setProductSubtab("new-product-panel");
 document.getElementById("form-title").scrollIntoView({behavior:"smooth"});
 }
 
