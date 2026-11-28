@@ -1,21 +1,18 @@
-
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Compras / Envíos — Morón Madrid</title>
 
+  <!-- ESTILOS Y RECURSOS -->
   <link rel="icon" type="image/png" href="../sticker.png">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
+  <!-- ESTILOS DE LA PÁGINA -->
   <style>
-    /* =====================================================
-       PÁGINA COMPRAS / ENVÍOS
-       ===================================================== */
-
     .information-page {
       width: 100%;
       padding: 65px 8% 100px;
@@ -26,6 +23,13 @@
       margin: 0 auto;
       font-size: .7rem;
       line-height: 1.6;
+    }
+
+    .information-content h1 {
+      font-size: 1rem;
+      font-weight: 400;
+      margin: 0 0 45px;
+      text-transform: lowercase;
     }
 
     .information-content h2 {
@@ -59,6 +63,7 @@
       margin-top: 45px !important;
     }
 
+    /* RESPONSIVE */
     @media (max-width: 700px) {
       .information-page {
         padding: 35px 20px 65px;
@@ -66,6 +71,10 @@
 
       .information-content {
         font-size: .82rem;
+      }
+
+      .information-content h1 {
+        margin-bottom: 35px;
       }
 
       .information-content h2 {
@@ -77,16 +86,10 @@
 
 <body>
 
-  <!-- =====================================================
-       HEADER COMPARTIDO
-       ===================================================== -->
-
+  <!-- HEADER COMPARTIDO -->
   <div id="site-header"></div>
 
-  <!-- =====================================================
-       CONTENIDO COMPRAS / ENVÍOS
-       ===================================================== -->
-
+  <!-- CONTENIDO: CÓMO COMPRAR -->
   <main class="information-page">
     <article class="information-content">
 
@@ -141,6 +144,7 @@
         </li>
       </ol>
 
+      <!-- ENVÍOS -->
       <h2>Envíos</h2>
 
       <ul>
@@ -167,38 +171,4 @@
           paquete aguardará en la sucursal más cercana al domicilio de entrega
           durante 5 días hábiles para ser retirado por la persona a nombre de
           quien estaba el envío con su DNI y código de seguimiento, o la que
-          esta autorice. Para más detalles hacé
-          <a href="https://www.correoargentino.com.ar/" target="_blank" rel="noopener">
-            clic acá
-          </a>.
-        </li>
-      </ul>
-
-      <p class="information-closing">
-        Si tenés dudas o consultas antes de realizar tu compra, contactate
-        con nosotros así podemos ayudarte en todo lo que necesites!
-      </p>
-
-      <p>
-        Desde ya muchas gracias por tu apoyo y esperamos que disfrutes tu compra!
-      </p>
-
-    </article>
-  </main>
-
-  <!-- =====================================================
-       FOOTER COMPARTIDO
-       ===================================================== -->
-
-  <div id="shared-footer"></div>
-
-  <!-- =====================================================
-       SCRIPTS COMPARTIDOS
-       ===================================================== -->
-
-  <script src="header.js"></script>
-  <script src="footer.js"></script>
-  <script src="modals.js"></script>
-
-</body>
-</html>
+          esta autorice. Para más detalles hac
