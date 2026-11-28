@@ -9,9 +9,9 @@
 
   const API_URL = "https://moron-madrid-api.moronmadrid.workers.dev";
 
-  /* -----------------------------------------------------
+  /* =====================================================
      ESTILOS
-  ----------------------------------------------------- */
+     ===================================================== */
 
   const styles = document.createElement("style");
 
@@ -22,7 +22,7 @@
       src: url(https://assets.brevo.com/font/Roboto/Latin/normal/normal/7529907e9eaf8ebb5220c5f9850e3811.woff2) format("woff2");
     }
 
-    /* CONTACTO */
+    /* MODAL DE CONTACTO */
 
     .contact-modal-overlay {
       position: fixed;
@@ -138,7 +138,7 @@
       opacity: 0 !important;
     }
 
-    /* NEWSLETTER */
+    /* POPUP NEWSLETTER */
 
     .custom-popup-overlay {
       position: fixed;
@@ -208,6 +208,7 @@
     #custom-form input.input {
       background: transparent !important;
       border: none !important;
+      border-bottom: 0 solid #fff !important;
       color: #fff !important;
       text-align: center !important;
       font-size: 15px !important;
@@ -285,78 +286,138 @@
 
   document.head.appendChild(styles);
 
-  /* -----------------------------------------------------
+  /* =====================================================
      HTML DE LOS MODALES
-  ----------------------------------------------------- */
+     ===================================================== */
 
   const mount = document.createElement("div");
 
   mount.innerHTML = `
-    <div class="contact-modal-overlay" id="contactModal" aria-hidden="true">
-      <section class="contact-modal" role="dialog"
-        aria-modal="true" aria-labelledby="contactModalTitle">
+    <!-- CONTACTO -->
 
-        <button class="contact-modal-close" id="closeContactModal"
-          type="button" aria-label="Cerrar">×</button>
+    <div class="contact-modal-overlay" id="contactModal"
+      aria-hidden="true">
+
+      <section class="contact-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="contactModalTitle">
+
+        <button class="contact-modal-close"
+          id="closeContactModal"
+          type="button"
+          aria-label="Cerrar">×</button>
 
         <h2 id="contactModalTitle">contacto</h2>
 
         <form id="contactForm">
+
           <label for="contactName">nombre</label>
-          <input id="contactName" name="name" type="text"
-            autocomplete="name" maxlength="100" required
+          <input
+            id="contactName"
+            name="name"
+            type="text"
+            autocomplete="name"
+            maxlength="100"
+            required
             placeholder="tu nombre">
 
           <label for="contactEmail">email</label>
-          <input id="contactEmail" name="email" type="email"
-            autocomplete="email" maxlength="160" required
+          <input
+            id="contactEmail"
+            name="email"
+            type="email"
+            autocomplete="email"
+            maxlength="160"
+            required
             placeholder="tu@email.com">
 
           <label for="contactMessage">mensaje</label>
-          <textarea id="contactMessage" name="message"
-            rows="4" maxlength="3000" required
+          <textarea
+            id="contactMessage"
+            name="message"
+            rows="4"
+            maxlength="3000"
+            required
             placeholder="escribí tu mensaje..."></textarea>
 
-          <input class="contact-honeypot" type="text"
-            name="website" tabindex="-1" autocomplete="off"
+          <input
+            class="contact-honeypot"
+            type="text"
+            name="website"
+            tabindex="-1"
+            autocomplete="off"
             aria-hidden="true">
 
-          <button class="contact-submit" id="contactSubmit"
-            type="submit">enviar mensaje ↗</button>
+          <button
+            class="contact-submit"
+            id="contactSubmit"
+            type="submit">
+            enviar mensaje ↗
+          </button>
 
-          <p class="contact-form-status" id="contactFormStatus"
-            role="status" aria-live="polite"></p>
+          <p
+            class="contact-form-status"
+            id="contactFormStatus"
+            role="status"
+            aria-live="polite"></p>
+
         </form>
       </section>
     </div>
 
+    <!-- NEWSLETTER -->
+
     <div class="custom-popup-overlay" id="heartPopup">
+
       <div class="custom-popup-container">
 
-        <button class="custom-popup-close" id="closeHeartPopup"
-          type="button" aria-label="Cerrar">×</button>
+        <button
+          class="custom-popup-close"
+          id="closeHeartPopup"
+          type="button"
+          aria-label="Cerrar">×</button>
 
         <div class="custom-popup-content">
+
           <div id="custom-form-wrapper">
 
             <form id="custom-form">
+
               <div style="padding:0;width:100%;">
-                <input class="input" type="email" id="EMAIL"
-                  name="email" autocomplete="email"
-                  placeholder="tu email" required>
+                <input
+                  class="input"
+                  type="email"
+                  id="EMAIL"
+                  name="email"
+                  autocomplete="email"
+                  placeholder="tu email"
+                  required>
               </div>
 
               <div style="padding:0;width:100%;text-align:center;">
-                <button type="submit" class="custom-submit-btn"
-                  id="customSubmitBtn">suscribite!</button>
+                <button
+                  type="submit"
+                  class="custom-submit-btn"
+                  id="customSubmitBtn">
+                  suscribite!
+                </button>
               </div>
 
-              <input type="text" name="website" value=""
-                tabindex="-1" autocomplete="off"
+              <input
+                type="text"
+                name="website"
+                value=""
+                tabindex="-1"
+                autocomplete="off"
                 style="display:none;">
+
             </form>
 
-            <div id="status-message" class="custom-response-msg"></div>
+            <div
+              id="status-message"
+              class="custom-response-msg"></div>
+
           </div>
         </div>
       </div>
@@ -365,19 +426,40 @@
 
   document.body.appendChild(mount);
 
-  /* -----------------------------------------------------
-     CONTROL DE APERTURA Y CIERRE
-  ----------------------------------------------------- */
+  /* =====================================================
+     REFERENCIAS
+     ===================================================== */
 
   const contactModal = document.getElementById("contactModal");
   const newsletterModal = document.getElementById("heartPopup");
+
+  const contactForm = document.getElementById("contactForm");
+  const contactStatus = document.getElementById("contactFormStatus");
+  const contactSubmit = document.getElementById("contactSubmit");
+
+  const newsletterForm = document.getElementById("custom-form");
+  const newsletterSubmit = document.getElementById("customSubmitBtn");
+  const newsletterStatus = document.getElementById("status-message");
+
+  /* =====================================================
+     APERTURA Y CIERRE
+     ===================================================== */
+
+  function updateBodyScroll() {
+    const contactOpen = contactModal.classList.contains("is-open");
+    const newsletterOpen = newsletterModal.style.display === "flex";
+
+    document.body.style.overflow =
+      contactOpen || newsletterOpen ? "hidden" : "";
+  }
 
   function openContactModal() {
     closeNewsletterModal(false);
 
     contactModal.classList.add("is-open");
     contactModal.setAttribute("aria-hidden", "false");
-    document.body.style.overflow = "hidden";
+
+    updateBodyScroll();
 
     setTimeout(() => {
       document.getElementById("contactName").focus();
@@ -387,10 +469,7 @@
   function closeContactModal() {
     contactModal.classList.remove("is-open");
     contactModal.setAttribute("aria-hidden", "true");
-
-    if (newsletterModal.style.display !== "flex") {
-      document.body.style.overflow = "";
-    }
+    updateBodyScroll();
   }
 
   function openNewsletterModal() {
@@ -400,7 +479,8 @@
 
     localStorage.removeItem("popupDismissed");
     newsletterModal.style.display = "flex";
-    document.body.style.overflow = "hidden";
+
+    updateBodyScroll();
   }
 
   function closeNewsletterModal(saveDismissal = true) {
@@ -410,30 +490,39 @@
       localStorage.setItem("popupDismissed", "true");
     }
 
-    if (!contactModal.classList.contains("is-open")) {
-      document.body.style.overflow = "";
-    }
+    updateBodyScroll();
   }
+
+  /* Compatibilidad con el nombre utilizado anteriormente */
 
   window.closeHeartPopup = closeNewsletterModal;
 
+  /* Apertura desde encabezado y footer */
+
   document.addEventListener("click", event => {
-    if (event.target.closest(".open-contact-modal")) {
+    const contactLink = event.target.closest(".open-contact-modal");
+
+    const newsletterLink =
+      event.target.closest(".newsletter-link") ||
+      event.target.closest("#openNewsletterPopup");
+
+    if (contactLink) {
       event.preventDefault();
       openContactModal();
     }
 
-    if (
-      event.target.closest(".newsletter-link") ||
-      event.target.closest("#openNewsletterPopup")
-    ) {
+    if (newsletterLink) {
       event.preventDefault();
       openNewsletterModal();
     }
   });
 
+  /* Eventos compartidos */
+
   document.addEventListener("mm:open-contact", openContactModal);
   document.addEventListener("mm:open-newsletter", openNewsletterModal);
+
+  /* Botones de cierre */
 
   document.getElementById("closeContactModal")
     .addEventListener("click", closeContactModal);
@@ -441,8 +530,12 @@
   document.getElementById("closeHeartPopup")
     .addEventListener("click", () => closeNewsletterModal(true));
 
+  /* Cerrar al hacer clic fuera */
+
   contactModal.addEventListener("click", event => {
-    if (event.target === contactModal) closeContactModal();
+    if (event.target === contactModal) {
+      closeContactModal();
+    }
   });
 
   newsletterModal.addEventListener("click", event => {
@@ -451,24 +544,22 @@
     }
   });
 
-  document.addEventListener("keydown", event => {
-    if (event.key === "Escape") {
-      closeContactModal();
+  /* Cerrar con Escape */
 
-      if (newsletterModal.style.display === "flex") {
-        closeNewsletterModal(true);
-      }
+  document.addEventListener("keydown", event => {
+    if (event.key !== "Escape") return;
+
+    closeContactModal();
+
+    if (newsletterModal.style.display === "flex") {
+      closeNewsletterModal(true);
     }
   });
 
-  /* -----------------------------------------------------
+  /* =====================================================
      FORMULARIO DE CONTACTO
-     Mantiene el endpoint y la respuesta originales.
-  ----------------------------------------------------- */
-
-  const contactForm = document.getElementById("contactForm");
-  const contactStatus = document.getElementById("contactFormStatus");
-  const contactSubmit = document.getElementById("contactSubmit");
+     Endpoint original: POST /contact
+     ===================================================== */
 
   contactForm.addEventListener("submit", async event => {
     event.preventDefault();
@@ -492,22 +583,32 @@
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ name, email, message, website })
+        body: JSON.stringify({
+          name,
+          email,
+          message,
+          website
+        })
       });
 
       const data = await response.json();
 
       if (!response.ok || data.success !== true) {
-        throw new Error(data.message || "No se pudo enviar el mensaje.");
+        throw new Error(
+          data.message || "No se pudo enviar el mensaje."
+        );
       }
 
       contactForm.reset();
+
       contactStatus.textContent =
         "¡mensaje enviado! gracias por escribirnos.";
+
       contactSubmit.textContent = "enviado";
 
       setTimeout(() => {
         closeContactModal();
+
         contactSubmit.disabled = false;
         contactSubmit.textContent = "enviar mensaje ↗";
         contactStatus.textContent = "";
@@ -524,18 +625,16 @@
     }
   });
 
-  /* -----------------------------------------------------
+  /* =====================================================
      FORMULARIO NEWSLETTER
-  ----------------------------------------------------- */
-
-  const newsletterForm = document.getElementById("custom-form");
-  const newsletterSubmit = document.getElementById("customSubmitBtn");
-  const newsletterStatus = document.getElementById("status-message");
+     Endpoint original: POST /newsletter
+     ===================================================== */
 
   newsletterForm.addEventListener("submit", async event => {
     event.preventDefault();
 
     const formData = new FormData(newsletterForm);
+
     const email = String(formData.get("email") || "").trim();
     const website = String(formData.get("website") || "").trim();
 
@@ -557,13 +656,16 @@
       const data = await response.json();
 
       if (!response.ok || data.suscripcion !== "correcta") {
-        throw new Error(data.mensaje || "Error al suscribirse");
+        throw new Error(
+          data.mensaje || "Error al suscribirse"
+        );
       }
 
       localStorage.setItem("popupSubscribed", "true");
       localStorage.setItem("popupDismissed", "true");
 
       newsletterForm.style.display = "none";
+
       newsletterStatus.textContent = "listo!";
       newsletterStatus.style.display = "block";
 
@@ -578,23 +680,26 @@
         "no funcionó, intentá de nuevo";
 
       newsletterStatus.style.display = "block";
+
       newsletterSubmit.textContent = "suscribite!";
       newsletterSubmit.disabled = false;
     }
   });
 
-  /* -----------------------------------------------------
-     APERTURA AUTOMÁTICA SOLO EN EL INICIO DE LA TIENDA
-  ----------------------------------------------------- */
+  /* =====================================================
+     POPUP AUTOMÁTICO SOLO EN EL INICIO DE LA TIENDA
+     ===================================================== */
 
   const currentPath = window.location.pathname.replace(/\/+$/, "");
-  const isShopHome = /\/shop$/.test(currentPath);
 
-  if (
-    isShopHome &&
-    !localStorage.getItem("popupSubscribed") &&
-    !localStorage.getItem("popupDismissed")
-  ) {
+  const isShopHome =
+    /\/shop$/.test(currentPath) ||
+    /\/shop\/index\.html$/.test(currentPath);
+
+  const isSubscribed = localStorage.getItem("popupSubscribed");
+  const wasDismissed = localStorage.getItem("popupDismissed");
+
+  if (isShopHome && !isSubscribed && !wasDismissed) {
     setTimeout(openNewsletterModal, 500);
   }
 
