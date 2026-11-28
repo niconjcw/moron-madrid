@@ -473,6 +473,15 @@
       opacity: .7;
       text-decoration: none;
     }
+    /* Los filtros conservan el aspecto visual que tenían debajo de la cabecera */
+    .home-header [data-portfolio-filter],
+    .home-mobile-menu [data-portfolio-filter] {
+      opacity: .48;
+    }
+    .home-header [data-portfolio-filter].is-active,
+    .home-mobile-menu [data-portfolio-filter].is-active {
+      opacity: 1;
+    }
     .home-logo {
       display: block;
       width: 90px;
@@ -643,11 +652,6 @@
 
   <main>
     <section class="portfolio" id="portfolio">
-      <nav class="portfolio-filters" aria-label="Filtros del portfolio">
-        <a href="#inicio" data-portfolio-filter="todos" class="is-active" aria-current="true">inicio</a>
-        <a href="#coleccion" data-portfolio-filter="coleccion">colección</a>
-        <a href="#estudio" data-portfolio-filter="estudio">estudio</a>
-      </nav>
       <div class="portfolio-grid" id="portfolioGrid">
         <article class="portfolio-item" data-category="coleccion" style="--item:1">
           <img src="cartera cierre.jpg" alt="cartera de cierres" loading="lazy">
