@@ -2702,7 +2702,7 @@ throw new Error(data.error||"No se pudieron cargar los pedidos.");
 }
 
 orders=data.orders||[];
-renderAdminSummary(orders);
+if(filter!=="archived")renderAdminSummary(orders);
 
 /* Las ventas nuevas son los pedidos que siguen pendientes. */
 const newSales=orders.filter(order=>order.order_status==="pending").length;
