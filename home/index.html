@@ -6,6 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Morón Madrid</title>
   <link rel="icon" type="image/png" href="/home/images/sticker.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 
   <style>
     * {
@@ -627,7 +630,48 @@
       .home-mobile-menu > a { margin: 0 0 27px; }
     }
 
-  </style>
+  
+    /* TIPOGRAFÍA Y LINKS — MISMO FORMATO QUE LA TIENDA */
+    body {
+      font-family: Roboto, Arial, sans-serif;
+      font-size: .7rem;
+      font-weight: 300;
+      line-height: 1.2;
+    }
+
+    button, a {
+      font: inherit;
+    }
+
+    a {
+      color: #000;
+      text-decoration: none;
+      transition: opacity .2s ease;
+    }
+
+    a:hover {
+      opacity: .7;
+      text-decoration: none;
+    }
+
+    .home-header a,
+    .home-mobile-menu a,
+    .portfolio-filters a {
+      color: #000;
+      text-decoration: none;
+      font-family: Roboto, Arial, sans-serif;
+      font-size: .7rem;
+      font-weight: 300;
+    }
+
+    .home-header a:hover,
+    .home-mobile-menu a:hover,
+    .portfolio-filters a:hover {
+      opacity: .7;
+      text-decoration: none;
+    }
+
+</style>
 </head>
 
 <body id="inicio">
