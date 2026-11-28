@@ -538,6 +538,33 @@ button.secondary:hover{background:#eee}
 }
 
 
+/* SELECCIÓN Y ACCIONES MASIVAS DE VENTAS */
+.orders-bulk{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  margin:16px 0;padding:14px;background:#fff;border:1px solid #e5e5e5;
+}
+.orders-bulk select{width:auto;min-width:210px;max-width:100%;margin:0}
+.orders-bulk button{width:auto;margin:0}
+.orders-bulk-count{font-size:12px;color:#666;margin-right:auto}
+.order-select-cell{display:flex;align-items:center;justify-content:center}
+.order-select-cell input,.orders-bulk input{width:17px;height:17px;margin:0}
+.order-list-row{grid-template-columns:32px 105px 90px minmax(140px,1.3fr) minmax(180px,1.5fr) 105px 105px 120px}
+@media(max-width:900px){
+ .order-list-row{grid-template-columns:28px 1fr 1fr 1.5fr 1.5fr;gap:10px}
+ .order-list-total{grid-column:2}
+ .order-view-button{grid-column:3}
+ .order-actions-menu{grid-column:4 / 6}
+}
+@media(max-width:550px){
+ .order-list-row{grid-template-columns:28px 1fr 1fr;gap:10px}
+ .order-list-buyer{grid-column:2 / 4}
+ .order-list-status{grid-column:2 / 4}
+ .order-list-total{grid-column:2}
+ .order-view-button{grid-column:3}
+ .order-actions-menu{grid-column:2 / 4}
+ .orders-bulk{align-items:stretch;flex-direction:column}
+ .orders-bulk select,.orders-bulk button{width:100%;max-width:none}
+}
 /* LISTADO COMPACTO DE VENTAS */
 .order-list-row{
   display:grid;
@@ -886,6 +913,26 @@ Seleccioná todas las fotos juntas. La primera será la principal y las demás q
   </div>
 
   <div id="orders-count" class="hint"></div>
+  <div class="orders-bulk">
+    <label style="display:flex;align-items:center;gap:8px;margin:0">
+      <input type="checkbox" id="orders-select-all">
+      <span>Seleccionar todos</span>
+    </label>
+    <span id="orders-selected-count" class="orders-bulk-count">0 seleccionados</span>
+    <select id="orders-bulk-action" aria-label="Acción para pedidos seleccionados">
+      <option value="">Acciones para seleccionados</option>
+      <option value="status:pending">Cambiar a pendiente</option>
+      <option value="status:paid">Cambiar a pagado</option>
+      <option value="status:preparing">Cambiar a preparando</option>
+      <option value="status:shipped">Cambiar a enviado</option>
+      <option value="status:delivered">Cambiar a entregado</option>
+      <option value="status:cancelled">Cambiar a cancelado</option>
+      <option value="archive">Archivar</option>
+      <option value="restore">Restaurar</option>
+      <option value="delete">Eliminar</option>
+    </select>
+    <button type="button" id="orders-bulk-apply">Aplicar</button>
+  </div>
   <div id="orders-list"></div>
 </section>
   
@@ -2415,6 +2462,8 @@ await loadDiscountCodes();
 /* VENTAS */
 
 let orders=[];
+let visibleOrders=[];
+const selectedOrderIds=new Set();
 
 async function loadOrders(){
 const list=document.getElementById("orders-list");
@@ -2450,7 +2499,9 @@ const filtered=filter && filter!=="archived"
 count.textContent=filtered.length+
 (filtered.length===1?" pedido":" pedidos");
 
+visibleOrders=filtered;
 renderOrders(filtered);
+updateBulkSelectionUI();
 
 }catch(error){
 list.textContent=error.message;
@@ -2487,6 +2538,7 @@ const list=document.getElementById("orders-list");
 list.replaceChildren();
 
 if(!items.length){
+updateBulkSelectionUI();
 const empty=document.createElement("p");
 empty.className="order-empty";
 empty.textContent="Todavía no hay pedidos para mostrar.";
@@ -2504,6 +2556,19 @@ const dateText=order.created_at
 
 const row=document.createElement("div");
 row.className="order-list-row";
+
+const selectCell=document.createElement("div");
+selectCell.className="order-select-cell";
+const selectOrder=document.createElement("input");
+selectOrder.type="checkbox";
+selectOrder.checked=selectedOrderIds.has(order.id);
+selectOrder.setAttribute("aria-label","Seleccionar pedido "+(order.order_number??""));
+selectOrder.addEventListener("change",()=>{
+  if(selectOrder.checked)selectedOrderIds.add(order.id);
+  else selectedOrderIds.delete(order.id);
+  updateBulkSelectionUI();
+});
+selectCell.append(selectOrder);
 
 const dateCell=document.createElement("div");
 dateCell.className="order-list-date";
@@ -2607,7 +2672,7 @@ if(action==="delete")await deleteOrder(order.id,order.order_number,actionFeedbac
 if(action==="archive"||action==="restore")await archiveOrder(order.id,action,actionFeedback);
 });
 
-row.append(numberCell,dateCell,buyerCell,statusCell,totalCell,viewButton,actions);
+row.append(selectCell,numberCell,dateCell,buyerCell,statusCell,totalCell,viewButton,actions);
 
 const detail=document.createElement("div");
 detail.className="order-expanded";
@@ -2720,6 +2785,87 @@ card.append(row,detail);
 list.append(card);
 });
 }
+
+function updateBulkSelectionUI(){
+  const count=selectedOrderIds.size;
+  const countLabel=document.getElementById("orders-selected-count");
+  const selectAll=document.getElementById("orders-select-all");
+  const visibleIds=visibleOrders.map(order=>order.id);
+  const selectedVisible=visibleIds.filter(id=>selectedOrderIds.has(id)).length;
+  countLabel.textContent=count+" seleccionados";
+  selectAll.checked=visibleIds.length>0&&selectedVisible===visibleIds.length;
+  selectAll.indeterminate=selectedVisible>0&&selectedVisible<visibleIds.length;
+}
+
+document.getElementById("orders-select-all").addEventListener("change",event=>{
+  visibleOrders.forEach(order=>{
+    if(event.target.checked)selectedOrderIds.add(order.id);
+    else selectedOrderIds.delete(order.id);
+  });
+  renderOrders(visibleOrders);
+  updateBulkSelectionUI();
+});
+
+document.getElementById("orders-bulk-apply").addEventListener("click",async()=>{
+  const action=document.getElementById("orders-bulk-action").value;
+  const selected=orders.filter(order=>selectedOrderIds.has(order.id));
+  if(!action){message.textContent="Elegí una acción para aplicar.";return;}
+  if(!selected.length){message.textContent="Seleccioná al menos un pedido.";return;}
+
+  const [kind,value]=action.split(":");
+  const actionNames={archive:"archivar",restore:"restaurar",delete:"eliminar",status:"cambiar el estado de"};
+  const label=actionNames[kind]||"modificar";
+  const statusNames={pending:"Pendiente",paid:"Pagado",preparing:"Preparando",shipped:"Enviado",delivered:"Entregado",cancelled:"Cancelado"};
+  const confirmation=kind==="status"
+    ?"¿Cambiar a «"+statusNames[value]+"» "+selected.length+" pedidos seleccionados?"
+    :"¿"+label.charAt(0).toUpperCase()+label.slice(1)+" "+selected.length+" pedidos seleccionados?"+(kind==="delete"?" Esta acción no se puede deshacer.":"");
+  if(!confirm(confirmation))return;
+
+  const button=document.getElementById("orders-bulk-apply");
+  button.disabled=true;
+  button.textContent="Aplicando...";
+  let success=0,failed=0;
+  const failures=[];
+
+  for(const order of selected){
+    try{
+      let response;
+      if(kind==="delete"){
+        response=await fetch(API+"/admin/orders/"+encodeURIComponent(order.id),{
+          method:"DELETE",headers:{Authorization:"Bearer "+token()}
+        });
+      }else if(kind==="archive"||kind==="restore"){
+        response=await fetch(API+"/admin/orders/"+encodeURIComponent(order.id)+"/"+kind,{
+          method:"POST",headers:{Authorization:"Bearer "+token()}
+        });
+      }else if(kind==="status"){
+        if(order.archived_at)throw new Error("Los pedidos archivados deben restaurarse antes de cambiarles el estado.");
+        response=await fetch(API+"/admin/orders/"+encodeURIComponent(order.id),{
+          method:"PUT",
+          headers:{"Content-Type":"application/json",Authorization:"Bearer "+token()},
+          body:JSON.stringify({
+            order_status:value,
+            tracking_code:order.tracking_code||"",
+            shipping_label_url:order.shipping_label_url||""
+          })
+        });
+      }
+      const data=await response.json();
+      if(!response.ok)throw new Error(data.error||"No se pudo aplicar la acción.");
+      success++;
+      selectedOrderIds.delete(order.id);
+    }catch(error){
+      failed++;
+      failures.push("#"+(order.order_number??order.id)+": "+error.message);
+    }
+  }
+
+  message.textContent=success+" pedidos actualizados"+(failed?", "+failed+" con error: "+failures.slice(0,3).join(" · "):".");
+  document.getElementById("orders-bulk-action").value="";
+  await loadOrders();
+  button.disabled=false;
+  button.textContent="Aplicar";
+});
 
 async function deleteOrder(id,orderNumber,button){
 const label=orderNumber!=null?"#"+orderNumber:"este pedido";
