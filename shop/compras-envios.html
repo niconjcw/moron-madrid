@@ -4,12 +4,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Compras / Envíos — Morón Madrid</title>
-  <link rel="icon" type="image/png" href="sticker.png">
+
+  <link rel="icon" type="image/png" href="../sticker.png">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
   <style>
+    /* =====================================================
+       PÁGINA COMPRAS / ENVÍOS
+       ===================================================== */
+
     .information-page {
       width: 100%;
       padding: 65px 8% 100px;
@@ -22,13 +28,6 @@
       line-height: 1.6;
     }
 
-    .information-content h1 {
-      font-size: 1rem;
-      font-weight: 400;
-      margin: 0 0 45px;
-      text-transform: lowercase;
-    }
-
     .information-content h2 {
       font-size: .9rem;
       font-weight: 400;
@@ -39,7 +38,8 @@
       margin: 0 0 20px;
     }
 
-    .information-content ol {
+    .information-content ol,
+    .information-content ul {
       padding-left: 20px;
       margin: 0 0 35px;
     }
@@ -68,10 +68,6 @@
         font-size: .82rem;
       }
 
-      .information-content h1 {
-        margin-bottom: 35px;
-      }
-
       .information-content h2 {
         margin-top: 35px;
       }
@@ -81,10 +77,16 @@
 
 <body>
 
-  <!-- HEADER COMPARTIDO -->
+  <!-- =====================================================
+       HEADER COMPARTIDO
+       ===================================================== -->
+
   <div id="site-header"></div>
 
-  <!-- CONTENIDO ORIGINAL -->
+  <!-- =====================================================
+       CONTENIDO COMPRAS / ENVÍOS
+       ===================================================== -->
+
   <main class="information-page">
     <article class="information-content">
 
@@ -184,10 +186,16 @@
     </article>
   </main>
 
-  <!-- FOOTER COMPARTIDO -->
+  <!-- =====================================================
+       FOOTER COMPARTIDO
+       ===================================================== -->
+
   <div id="shared-footer"></div>
 
-  <!-- COMPONENTES COMPARTIDOS -->
+  <!-- =====================================================
+       SCRIPTS COMPARTIDOS
+       ===================================================== -->
+
   <script src="header.js"></script>
   <script src="footer.js"></script>
   <script src="modals.js"></script>
