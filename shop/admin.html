@@ -1808,7 +1808,7 @@ item.append(main,edit);
 productsBox.append(item);
 });
 
-message.textContent=data.products.length+(data.products.length===1?" producto encontrado.":" productos encontrados.");
+message.textContent="";
 }catch(error){
 message.textContent=error.message||"No pudimos cargar los productos.";
 }
