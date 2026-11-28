@@ -68,6 +68,20 @@ button.secondary{background:transparent;color:#000}
 .photo-actions button{width:100%;min-width:0;padding:8px 3px;margin:0;font-size:12px}
 .photo-actions .photo-remove{background:transparent;color:#000;border:1px solid #ccc}
 .photo-empty{font-size:12px;color:#777;padding:18px 0}
+
+/* PORTFOLIO ADMINISTRABLE */
+.portfolio-admin-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-top:20px}
+.portfolio-admin-card{min-width:0;padding:9px;border:1px solid #ddd;background:#fff;cursor:grab;transition:opacity .15s}
+.portfolio-admin-card:active{cursor:grabbing}
+.portfolio-admin-card.dragging{opacity:.35}
+.portfolio-admin-card.drag-over{outline:2px solid #000;outline-offset:2px}
+.portfolio-admin-card img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover;background:#eee}
+.portfolio-admin-caption{min-height:34px;margin:9px 0 4px;font-size:12px;line-height:1.4;overflow-wrap:anywhere}
+.portfolio-admin-meta{min-height:28px;margin-bottom:9px;color:#777;font-size:10px;line-height:1.4}
+.portfolio-admin-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.portfolio-admin-actions button{width:100%;min-width:0;margin:0;padding:9px 4px;font-size:11px}
+.portfolio-admin-actions button.secondary{border:1px solid #ccc}
+.portfolio-order-hint{margin:10px 0 0;color:#777;font-size:12px;line-height:1.5}
 .photo-card.dragging{opacity:.4}
 .photo-card.drag-over{outline:2px solid #000;outline-offset:2px}
 
@@ -751,7 +765,8 @@ Seleccioná todas las fotos juntas. La primera será la principal y las demás q
   <div class="form-section">
     <h2>Imágenes del portfolio</h2>
     <button type="button" id="portfolio-refresh" class="secondary">Actualizar portfolio</button>
-    <div id="portfolio-list"></div>
+    <p class="portfolio-order-hint">Arrastrá las imágenes para cambiar el orden. La primera queda arriba en la homepage.</p>
+    <div id="portfolio-list" class="portfolio-admin-grid"></div>
   </div>
 </section>
 
@@ -1893,6 +1908,8 @@ async function loadPortfolio(){
   }
 }
 
+let draggedPortfolioId=null;
+
 function renderPortfolioItems(){
   const list=document.getElementById("portfolio-list");
   list.replaceChildren();
@@ -1906,47 +1923,91 @@ function renderPortfolioItems(){
   }
 
   portfolioItems.forEach(item=>{
-    const row=document.createElement("div");
-    row.className="product";
-
-    const main=document.createElement("div");
-    main.className="product-main";
+    const card=document.createElement("article");
+    card.className="portfolio-admin-card";
+    card.draggable=true;
+    card.dataset.portfolioId=item.id;
+    card.title="Arrastrá para cambiar el orden";
 
     const image=document.createElement("img");
-    image.className="product-thumb";
     image.src=item.image_url||"";
     image.alt=item.caption||"Imagen del portfolio";
+    image.loading="lazy";
     image.onerror=()=>{image.style.visibility="hidden";};
 
-    const info=document.createElement("div");
-    const name=document.createElement("div");
-    name.className="product-name";
-    name.textContent=item.caption||"Sin pie de foto";
-    const details=document.createElement("div");
-    details.className="product-info";
-    details.textContent=(item.category==="coleccion"?"Colección":"Estudio")+
-      (item.product_name?" · Producto: "+item.product_name:"");
-    info.append(name,details);
-    main.append(image,info);
+    const caption=document.createElement("div");
+    caption.className="portfolio-admin-caption";
+    caption.textContent=item.caption||"Sin pie de foto";
+
+    const meta=document.createElement("div");
+    meta.className="portfolio-admin-meta";
+    meta.textContent=(item.category==="coleccion"?"Colección":"Estudio")+
+      (item.product_name?" · "+item.product_name:"");
 
     const actions=document.createElement("div");
-    actions.className="category-actions";
-
+    actions.className="portfolio-admin-actions";
     const edit=document.createElement("button");
     edit.type="button";
     edit.textContent="Editar";
     edit.addEventListener("click",()=>editPortfolioItem(item));
-
     const remove=document.createElement("button");
     remove.type="button";
     remove.className="secondary";
     remove.textContent="Eliminar";
     remove.addEventListener("click",()=>deletePortfolioItem(item));
-
     actions.append(edit,remove);
-    row.append(main,actions);
-    list.append(row);
+    card.append(image,caption,meta,actions);
+
+    card.addEventListener("dragstart",event=>{
+      draggedPortfolioId=item.id;
+      card.classList.add("dragging");
+      event.dataTransfer.effectAllowed="move";
+      event.dataTransfer.setData("text/plain",item.id);
+    });
+    card.addEventListener("dragover",event=>{
+      event.preventDefault();
+      event.dataTransfer.dropEffect="move";
+      card.classList.add("drag-over");
+    });
+    card.addEventListener("dragleave",()=>card.classList.remove("drag-over"));
+    card.addEventListener("drop",async event=>{
+      event.preventDefault();
+      card.classList.remove("drag-over");
+      const fromId=draggedPortfolioId||event.dataTransfer.getData("text/plain");
+      const toId=item.id;
+      if(!fromId||fromId===toId)return;
+      const reordered=[...portfolioItems];
+      const fromIndex=reordered.findIndex(entry=>entry.id===fromId);
+      const toIndex=reordered.findIndex(entry=>entry.id===toId);
+      if(fromIndex<0||toIndex<0)return;
+      const [moved]=reordered.splice(fromIndex,1);
+      reordered.splice(toIndex,0,moved);
+      portfolioItems=reordered;
+      renderPortfolioItems();
+      await savePortfolioOrder();
+    });
+    card.addEventListener("dragend",()=>{
+      draggedPortfolioId=null;
+      list.querySelectorAll(".portfolio-admin-card").forEach(node=>node.classList.remove("dragging","drag-over"));
+    });
+    list.append(card);
   });
+}
+
+async function savePortfolioOrder(){
+  try{
+    const response=await fetch(API+"/admin/portfolio/reorder",{
+      method:"POST",
+      headers:{"Content-Type":"application/json",Authorization:"Bearer "+token()},
+      body:JSON.stringify({ids:portfolioItems.map(item=>item.id)})
+    });
+    const data=await response.json();
+    if(!response.ok)throw new Error(data.error||"No se pudo guardar el orden.");
+    message.textContent="Orden del portfolio actualizado.";
+  }catch(error){
+    message.textContent=error.message;
+    await loadPortfolio();
+  }
 }
 
 function editPortfolioItem(item){
