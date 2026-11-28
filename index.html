@@ -374,6 +374,61 @@
       }
     }
 
+  
+    /* MODAL DE IMÁGENES DEL PORTFOLIO */
+    .portfolio-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 5vh 5vw;
+      background: rgba(245,245,245,.58);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .portfolio-modal.is-open { display: flex; }
+    .portfolio-modal-content {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 90vw;
+      max-height: 90vh;
+    }
+    .portfolio-modal-image {
+      display: block;
+      max-width: 90vw;
+      max-height: 82vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+    .portfolio-modal-caption {
+      margin-top: 10px;
+      font-size: 11px;
+      font-weight: 300;
+      text-align: center;
+    }
+    .portfolio-modal-close {
+      position: absolute;
+      top: -34px;
+      right: -34px;
+      border: 0;
+      background: transparent;
+      color: #000;
+      font: 300 30px/1 Roboto, sans-serif;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+    .portfolio-grid .item img { cursor: zoom-in; }
+    @media (max-width: 600px) {
+      .portfolio-modal { padding: 6vh 4vw; }
+      .portfolio-modal-image { max-width: 92vw; max-height: 78vh; }
+      .portfolio-modal-close { top: -36px; right: -8px; }
+    }
+
   </style>
 </head>
 
@@ -591,6 +646,56 @@
     </section>
 
   </main>
+
+
+  <!-- MODAL DE IMÁGENES DEL PORTFOLIO -->
+  <div class="portfolio-modal" id="portfolioModal" aria-hidden="true">
+    <div class="portfolio-modal-content">
+      <button class="portfolio-modal-close" id="portfolioModalClose" type="button" aria-label="Cerrar">×</button>
+      <img class="portfolio-modal-image" id="portfolioModalImage" alt="">
+      <div class="portfolio-modal-caption" id="portfolioModalCaption"></div>
+    </div>
+  </div>
+
+  <script>
+    /* APERTURA Y CIERRE DEL MODAL */
+    (() => {
+      const modal = document.getElementById("portfolioModal");
+      const modalImage = document.getElementById("portfolioModalImage");
+      const modalCaption = document.getElementById("portfolioModalCaption");
+      const closeButton = document.getElementById("portfolioModalClose");
+
+      function closePortfolioModal() {
+        modal.classList.remove("is-open");
+        modal.setAttribute("aria-hidden", "true");
+        modalImage.src = "";
+        document.body.style.overflow = "";
+      }
+
+      document.querySelectorAll(".portfolio-grid .item img").forEach(image => {
+        image.addEventListener("click", () => {
+          const item = image.closest(".item");
+          const caption = item ? item.querySelector(".caption") : null;
+          modalImage.src = image.currentSrc || image.src;
+          modalImage.alt = image.alt || (caption ? caption.textContent.trim() : "");
+          modalCaption.textContent = caption ? caption.textContent.trim() : "";
+          modal.classList.add("is-open");
+          modal.setAttribute("aria-hidden", "false");
+          document.body.style.overflow = "hidden";
+        });
+      });
+
+      closeButton.addEventListener("click", closePortfolioModal);
+      modal.addEventListener("click", event => {
+        if (event.target === modal) closePortfolioModal();
+      });
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape" && modal.classList.contains("is-open")) {
+          closePortfolioModal();
+        }
+      });
+    })();
+  </script>
 
 </body>
 </html>
