@@ -1674,11 +1674,12 @@ document.getElementById("form-title").scrollIntoView({behavior:"smooth"});
 
 /* SUBIR IMAGEN */
 
-async function uploadImage(file){
+async function uploadImage(file, folder="shop/images"){
 if(file.size>6*1024*1024)throw new Error("Una de las imágenes supera los 6 MB.");
 
 const form=new FormData();
 form.append("image",file);
+form.append("folder",folder);
 
 const response=await fetch(API+"/admin/upload",{
 method:"POST",
@@ -2003,7 +2004,7 @@ document.getElementById("portfolio-form").addEventListener("submit",async event=
 
   try{
     let imageUrl=portfolioImageUrl;
-    if(file)imageUrl=await uploadImage(file);
+    if(file)imageUrl=await uploadImage(file,"home/images");
     if(!imageUrl)throw new Error("Seleccioná una imagen para el portfolio.");
 
     const productId=document.getElementById("portfolio-product").value||null;
