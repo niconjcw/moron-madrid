@@ -429,33 +429,203 @@
       .portfolio-modal-close { top: -36px; right: -8px; }
     }
 
+  
+    /* HEADER HOMEPAGE — MISMO LENGUAJE VISUAL QUE LA TIENDA */
+    .home-announcement {
+      width: 100%;
+      min-height: 25px;
+      padding: 5px 12px;
+      background: #dcd63b;
+      color: #000;
+      text-align: center;
+      font-size: .7rem;
+      line-height: 1.2;
+    }
+    .home-header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      width: 100%;
+      height: 105px;
+      padding: 0 30px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      background: #f5f5f5;
+    }
+    .home-nav {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+    .home-nav-right { justify-content: flex-end; }
+    .home-header a,
+    .home-mobile-menu a {
+      color: #000;
+      text-decoration: none;
+      text-transform: lowercase;
+      font-size: .7rem;
+      font-weight: 300;
+      white-space: nowrap;
+      transition: opacity .2s ease;
+    }
+    .home-header a:hover,
+    .home-mobile-menu a:hover {
+      opacity: .7;
+      text-decoration: none;
+    }
+    .home-logo {
+      display: block;
+      width: 90px;
+      justify-self: center;
+      grid-column: 2;
+    }
+    .home-logo img,
+    .home-mobile-logo img {
+      display: block;
+      width: 100%;
+      height: auto;
+      transition: transform .7s cubic-bezier(.2,.8,.2,1);
+    }
+    .home-logo:hover,
+    .home-mobile-logo:hover { opacity: 1; }
+    .home-logo:hover img,
+    .home-mobile-logo:hover img { transform: rotate(360deg) scale(1.05); }
+    .home-mobile-header,
+    .home-mobile-menu { display: none; }
+    main { padding-top: 0; }
+
+    @media (max-width: 700px) {
+      .home-announcement {
+        min-height: 24px;
+        padding: 5px 8px;
+        font-size: .7rem;
+      }
+      .home-header {
+        height: 70px;
+        padding: 0 14px;
+        display: block;
+      }
+      .home-header > .home-nav,
+      .home-header > .home-logo { display: none; }
+      .home-mobile-header {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 14px;
+      }
+      .home-menu-toggle {
+        width: 30px;
+        height: 30px;
+        padding: 4px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 5px;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+      }
+      .home-menu-toggle span {
+        display: block;
+        width: 21px;
+        height: 1px;
+        background: #000;
+      }
+      .home-mobile-logo {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        display: block;
+        width: 58px;
+      }
+      .home-mobile-menu {
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        padding: 25px;
+        background: #f5f5f5;
+        overflow-y: auto;
+        transform: translateX(-100%);
+        visibility: hidden;
+        transition: transform .35s ease, visibility .35s ease;
+      }
+      .home-mobile-menu[hidden] { display: none !important; }
+      .home-mobile-menu.is-open {
+        transform: translateX(0);
+        visibility: visible;
+      }
+      .home-menu-close {
+        align-self: flex-end;
+        padding: 0;
+        margin: 0 0 45px;
+        border: 0;
+        background: transparent;
+        color: #000;
+        font-size: 30px;
+        font-weight: 200;
+        line-height: 1;
+        cursor: pointer;
+      }
+      .home-mobile-menu > a { margin: 0 0 27px; }
+    }
+
   </style>
 </head>
 
-<body>
+<body id="inicio">
 
   <div id="intro">Morón Madrid — ARG — 2026</div>
 
-  <header>
+  <!-- BARRA DE ANUNCIOS -->
+  <div class="home-announcement">
+    <marquee>3 cuotas sin interés / -5% por transferencia / envíos a todo el país /</marquee>
+  </div>
 
-    <a href="/" class="logo">
+  <!-- HEADER PRINCIPAL -->
+  <header class="home-header">
+    <nav class="home-nav home-nav-left" aria-label="Navegación principal">
+      <a href="#inicio">inicio</a>
+      <a href="#archivo">colección</a>
+      <a href="#nosotros">estudio</a>
+    </nav>
+
+    <a href="#inicio" class="home-logo" aria-label="Morón Madrid, inicio">
       <img src="sticker.png" alt="morón madrid">
     </a>
 
-    <nav>
-
-      <span class="tienda-link">
-        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEguX14GzmThK94GeMibceKA7zICqad06YxNNfXdMDJWfekWmO24pdYg9z9BdkouOws5N-Haa-0IfN-U79hTyy7-EB1WS40G4UsRYDb8xFVnx9iB5SYvx0J5BH5a5E35dx3srcSqWHckxVBJ/s1600/nuevo-2.gif">
-        <a href="http://moronmadrid.com.ar">tienda</a>
-      </span>
-
-      <a href="#archivo">archivo</a>
-      <a href="#nosotros">nosotros</a>
+    <nav class="home-nav home-nav-right" aria-label="Navegación secundaria">
+      <a href="https://moronmadrid.com.ar">tienda</a>
       <a href="#contacto">contacto</a>
-
     </nav>
 
+    <div class="home-mobile-header">
+      <button class="home-menu-toggle" id="homeMenuToggle" type="button"
+        aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <a href="#inicio" class="home-mobile-logo" aria-label="Morón Madrid, inicio">
+        <img src="sticker.png" alt="morón madrid">
+      </a>
+    </div>
   </header>
+
+  <nav class="home-mobile-menu" id="homeMobileMenu" aria-label="Menú móvil" hidden>
+    <button class="home-menu-close" id="homeMenuClose" type="button" aria-label="Cerrar menú">×</button>
+    <a href="#inicio">inicio</a>
+    <a href="#archivo">colección</a>
+    <a href="#nosotros">estudio</a>
+    <a href="https://moronmadrid.com.ar">tienda</a>
+    <a href="#contacto">contacto</a>
+  </nav>
 
   <main>
 
@@ -693,6 +863,37 @@
         if (event.key === "Escape" && modal.classList.contains("is-open")) {
           closePortfolioModal();
         }
+      });
+    })();
+  </script>
+
+
+  <script>
+    /* MENÚ MÓVIL DEL HOME */
+    (() => {
+      const menu = document.getElementById("homeMobileMenu");
+      const toggle = document.getElementById("homeMenuToggle");
+      const close = document.getElementById("homeMenuClose");
+      if (!menu || !toggle || !close) return;
+
+      function closeMenu() {
+        menu.classList.remove("is-open");
+        menu.hidden = true;
+        toggle.setAttribute("aria-expanded", "false");
+        document.body.style.overflow = "";
+      }
+
+      toggle.addEventListener("click", () => {
+        menu.hidden = false;
+        requestAnimationFrame(() => menu.classList.add("is-open"));
+        toggle.setAttribute("aria-expanded", "true");
+        document.body.style.overflow = "hidden";
+      });
+
+      close.addEventListener("click", closeMenu);
+      menu.querySelectorAll("a").forEach(link => link.addEventListener("click", closeMenu));
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape") closeMenu();
       });
     })();
   </script>
