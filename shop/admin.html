@@ -2537,15 +2537,32 @@ status.append(option);
 status.value=order.order_status||"pending";
 status.disabled=Boolean(order.archived_at);
 status.title=order.archived_at?"Restaurá el pedido para modificar su estado":"Cambiar estado del pedido";
-status.addEventListener("change",()=>{
+status.addEventListener("change",async()=>{
 const previous=order.order_status||"pending";
 const next=status.value;
 status.disabled=true;
-saveOrder(order.id,{
+try{
+const response=await fetch(API+"/admin/orders/"+encodeURIComponent(order.id),{
+method:"PUT",
+headers:{"Content-Type":"application/json",Authorization:"Bearer "+token()},
+body:JSON.stringify({
 order_status:next,
 tracking_code:order.tracking_code||"",
 shipping_label_url:order.shipping_label_url||""
-},status).then(()=>{order.order_status=next;}).catch(()=>{status.value=previous;}).finally(()=>{status.disabled=Boolean(order.archived_at);});
+})
+});
+const data=await response.json();
+if(!response.ok)throw new Error(data.error||"No se pudo actualizar el estado.");
+order.order_status=next;
+detailStatus.value=next;
+meta.textContent=dateText+" · "+orderStatusLabel(next);
+message.textContent="Estado del pedido actualizado.";
+}catch(error){
+status.value=previous;
+message.textContent=error.message;
+}finally{
+status.disabled=Boolean(order.archived_at);
+}
 });
 statusCell.append(status);
 
@@ -2585,8 +2602,9 @@ actions.append(deleteOption);
 actions.addEventListener("change",async()=>{
 const action=actions.value;
 actions.value="";
-if(action==="delete")await deleteOrder(order.id,order.order_number,actions);
-if(action==="archive"||action==="restore")await archiveOrder(order.id,action,actions);
+const actionFeedback={disabled:false,textContent:""};
+if(action==="delete")await deleteOrder(order.id,order.order_number,actionFeedback);
+if(action==="archive"||action==="restore")await archiveOrder(order.id,action,actionFeedback);
 });
 
 row.append(dateCell,numberCell,buyerCell,statusCell,totalCell,viewButton,actions);
