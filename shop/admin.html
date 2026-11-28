@@ -784,6 +784,7 @@ Seleccioná todas las fotos juntas. La primera será la principal y las demás q
       <option value="shipped">Enviados</option>
       <option value="delivered">Entregados</option>
       <option value="cancelled">Cancelados</option>
+      <option value="archived">Archivados</option>
     </select>
   </div>
 
@@ -2327,7 +2328,7 @@ list.textContent="Cargando pedidos...";
 count.textContent="";
 
 try{
-const response=await fetch(API+"/admin/orders",{
+const response=await fetch(API+"/admin/orders?limit=500"+(filter==="archived"?"&archived=1":""),{
 headers:{Authorization:"Bearer "+token()}
 });
 
@@ -2345,7 +2346,7 @@ const salesBadge=document.getElementById("new-sales-count");
 salesBadge.textContent=String(newSales);
 salesBadge.hidden=newSales===0;
 
-const filtered=filter
+const filtered=filter && filter!=="archived"
 ?orders.filter(order=>order.order_status===filter)
 :orders;
 
@@ -2509,6 +2510,19 @@ itemsBox,
 discount
 );
 
+/* PEDIDOS ARCHIVADOS: SOLO PERMITIR RESTAURAR */
+
+if(order.archived_at){
+const restore=document.createElement("button");
+restore.type="button";
+restore.className="secondary";
+restore.textContent="Restaurar pedido";
+restore.addEventListener("click",()=>archiveOrder(order.id,"restore",restore));
+card.append(top,details,restore);
+list.append(card);
+return;
+}
+
 /* EDICIÓN DEL PEDIDO */
 
 const edit=document.createElement("div");
@@ -2574,9 +2588,45 @@ labelURL,
 save
 );
 
+if(["shipped","delivered","cancelled"].includes(order.order_status)){
+const archive=document.createElement("button");
+archive.type="button";
+archive.className="secondary";
+archive.textContent="Archivar pedido";
+archive.style.marginTop="10px";
+archive.addEventListener("click",()=>archiveOrder(order.id,"archive",archive));
+edit.append(archive);
+}
+
 card.append(top,details,edit);
 list.append(card);
 });
+}
+
+async function archiveOrder(id,action,button){
+const actionLabel=action==="archive"?"archivar":"restaurar";
+if(action==="archive" && !confirm("¿Archivar este pedido? Podés restaurarlo cuando quieras."))return;
+
+button.disabled=true;
+button.textContent=action==="archive"?"Archivando...":"Restaurando...";
+
+try{
+const response=await fetch(API+"/admin/orders/"+encodeURIComponent(id)+"/"+action,{
+method:"POST",
+headers:{Authorization:"Bearer "+token()}
+});
+
+const data=await response.json();
+if(!response.ok)throw new Error(data.error||"No se pudo "+actionLabel+" el pedido.");
+
+message.textContent=action==="archive"?"Pedido archivado.":"Pedido restaurado.";
+await loadOrders();
+}catch(error){
+message.textContent=error.message;
+}finally{
+button.disabled=false;
+button.textContent=action==="archive"?"Archivar pedido":"Restaurar pedido";
+}
 }
 
 async function saveOrder(id,body,button){
