@@ -843,8 +843,23 @@
       const items = [...document.querySelectorAll(".portfolio-item")];
       const filters = [...document.querySelectorAll("[data-portfolio-filter]")];
       function setFilter(category) {
+        let visibleIndex = 0;
+        const grid = document.getElementById("portfolioGrid");
+        grid.classList.toggle("is-filtered", category !== "todos");
+
         items.forEach(item => {
-          item.hidden = category !== "todos" && item.dataset.category !== category;
+          const visible = category === "todos" || item.dataset.category === category;
+          item.hidden = !visible;
+
+          if (category !== "todos" && visible) {
+            const positions = [0, 145, 55, 190, 25, 115];
+            item.style.gridColumn = visibleIndex % 2 === 0 ? "1 / 8" : "6 / 13";
+            item.style.marginTop = positions[visibleIndex % positions.length] + "px";
+            visibleIndex++;
+          } else {
+            item.style.gridColumn = "";
+            item.style.marginTop = "";
+          }
         });
         filters.forEach(link => {
           const active = link.dataset.portfolioFilter === category;
