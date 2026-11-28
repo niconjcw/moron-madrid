@@ -36,7 +36,7 @@
 
         <div class="footer-column">
           <a href="./" class="footer-heart">
-            <img src="../sticker.png" alt="morón madrid">
+            <img src="/home/images/sticker.png" alt="morón madrid">
           </a>
         </div>
 
