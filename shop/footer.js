@@ -1,7 +1,7 @@
 
-/* =========================================
+/* =====================================================
    MORÓN MADRID — FOOTER COMPARTIDO
-========================================= */
+   ===================================================== */
 
 (() => {
   "use strict";
@@ -27,12 +27,8 @@
         <div class="footer-column">
           <p class="footer-heading">seguinos</p>
           <a href="https://www.instagram.com/moronmadrid/"
-             target="_blank" rel="noopener noreferrer">
-            instagram ↗
-          </a>
-          <a href="#" class="open-newsletter-modal">
-            newsletter
-          </a>
+             target="_blank" rel="noopener noreferrer">instagram ↗</a>
+          <a href="#newsletter" class="newsletter-link">newsletter</a>
         </div>
 
         <div class="footer-column">
@@ -56,7 +52,7 @@
 
     mount.innerHTML = footerHTML;
 
-    const clock = document.getElementById("footer-clock");
+    const clock = mount.querySelector("#footer-clock");
 
     function updateClock() {
       if (!clock) return;
@@ -67,9 +63,7 @@
         now.getHours(),
         now.getMinutes(),
         now.getSeconds()
-      ]
-        .map(value => String(value).padStart(2, "0"))
-        .join(":");
+      ].map(value => String(value).padStart(2, "0")).join(":");
     }
 
     updateClock();
@@ -77,7 +71,7 @@
 
     mount.addEventListener("click", event => {
       const contact = event.target.closest(".open-contact-modal");
-      const newsletter = event.target.closest(".open-newsletter-modal");
+      const newsletter = event.target.closest(".newsletter-link");
 
       if (contact) {
         event.preventDefault();
