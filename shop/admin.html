@@ -624,6 +624,70 @@ button.secondary:hover{background:#eee}
   .orders-bulk select,.orders-bulk button{width:100%;max-width:none}
 }
 
+
+
+
+/* SISTEMA VISUAL EDITORIAL — ADMIN */
+body{font-family:Roboto,Arial,sans-serif;font-size:13px;color:#171717}
+body>header{margin-bottom:28px}
+#dashboard>h1{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#777;margin-bottom:22px;padding-bottom:13px}
+#dashboard{grid-template-columns:190px minmax(0,1fr);column-gap:34px}
+.admin-tabs{border-right:1px solid #dedede;padding-right:14px}
+.admin-tab{font-size:10px;letter-spacing:.065em;padding:10px 12px}
+#dashboard>section[id$="-panel"] h2{font-size:19px;letter-spacing:-.025em}
+.summary-heading{display:flex;justify-content:space-between;align-items:end;gap:20px;margin:0 0 20px}
+.summary-heading h2{margin:0!important;font-size:26px!important;letter-spacing:-.045em}
+.summary-eyebrow,.summary-date{font-size:9px;letter-spacing:.13em;color:#888;margin:0 0 8px}
+.summary-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-bottom:28px}
+.summary-stat{background:#fff;border:1px solid #e7e7e7;padding:16px 17px;min-width:0}
+.summary-stat span{display:block;color:#777;font-size:9px;letter-spacing:.1em;line-height:1.4}
+.summary-stat strong{display:block;margin-top:10px;font-size:25px;font-weight:400;letter-spacing:-.04em;overflow-wrap:anywhere}
+.summary-lower{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(210px,.8fr);gap:24px;align-items:start}
+.summary-recent,.summary-shortcuts{background:#fff;border:1px solid #e7e7e7;padding:18px}
+.summary-section-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}
+.summary-section-heading h3,.summary-shortcuts h3{font-size:12px;font-weight:600;margin:0;letter-spacing:.02em}
+.summary-link{width:auto;margin:0;padding:5px 0;background:transparent;color:#777;border:0;font-size:9px;letter-spacing:.06em}
+.summary-order-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(95px,.8fr) auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid #eee}
+.summary-order-row>div{display:flex;flex-direction:column;gap:4px;min-width:0}
+.summary-order-row strong{font-size:11px;font-weight:600}
+.summary-order-row>div span{font-size:10px;color:#777;overflow-wrap:anywhere}
+.summary-order-status{font-size:10px;color:#666}
+.summary-order-total{white-space:nowrap}
+.summary-shortcuts{display:flex;flex-direction:column;gap:0}
+.summary-shortcuts h3{margin-bottom:12px}
+.summary-shortcuts button{display:flex;justify-content:space-between;align-items:center;width:100%;margin:0;padding:12px 0;background:transparent;color:#333;border:0;border-top:1px solid #eee;text-align:left;font-size:10px;letter-spacing:.04em}
+.summary-shortcuts button span{color:#888}
+.form-section,.variants-section,.category-manager,.discount-section{padding:19px;margin-top:18px}
+.form-section h2,.variants-section h2,.category-manager h2,.discount-section h2{margin-top:0}
+input,textarea,.category-select,.newsletter-filter,.order-status{font-size:12px;padding:10px 11px}
+label{font-size:11px;margin:11px 0 6px}
+button{font-size:10px;padding:10px 13px}
+.product{padding:10px 0}
+.product-thumb{width:56px;height:68px}
+.order-card{padding:12px 0}
+.order-list-row{gap:9px}
+.portfolio-admin-grid{gap:11px}
+.portfolio-admin-card{padding:7px}
+.portfolio-admin-caption{font-size:11px}
+.portfolio-admin-actions button{padding:8px 3px}
+#logout{margin-top:24px}
+@media(max-width:760px){
+ #dashboard{grid-template-columns:minmax(0,1fr);row-gap:14px}
+ .admin-tabs{padding-right:0}
+ .summary-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ .summary-stat{padding:13px}
+ .summary-stat strong{font-size:22px}
+ .summary-lower{grid-template-columns:minmax(0,1fr);gap:12px}
+ .summary-order-row{grid-template-columns:minmax(0,1fr) minmax(80px,.7fr) auto;gap:8px}
+}
+@media(max-width:480px){
+ .summary-heading{align-items:flex-start;flex-direction:column;gap:5px}
+ .summary-heading h2{font-size:23px!important}
+ .summary-recent,.summary-shortcuts{padding:14px}
+ .summary-order-status{font-size:9px}
+ .summary-order-total{font-size:10px!important}
+}
+
 </style>
 </head>
 
@@ -646,7 +710,8 @@ button.secondary:hover{background:#eee}
 <h1>Morón Madrid — Administración</h1>
 
 <nav class="admin-tabs">
-<button type="button" class="admin-tab active" data-tab="new-product-panel">NUEVO PRODUCTO</button>
+<button type="button" class="admin-tab active" data-tab="summary-panel">RESUMEN</button>
+<button type="button" class="admin-tab" data-tab="new-product-panel">NUEVO PRODUCTO</button>
 <button type="button" class="admin-tab" data-tab="products-panel">PRODUCTOS</button>
 <button type="button" class="admin-tab" data-tab="categories-panel">CATEGORÍAS</button>
 <button type="button" class="admin-tab" data-tab="orders-panel">VENTAS <span id="new-sales-count" class="sales-tab-count" hidden>0</span></button>
@@ -654,6 +719,33 @@ button.secondary:hover{background:#eee}
 <button type="button" class="admin-tab" data-tab="portfolio-panel">PORTFOLIO</button>
 <button type="button" class="admin-tab" data-tab="newsletter-panel">NEWSLETTER</button>
 </nav>
+
+<!-- PANEL RESUMEN -->
+<section id="summary-panel">
+  <div class="summary-heading">
+    <div><p class="summary-eyebrow">MORÓN MADRID / ADMINISTRACIÓN</p><h2>Resumen</h2></div>
+    <span id="summary-date" class="summary-date"></span>
+  </div>
+  <div class="summary-stats">
+    <article class="summary-stat"><span>PEDIDOS ACTIVOS</span><strong id="summary-orders">—</strong></article>
+    <article class="summary-stat"><span>PENDIENTES</span><strong id="summary-pending">—</strong></article>
+    <article class="summary-stat"><span>PREPARANDO</span><strong id="summary-preparing">—</strong></article>
+    <article class="summary-stat"><span>VENTAS DEL MES</span><strong id="summary-revenue">—</strong></article>
+  </div>
+  <div class="summary-lower">
+    <section class="summary-recent">
+      <div class="summary-section-heading"><h3>Actividad reciente</h3><button type="button" class="summary-link" data-go-tab="orders-panel">VER TODAS LAS VENTAS ↗</button></div>
+      <div id="summary-recent-orders"><p class="hint">Cargando actividad...</p></div>
+    </section>
+    <section class="summary-shortcuts">
+      <h3>Accesos rápidos</h3>
+      <button type="button" data-go-tab="new-product-panel">+ NUEVO PRODUCTO <span>↗</span></button>
+      <button type="button" data-go-tab="orders-panel">VER VENTAS <span>↗</span></button>
+      <button type="button" data-go-tab="products-panel">GESTIONAR PRODUCTOS <span>↗</span></button>
+      <button type="button" data-go-tab="discounts-panel">CONFIGURAR PAGOS <span>↗</span></button>
+    </section>
+  </div>
+</section>
 
 <!-- PANEL NUEVO PRODUCTO -->
 
@@ -1003,7 +1095,7 @@ sessionStorage.removeItem("mm_admin_token");
 async function showDashboard(){
 loginSection.hidden=true;
 dashboard.hidden=false;
-setActiveTab("new-product-panel");
+setActiveTab("summary-panel");
 await loadCategories();
 await loadProducts();
 await loadOrders();
@@ -1017,6 +1109,7 @@ tab.classList.toggle("active",tab.dataset.tab===target);
 });
 
 [
+"summary-panel",
 "new-product-panel",
 "products-panel",
 "portfolio-panel",
@@ -1047,6 +1140,70 @@ if(target==="products-panel")await loadProducts();
 if(target==="portfolio-panel"){await loadPortfolioProducts();await loadPortfolio();}
 if(target==="orders-panel")await loadOrders();
 });
+});
+
+/* RESUMEN DEL ADMIN */
+function renderAdminSummary(items){
+  const active=items.filter(order=>!order.archived_at);
+  const pending=active.filter(order=>order.order_status==="pending");
+  const preparing=active.filter(order=>order.order_status==="preparing");
+  const now=new Date();
+  const month=now.getMonth(),year=now.getFullYear();
+  const paidStatuses=["paid","preparing","shipped","delivered"];
+  const revenue=active.reduce((sum,order)=>{
+    const date=order.created_at?new Date(order.created_at.replace(" ","T")+"Z"):null;
+    const isPaid=order.payment_status==="paid"||paidStatuses.includes(order.order_status);
+    return date&&date.getMonth()===month&&date.getFullYear()===year&&isPaid
+      ?sum+Number(order.total||0):sum;
+  },0);
+  document.getElementById("summary-orders").textContent=String(active.length);
+  document.getElementById("summary-pending").textContent=String(pending.length);
+  document.getElementById("summary-preparing").textContent=String(preparing.length);
+  document.getElementById("summary-revenue").textContent="$"+revenue.toLocaleString("es-AR");
+  document.getElementById("summary-date").textContent=now.toLocaleDateString("es-AR",{day:"2-digit",month:"long",year:"numeric"}).toUpperCase();
+
+  const recent=document.getElementById("summary-recent-orders");
+  recent.replaceChildren();
+  const latest=[...active].sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0)).slice(0,5);
+  if(!latest.length){
+    const empty=document.createElement("p");
+    empty.className="hint";
+    empty.textContent="Todavía no hay pedidos para mostrar.";
+    recent.append(empty);
+    return;
+  }
+  latest.forEach(order=>{
+    const row=document.createElement("div");
+    row.className="summary-order-row";
+    const info=document.createElement("div");
+    const number=document.createElement("strong");
+    number.textContent=order.order_number!=null?"#"+order.order_number:"Pedido";
+    const buyer=document.createElement("span");
+    buyer.textContent=order.customer_name||"Comprador sin nombre";
+    info.append(number,buyer);
+    const state=document.createElement("span");
+    state.className="summary-order-status";
+    state.textContent=orderStatusLabel(order.order_status);
+    const total=document.createElement("strong");
+    total.className="summary-order-total";
+    total.textContent="$"+Number(order.total||0).toLocaleString("es-AR");
+    row.append(info,state,total);
+    recent.append(row);
+  });
+}
+
+document.querySelectorAll("[data-go-tab]").forEach(button=>{
+  button.addEventListener("click",async()=>{
+    const target=button.dataset.goTab;
+    setActiveTab(target);
+    if(target==="orders-panel")await loadOrders();
+    if(target==="products-panel")await loadProducts();
+    if(target==="discounts-panel"){
+      await loadDiscountSettings();
+      await loadDiscountProducts();
+      await loadDiscountCodes();
+    }
+  });
 });
 
 /* FOTOGRAFÍAS: GESTIÓN Y ORDEN */
@@ -2545,6 +2702,7 @@ throw new Error(data.error||"No se pudieron cargar los pedidos.");
 }
 
 orders=data.orders||[];
+renderAdminSummary(orders);
 
 /* Las ventas nuevas son los pedidos que siguen pendientes. */
 const newSales=orders.filter(order=>order.order_status==="pending").length;
