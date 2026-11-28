@@ -2607,7 +2607,7 @@ if(action==="delete")await deleteOrder(order.id,order.order_number,actionFeedbac
 if(action==="archive"||action==="restore")await archiveOrder(order.id,action,actionFeedback);
 });
 
-row.append(dateCell,numberCell,buyerCell,statusCell,totalCell,viewButton,actions);
+row.append(numberCell,dateCell,buyerCell,statusCell,totalCell,viewButton,actions);
 
 const detail=document.createElement("div");
 detail.className="order-expanded";
